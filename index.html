@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <title>YiXuan 的博客</title>
+  <title>The Time Forever</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <style>
@@ -12,7 +12,12 @@
       box-sizing: border-box;
     }
 
-    html, body {
+    html {
+      height: 100%;
+      scroll-behavior: smooth; /* 点击锚点时平滑滚动 */
+    }
+
+    body {
       height: 100%;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
@@ -44,16 +49,16 @@
       position: relative;
       min-height: 100vh;
       padding: 24px;
-      background: rgba(0, 0, 0, 0.35); /* 半透明黑色遮罩，让文字更清晰 */
+      background: rgba(0, 0, 0, 0.35);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
+      color: #fff;
     }
 
     .header {
-      color: #fff;
       margin-bottom: 32px;
     }
 
@@ -97,17 +102,107 @@
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
     }
 
-    /* 底部小字 */
+    /* 底部下拉箭头按钮（在第一屏中间偏下） */
+    .scroll-down {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 28px;
+      color: #fff;
+      text-decoration: none;
+      opacity: 0.8;
+      cursor: pointer;
+      animation: bounce 1.5s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translate(-50%, 0); }
+      50% { transform: translate(-50%, -8px); }
+    }
+
+    /* 第二屏内容区域 */
+    #more {
+      background: #f5f5f7;
+      color: #222;
+      padding: 60px 20px 80px;
+    }
+
+    .content-inner {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .content-inner h2 {
+      font-size: 22px;
+      margin-bottom: 16px;
+    }
+
+    .post-list {
+      list-style: none;
+      margin-bottom: 32px;
+    }
+
+    .post-list li {
+      padding: 8px 0;
+      border-bottom: 1px solid #ddd;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 14px;
+    }
+
+    .post-list a {
+      color: #0070f3;
+      text-decoration: none;
+    }
+
+    .post-list a:hover {
+      text-decoration: underline;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .card h3 {
+      margin-bottom: 8px;
+      font-size: 18px;
+    }
+
+    .card p {
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+
+    .card-link {
+      font-size: 14px;
+      color: #0070f3;
+      text-decoration: none;
+    }
+
+    .card-link:hover {
+      text-decoration: underline;
+    }
+
+    /* 底部版权 */
     .footer {
-      position: fixed;
-      bottom: 12px;
-      left: 0;
-      width: 100%;
+      padding: 12px 0 16px;
       text-align: center;
       font-size: 12px;
       color: #fff;
       opacity: 0.8;
-      pointer-events: none;
+      background: rgba(0, 0, 0, 0.4);
     }
 
     @media (max-width: 600px) {
@@ -119,31 +214,70 @@
 </head>
 
 <body>
-  <!-- 背景轮播图片 -->
+  <!-- 背景轮播图片：images/bg1.jpg/bg2.jpg/bg3.jpg 需与你仓库中的图片文件名一致 -->
   <div class="bg-slideshow">
     <img src="images/bg1.jpg" class="active" alt="background 1" />
     <img src="images/bg2.jpg" alt="background 2" />
     <img src="images/bg3.jpg" alt="background 3" />
   </div>
 
-  <!-- 前景内容 -->
+  <!-- 第一屏：封面 -->
   <div class="overlay">
     <div class="header">
-      <h1>YiXuan Xu</h1>
-      <p>欢迎来到我的博客 · 记录生活、学习与思考</p>
+      <!-- 这里改成你想要显示的大标题 -->
+      <h1>The Time Forever</h1>
+      <!-- 这里是副标题，可以随便改 -->
+      <p>欢迎来到我的博客，记录生活、学习与思考</p>
     </div>
 
     <div class="nav-buttons">
-      <!-- 这里是你说的“界面按钮”，可以按需要改文字和链接 -->
+      <!-- 链接按你实际的路径改就行 -->
       <a href="/posts">文章列表</a>
       <a href="/about">关于我</a>
       <a href="https://github.com/the-time-forever" target="_blank">GitHub</a>
+      <!-- 把下面这个邮箱改成你的 GitHub noreply 邮箱 -->
       <a href="mailto:206166322+The-time-forever@users.noreply.github.com">联系我</a>
     </div>
+
+    <!-- 下拉箭头 -->
+    <a href="#more" class="scroll-down">⌄</a>
   </div>
 
+  <!-- 第二屏内容：最新博客 & 其他账号 -->
+  <section id="more">
+    <div class="content-inner">
+      <h2>最新博客</h2>
+      <ul class="post-list">
+        <!-- 这里的链接改成你实际文章的路径和标题 -->
+        <li>
+          <a href="posts/my-first-post.md">如何用 GitHub 搭建这个博客</a>
+          <span>2025-11-18</span>
+        </li>
+        <li>
+          <a href="posts/second-post.md">第二篇示例文章标题</a>
+          <span>2025-11-20</span>
+        </li>
+      </ul>
+
+      <h2>我的其他平台</h2>
+      <div class="cards">
+        <div class="card">
+          <h3>CSDN</h3>
+          <p>在 CSDN 主要记录一些技术笔记和学习心得。</p>
+          <!-- 把下面链接改成你的 CSDN 主页地址 -->
+          <a class="card-link" href="https://blog.csdn.net/your_csdn_id" target="_blank">前往我的 CSDN</a>
+        </div>
+        <div class="card">
+          <h3>更多</h3>
+          <p>可以放 Bilibili、知乎、公众号等你想展示的渠道。</p>
+          <a class="card-link" href="#" target="_blank">稍后添加</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <div class="footer">
-    © 2025 YiXuan Xu · Hosted on GitHub Pages
+    © 2025 The Time Forever · Hosted on GitHub Pages
   </div>
 
   <!-- 简单的 JS，用来轮播背景图片 -->
@@ -155,7 +289,7 @@
       slides[index].classList.remove("active");
       index = (index + 1) % slides.length;
       slides[index].classList.add("active");
-    }, 8000); // 每 8 秒切换一张，可以自己改成 5000 之类
+    }, 5000); // 每 8 秒切换一张
   </script>
 </body>
 </html>
