@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>YiXuan 的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    /* 背景轮播容器 */
+    .bg-slideshow {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      overflow: hidden;
+    }
+
+    .bg-slideshow img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity 1.5s ease-in-out;
+    }
+
+    .bg-slideshow img.active {
+      opacity: 1;
+    }
+
+    /* 前景遮罩和整体布局 */
+    .overlay {
+      position: relative;
+      min-height: 100vh;
+      padding: 24px;
+      background: rgba(0, 0, 0, 0.35); /* 半透明黑色遮罩，让文字更清晰 */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .header {
+      color: #fff;
+      margin-bottom: 32px;
+    }
+
+    .header h1 {
+      font-size: 32px;
+      letter-spacing: 0.04em;
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      font-size: 15px;
+      opacity: 0.9;
+    }
+
+    /* 导航按钮区域 */
+    .nav-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .nav-buttons a {
+      padding: 10px 18px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      color: #fff;
+      text-decoration: none;
+      font-size: 14px;
+      backdrop-filter: blur(8px);
+      background: rgba(0, 0, 0, 0.25);
+      transition:
+        transform 0.15s ease,
+        background 0.15s ease,
+        box-shadow 0.15s ease;
+    }
+
+    .nav-buttons a:hover {
+      transform: translateY(-2px);
+      background: rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    /* 底部小字 */
+    .footer {
+      position: fixed;
+      bottom: 12px;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      font-size: 12px;
+      color: #fff;
+      opacity: 0.8;
+      pointer-events: none;
+    }
+
+    @media (max-width: 600px) {
+      .header h1 {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 背景轮播图片 -->
+  <div class="bg-slideshow">
+    <img src="images/bg1.jpg" class="active" alt="background 1" />
+    <img src="images/bg2.jpg" alt="background 2" />
+    <img src="images/bg3.jpg" alt="background 3" />
+  </div>
+
+  <!-- 前景内容 -->
+  <div class="overlay">
+    <div class="header">
+      <h1>YiXuan Xu</h1>
+      <p>欢迎来到我的博客 · 记录生活、学习与思考</p>
+    </div>
+
+    <div class="nav-buttons">
+      <!-- 这里是你说的“界面按钮”，可以按需要改文字和链接 -->
+      <a href="/posts">文章列表</a>
+      <a href="/about">关于我</a>
+      <a href="https://github.com/the-time-forever" target="_blank">GitHub</a>
+      <a href="mailto:你的邮箱@example.com">联系我</a>
+    </div>
+  </div>
+
+  <div class="footer">
+    © 2025 YiXuan Xu · Hosted on GitHub Pages
+  </div>
+
+  <!-- 简单的 JS，用来轮播背景图片 -->
+  <script>
+    const slides = document.querySelectorAll(".bg-slideshow img");
+    let index = 0;
+
+    setInterval(() => {
+      slides[index].classList.remove("active");
+      index = (index + 1) % slides.length;
+      slides[index].classList.add("active");
+    }, 8000); // 每 8 秒切换一张，可以自己改成 5000 之类
+  </script>
+</body>
+</html>
