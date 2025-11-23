@@ -136,22 +136,23 @@
       background: transparent;
       color: #222;
       padding: 0 20px 80px;
-      /* 顶部 padding 减小，由 margin-top 控制重叠 */
     }
 
     .content-inner {
       max-width: 900px;
-      margin: -50px auto 0;
-      /* 负边距实现重叠效果 */
-      background: rgba(255, 255, 255, 0.9);
-      /* 半透明白底 */
-      backdrop-filter: blur(10px);
-      /* 毛玻璃 */
-      -webkit-backdrop-filter: blur(10px);
+      margin: 20px auto 0;
+      /* 修复：改为正边距，避免遮挡箭头 */
+      background: rgba(255, 255, 255, 0.2);
+      /* iOS 风格极低透明度白色 */
+      backdrop-filter: blur(20px) saturate(180%);
+      /* 高斯模糊 + 饱和度提升 */
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
       border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      /* 玻璃边缘反光 */
       padding: 40px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-      /* 柔和阴影 */
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15);
+      /* 柔和扩散阴影 */
       position: relative;
       z-index: 10;
     }
@@ -160,9 +161,10 @@
       font-size: 22px;
       margin-bottom: 24px;
       text-align: center;
-      /* 标题居中 */
       font-weight: 600;
-      color: #333;
+      color: #000;
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+      /* 文字光晕，确保背景深色时可见 */
     }
 
     .post-list {
@@ -172,24 +174,26 @@
 
     .post-list li {
       padding: 12px 0;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-      /* 线条颜色调淡 */
+      border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+      /* 线条改为半透明白 */
       display: flex;
       justify-content: space-between;
       gap: 12px;
       font-size: 15px;
       transition: background 0.2s;
+      color: #222;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
     }
 
     .post-list li:hover {
-      background: rgba(0, 0, 0, 0.02);
+      background: rgba(255, 255, 255, 0.2);
       padding-left: 8px;
       padding-right: 8px;
       border-radius: 8px;
     }
 
     .post-list a {
-      color: #333;
+      color: #000;
       text-decoration: none;
       font-weight: 500;
     }
