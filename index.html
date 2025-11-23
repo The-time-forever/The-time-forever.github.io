@@ -132,29 +132,46 @@
 
     /* 第二屏内容区域 */
     #more {
-      /* 去除全屏白底，改为透明以便显示悬浮卡片 */
       background: transparent;
       color: #222;
-      padding: 0 20px 80px;
+      padding: 0 0 80px;
+      /* 去掉左右 padding，允许全宽 */
     }
 
     .content-inner {
-      max-width: 900px;
-      margin: 20px auto 0;
-      /* 修复：改为正边距，避免遮挡箭头 */
+      width: 100%;
+      /* 全宽 */
+      max-width: none;
+      margin: 0;
+      /* 紧贴上一屏下方 */
       background: rgba(255, 255, 255, 0.2);
-      /* iOS 风格极低透明度白色 */
       backdrop-filter: blur(20px) saturate(180%);
-      /* 高斯模糊 + 饱和度提升 */
       -webkit-backdrop-filter: blur(20px) saturate(180%);
-      border-radius: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      /* 玻璃边缘反光 */
-      padding: 40px;
+      border-radius: 0;
+      /* 去掉圆角 */
+      border-top: 1px solid rgba(255, 255, 255, 0.3);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+      border-left: none;
+      border-right: none;
+      padding: 60px 0;
+      /* 垂直内边距 */
       box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15);
-      /* 柔和扩散阴影 */
       position: relative;
       z-index: 10;
+
+      /* Flex 布局让内部内容居中 */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* 限制内容宽度并防止贴边 */
+    .content-inner>* {
+      width: 100%;
+      max-width: 900px;
+      padding: 0 24px;
+      /* 水平内边距防止贴边 */
+      box-sizing: border-box;
     }
 
     .content-inner h2 {
@@ -164,7 +181,6 @@
       font-weight: 600;
       color: #000;
       text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
-      /* 文字光晕，确保背景深色时可见 */
     }
 
     .post-list {
@@ -203,7 +219,8 @@
     }
 
     .post-list span {
-      color: #999;
+      color: #000000;
+      font-weight: 500;
       font-size: 0.9em;
     }
 
