@@ -8,6 +8,17 @@ layout: null
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>关于我 | The Time Forever</title>
+
+    <!-- KaTeX CSS & JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
+        integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"
+        integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8"
+        crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+        integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05"
+        crossorigin="anonymous"></script>
+
     <style>
         /* 1. 基础设置 & 字体 */
         :root {
@@ -44,7 +55,7 @@ layout: null
             /* 让背景稍微暗淡一点，不抢视觉 */
         }
 
-        /* 3. 静态纹理叠加 (噪点 + 数学符号水印) */
+        /* 3. 静态纹理叠加 (噪点 + 数学公式背景) */
         .texture-overlay {
             position: fixed;
             inset: 0;
@@ -54,19 +65,51 @@ layout: null
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
         }
 
-        .math-watermark {
+        .math-formulas {
             position: absolute;
+            inset: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            align-content: space-around;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .math-item {
             color: rgba(255, 255, 255, 0.15);
-            /* 提高不透明度，更亮 */
-            font-family: "Latin Modern Math", "Cambria Math", serif;
-            /* 数学字体 */
-            font-style: italic;
-            font-weight: normal;
-            user-select: none;
-            z-index: 1;
-            white-space: nowrap;
-            filter: blur(0.5px);
-            /* 极轻微模糊，模拟粉笔质感，但保持清晰 */
+            /* 半透明米白 */
+            font-size: 1.2rem;
+            margin: 2rem 3rem;
+            filter: blur(0.3px);
+            /* 极轻微模糊 */
+            transition: transform 0.5s ease;
+            opacity: 0.6;
+        }
+
+        /* 随机微调大小和旋转 */
+        .math-item:nth-child(3n) {
+            font-size: 1.5rem;
+            transform: rotate(-5deg);
+        }
+
+        .math-item:nth-child(3n+1) {
+            font-size: 1rem;
+            transform: rotate(3deg);
+        }
+
+        .math-item:nth-child(3n+2) {
+            font-size: 1.3rem;
+            transform: rotate(8deg);
+        }
+
+        .math-item:nth-child(5n) {
+            opacity: 0.4;
+        }
+
+        .math-item:nth-child(7n) {
+            opacity: 0.3;
+            font-size: 2rem;
         }
 
         /* 4. 前景内容容器 */
@@ -191,39 +234,47 @@ layout: null
 
     <!-- 静态纹理层 -->
     <div class="texture-overlay">
-        <!-- 随机散落的数学符号 -->
-        <!-- 基础微积分 -->
-        <div class="math-watermark" style="top: 10%; left: 5%; font-size: 6rem;">∫</div>
-        <div class="math-watermark" style="bottom: 15%; right: 10%; font-size: 5rem;">∑</div>
-        <div class="math-watermark" style="bottom: 25%; left: 10%; font-size: 4rem;">∂</div>
-
-        <!-- 欧拉公式 -->
-        <div class="math-watermark" style="top: 20%; right: 15%; font-size: 2.5rem;">e^{i\pi} + 1 = 0</div>
-
-        <!-- 薛定谔方程 -->
-        <div class="math-watermark" style="top: 15%; left: 30%; font-size: 2rem; opacity: 0.12;">
-            i\hbar\frac{\partial}{\partial t}\Psi = \hat{H}\Psi</div>
-
-        <!-- 麦克斯韦方程组 (微分形式) -->
-        <div class="math-watermark" style="bottom: 30%; right: 25%; font-size: 1.8rem; opacity: 0.1;">\nabla \cdot
-            \mathbf{E} = \frac{\rho}{\varepsilon_0}</div>
-        <div class="math-watermark" style="bottom: 22%; right: 22%; font-size: 1.8rem; opacity: 0.1;">\nabla \times
-            \mathbf{B} = \mu_0\mathbf{J} + \mu_0\varepsilon_0\frac{\partial \mathbf{E}}{\partial t}</div>
-
-        <!-- 傅里叶变换 -->
-        <div class="math-watermark" style="top: 40%; left: 8%; font-size: 1.5rem; opacity: 0.1;">\hat{f}(\xi) =
-            \int_{-\infty}^{\infty} f(x)e^{-2\pi i x \xi}dx</div>
-
-        <!-- 黎曼ζ函数 -->
-        <div class="math-watermark" style="top: 60%; right: 5%; font-size: 2rem; opacity: 0.08;">\zeta(s) =
-            \sum_{n=1}^{\infty} \frac{1}{n^s}</div>
-
-        <!-- 质能方程 -->
-        <div class="math-watermark" style="bottom: 10%; left: 40%; font-size: 3rem; opacity: 0.1;">E = mc^2</div>
-
-        <!-- 装饰性无穷大 -->
-        <div class="math-watermark"
-            style="top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 15rem; opacity: 0.03;">∞</div>
+        <div class="math-formulas">
+            <!-- 欧拉恒等式 -->
+            <div class="math-item">$$ e^{i\pi} + 1 = 0 $$</div>
+            <!-- 高斯积分 -->
+            <div class="math-item">$$ \int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi} $$</div>
+            <!-- 麦克斯韦方程组 -->
+            <div class="math-item">$$ \nabla \cdot \mathbf{E} = \frac{\rho}{\varepsilon_0} $$</div>
+            <div class="math-item">$$ \nabla \times \mathbf{E} = -\frac{\partial \mathbf{B}}{\partial t} $$</div>
+            <div class="math-item">$$ \nabla \cdot \mathbf{B} = 0 $$</div>
+            <div class="math-item">$$ \nabla \times \mathbf{B} = \mu_0\mathbf{J} + \mu_0\varepsilon_0\frac{\partial
+                \mathbf{E}}{\partial t} $$</div>
+            <!-- 薛定谔方程 -->
+            <div class="math-item">$$ i\hbar\frac{\partial}{\partial t}\Psi = \hat{H}\Psi $$</div>
+            <!-- 质能方程 -->
+            <div class="math-item">$$ E = mc^2 $$</div>
+            <!-- 傅里叶变换 -->
+            <div class="math-item">$$ \hat{f}(\xi) = \int_{-\infty}^{\infty} f(x)e^{-2\pi i x \xi}dx $$</div>
+            <!-- 黎曼ζ函数 -->
+            <div class="math-item">$$ \zeta(s) = \sum_{n=1}^{\infty} \frac{1}{n^s} $$</div>
+            <!-- 纳维-斯托克斯方程 -->
+            <div class="math-item">$$ \rho \left( \frac{\partial \mathbf{v}}{\partial t} + \mathbf{v} \cdot \nabla
+                \mathbf{v} \right) = -\nabla p + \mu \nabla^2 \mathbf{v} + \mathbf{f} $$</div>
+            <!-- 黑洞熵 -->
+            <div class="math-item">$$ S = \frac{k c^3 A}{4 \hbar G} $$</div>
+            <!-- 泰勒级数 -->
+            <div class="math-item">$$ f(x) = \sum_{n=0}^{\infty} \frac{f^{(n)}(a)}{n!} (x-a)^n $$</div>
+            <!-- 勾股定理 -->
+            <div class="math-item">$$ a^2 + b^2 = c^2 $$</div>
+            <!-- 二次方程求根 -->
+            <div class="math-item">$$ x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a} $$</div>
+            <!-- 贝叶斯定理 -->
+            <div class="math-item">$$ P(A|B) = \frac{P(B|A)P(A)}{P(B)} $$</div>
+            <!-- 极限定义 -->
+            <div class="math-item">$$ \lim_{x \to c} f(x) = L $$</div>
+            <!-- 黄金分割 -->
+            <div class="math-item">$$ \varphi = \frac{1 + \sqrt{5}}{2} $$</div>
+            <!-- 德布罗意波长 -->
+            <div class="math-item">$$ \lambda = \frac{h}{p} $$</div>
+            <!-- 海森堡不确定性原理 -->
+            <div class="math-item">$$ \Delta x \Delta p \ge \frac{\hbar}{2} $$</div>
+        </div>
     </div>
 
     <!-- 前景内容 -->
@@ -324,6 +375,18 @@ layout: null
         }
 
         draw();
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    { left: "$$", right: "$$", display: true },
+                    { left: "$", right: "$", display: false }
+                ],
+                throwOnError: false
+            });
+        });
     </script>
 </body>
 
