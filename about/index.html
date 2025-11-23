@@ -3,6 +3,7 @@ layout: null
 ---
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,13 +11,17 @@ layout: null
     <style>
         /* 1. 基础设置 & 字体 */
         :root {
-            --bg-color: #0f172a; /* 深蓝/黑板色 */
-            --text-color: #e2e8f0; /* 米白 */
-            --accent-color: #f1c40f; /* 淡金 */
+            --bg-color: #0f172a;
+            /* 深蓝/黑板色 */
+            --text-color: #e2e8f0;
+            /* 米白 */
+            --accent-color: #f1c40f;
+            /* 淡金 */
             --font-serif: "Latin Modern Roman", "Computer Modern", "Times New Roman", serif;
         }
 
-        body, html {
+        body,
+        html {
             margin: 0;
             padding: 0;
             width: 100%;
@@ -35,7 +40,8 @@ layout: null
             width: 100%;
             height: 100%;
             z-index: 0;
-            opacity: 0.6; /* 让背景稍微暗淡一点，不抢视觉 */
+            opacity: 0.6;
+            /* 让背景稍微暗淡一点，不抢视觉 */
         }
 
         /* 3. 静态纹理叠加 (噪点 + 数学符号水印) */
@@ -50,11 +56,17 @@ layout: null
 
         .math-watermark {
             position: absolute;
-            color: rgba(255, 255, 255, 0.03);
+            color: rgba(255, 255, 255, 0.15);
+            /* 提高不透明度，更亮 */
+            font-family: "Latin Modern Math", "Cambria Math", serif;
+            /* 数学字体 */
             font-style: italic;
-            font-weight: bold;
+            font-weight: normal;
             user-select: none;
             z-index: 1;
+            white-space: nowrap;
+            filter: blur(0.5px);
+            /* 极轻微模糊，模拟粉笔质感，但保持清晰 */
         }
 
         /* 4. 前景内容容器 */
@@ -72,10 +84,12 @@ layout: null
         .classical-frame {
             position: relative;
             padding: 60px 80px;
-            border: 3px double rgba(241, 196, 15, 0.3); /* 双线框 */
-            background: rgba(15, 23, 42, 0.6); /* 半透明深底 */
-            backdrop-filter: blur(5px);
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+            border: 3px double rgba(241, 196, 15, 0.3);
+            /* 双线框 */
+            background: rgba(15, 23, 42, 0.75);
+            /* 加深背景，提高文字对比度 */
+            backdrop-filter: blur(8px);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
         }
 
         /* 角落装饰 */
@@ -87,26 +101,55 @@ layout: null
             border-style: solid;
             opacity: 0.8;
         }
-        .tl { top: -2px; left: -2px; border-width: 2px 0 0 2px; }
-        .tr { top: -2px; right: -2px; border-width: 2px 2px 0 0; }
-        .bl { bottom: -2px; left: -2px; border-width: 0 0 2px 2px; }
-        .br { bottom: -2px; right: -2px; border-width: 0 2px 2px 0; }
+
+        .tl {
+            top: -2px;
+            left: -2px;
+            border-width: 2px 0 0 2px;
+        }
+
+        .tr {
+            top: -2px;
+            right: -2px;
+            border-width: 2px 2px 0 0;
+        }
+
+        .bl {
+            bottom: -2px;
+            left: -2px;
+            border-width: 0 0 2px 2px;
+        }
+
+        .br {
+            bottom: -2px;
+            right: -2px;
+            border-width: 0 2px 2px 0;
+        }
 
         h1 {
-            font-size: 3.5rem;
+            font-family: "STXingkai", "Xingkai SC", "Fuzzy Bubbles", cursive;
+            /* 华文行楷或类似书法字体 */
+            font-size: 4.5rem;
+            /* 加大字号 */
             margin: 0 0 1rem 0;
             font-weight: normal;
             letter-spacing: 0.1em;
-            text-shadow: 0 0 10px rgba(241, 196, 15, 0.3);
+            text-shadow: 0 0 15px rgba(241, 196, 15, 0.4);
+            color: #f1c40f;
+            /* 金色标题 */
         }
 
         h2 {
             font-size: 1.2rem;
             font-weight: 300;
             margin: 0 0 2rem 0;
-            opacity: 0.8;
-            letter-spacing: 0.2em;
+            opacity: 0.9;
+            letter-spacing: 0.3em;
             text-transform: uppercase;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 10px 0;
+            display: inline-block;
         }
 
         .back-btn {
@@ -129,11 +172,18 @@ layout: null
         }
 
         @media (max-width: 600px) {
-            .classical-frame { padding: 40px 20px; width: 85%; }
-            h1 { font-size: 2.5rem; }
+            .classical-frame {
+                padding: 40px 20px;
+                width: 85%;
+            }
+
+            h1 {
+                font-size: 2.5rem;
+            }
         }
     </style>
 </head>
+
 <body>
 
     <!-- 动态背景 -->
@@ -142,11 +192,38 @@ layout: null
     <!-- 静态纹理层 -->
     <div class="texture-overlay">
         <!-- 随机散落的数学符号 -->
-        <div class="math-watermark" style="top: 10%; left: 5%; font-size: 8rem;">∫</div>
-        <div class="math-watermark" style="bottom: 15%; right: 10%; font-size: 6rem;">∑</div>
-        <div class="math-watermark" style="top: 20%; right: 15%; font-size: 4rem;">e^{i\pi}+1=0</div>
-        <div class="math-watermark" style="bottom: 25%; left: 10%; font-size: 5rem;">∂</div>
-        <div class="math-watermark" style="top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 15rem; opacity: 0.01;">∞</div>
+        <!-- 基础微积分 -->
+        <div class="math-watermark" style="top: 10%; left: 5%; font-size: 6rem;">∫</div>
+        <div class="math-watermark" style="bottom: 15%; right: 10%; font-size: 5rem;">∑</div>
+        <div class="math-watermark" style="bottom: 25%; left: 10%; font-size: 4rem;">∂</div>
+
+        <!-- 欧拉公式 -->
+        <div class="math-watermark" style="top: 20%; right: 15%; font-size: 2.5rem;">e^{i\pi} + 1 = 0</div>
+
+        <!-- 薛定谔方程 -->
+        <div class="math-watermark" style="top: 15%; left: 30%; font-size: 2rem; opacity: 0.12;">
+            i\hbar\frac{\partial}{\partial t}\Psi = \hat{H}\Psi</div>
+
+        <!-- 麦克斯韦方程组 (微分形式) -->
+        <div class="math-watermark" style="bottom: 30%; right: 25%; font-size: 1.8rem; opacity: 0.1;">\nabla \cdot
+            \mathbf{E} = \frac{\rho}{\varepsilon_0}</div>
+        <div class="math-watermark" style="bottom: 22%; right: 22%; font-size: 1.8rem; opacity: 0.1;">\nabla \times
+            \mathbf{B} = \mu_0\mathbf{J} + \mu_0\varepsilon_0\frac{\partial \mathbf{E}}{\partial t}</div>
+
+        <!-- 傅里叶变换 -->
+        <div class="math-watermark" style="top: 40%; left: 8%; font-size: 1.5rem; opacity: 0.1;">\hat{f}(\xi) =
+            \int_{-\infty}^{\infty} f(x)e^{-2\pi i x \xi}dx</div>
+
+        <!-- 黎曼ζ函数 -->
+        <div class="math-watermark" style="top: 60%; right: 5%; font-size: 2rem; opacity: 0.08;">\zeta(s) =
+            \sum_{n=1}^{\infty} \frac{1}{n^s}</div>
+
+        <!-- 质能方程 -->
+        <div class="math-watermark" style="bottom: 10%; left: 40%; font-size: 3rem; opacity: 0.1;">E = mc^2</div>
+
+        <!-- 装饰性无穷大 -->
+        <div class="math-watermark"
+            style="top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 15rem; opacity: 0.03;">∞</div>
     </div>
 
     <!-- 前景内容 -->
@@ -156,15 +233,15 @@ layout: null
             <div class="corner tr"></div>
             <div class="corner bl"></div>
             <div class="corner br"></div>
-            
+
             <h1>建设中</h1>
             <h2>Under Construction</h2>
-            
-            <p style="font-style: italic; opacity: 0.6; margin-bottom: 30px;">
+
+            <p style="font-style: italic; opacity: 0.8; margin-bottom: 30px; font-size: 1.1rem;">
                 "Mathematics is the music of reason."
             </p>
 
-            <a href="/" class="back-btn">Return Home</a>
+            <a href="/" class="back-btn">返回首页</a>
         </div>
     </div>
 
@@ -211,32 +288,32 @@ layout: null
                 // Lissajous parameters that change slowly over time
                 // x = A * sin(a*t + delta)
                 // y = B * sin(b*t)
-                
+
                 const scale = Math.min(width, height) * 0.35;
                 const speed = 0.005;
                 const phaseSpeed = 0.0002;
-                
+
                 // Draw a segment
                 for (let i = 0; i < 200; i++) {
                     // We draw a slightly longer segment to make it look like a continuous line
                     // but actually we are just drawing the "head" of the curve moving
                     // Wait, to make it look like a "chalk drawing", we should probably draw the whole curve
                     // but animate its parameters.
-                    
+
                     // Let's try animating the phase shift
-                    const angle = (t * speed) + (i * 0.05); 
-                    
+                    const angle = (t * speed) + (i * 0.05);
+
                     // Modulate parameters for "breathing" effect
-                    const modA = curve.a + Math.sin(t * phaseSpeed * (index+1)) * 0.5;
-                    const modB = curve.b + Math.cos(t * phaseSpeed * (index+1)) * 0.5;
-                    
+                    const modA = curve.a + Math.sin(t * phaseSpeed * (index + 1)) * 0.5;
+                    const modB = curve.b + Math.cos(t * phaseSpeed * (index + 1)) * 0.5;
+
                     const x = Math.sin(angle * modA + t * phaseSpeed) * scale;
                     const y = Math.cos(angle * modB) * scale;
-                    
+
                     if (i === 0) ctx.moveTo(x, y);
                     else ctx.lineTo(x, y);
                 }
-                
+
                 ctx.stroke();
             });
 
@@ -249,4 +326,5 @@ layout: null
         draw();
     </script>
 </body>
+
 </html>
