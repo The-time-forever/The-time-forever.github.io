@@ -1,0 +1,252 @@
+---
+layout: null
+---
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>关于我 | The Time Forever</title>
+    <style>
+        /* 1. 基础设置 & 字体 */
+        :root {
+            --bg-color: #0f172a; /* 深蓝/黑板色 */
+            --text-color: #e2e8f0; /* 米白 */
+            --accent-color: #f1c40f; /* 淡金 */
+            --font-serif: "Latin Modern Roman", "Computer Modern", "Times New Roman", serif;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--bg-color);
+            font-family: var(--font-serif);
+            color: var(--text-color);
+        }
+
+        /* 2. 动态 Canvas 背景 */
+        #math-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.6; /* 让背景稍微暗淡一点，不抢视觉 */
+        }
+
+        /* 3. 静态纹理叠加 (噪点 + 数学符号水印) */
+        .texture-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            /* 噪点纹理 */
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+        }
+
+        .math-watermark {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.03);
+            font-style: italic;
+            font-weight: bold;
+            user-select: none;
+            z-index: 1;
+        }
+
+        /* 4. 前景内容容器 */
+        .center-container {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+        }
+
+        .classical-frame {
+            position: relative;
+            padding: 60px 80px;
+            border: 3px double rgba(241, 196, 15, 0.3); /* 双线框 */
+            background: rgba(15, 23, 42, 0.6); /* 半透明深底 */
+            backdrop-filter: blur(5px);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+        }
+
+        /* 角落装饰 */
+        .corner {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-color: var(--accent-color);
+            border-style: solid;
+            opacity: 0.8;
+        }
+        .tl { top: -2px; left: -2px; border-width: 2px 0 0 2px; }
+        .tr { top: -2px; right: -2px; border-width: 2px 2px 0 0; }
+        .bl { bottom: -2px; left: -2px; border-width: 0 0 2px 2px; }
+        .br { bottom: -2px; right: -2px; border-width: 0 2px 2px 0; }
+
+        h1 {
+            font-size: 3.5rem;
+            margin: 0 0 1rem 0;
+            font-weight: normal;
+            letter-spacing: 0.1em;
+            text-shadow: 0 0 10px rgba(241, 196, 15, 0.3);
+        }
+
+        h2 {
+            font-size: 1.2rem;
+            font-weight: 300;
+            margin: 0 0 2rem 0;
+            opacity: 0.8;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            font-family: var(--font-serif);
+            letter-spacing: 0.05em;
+        }
+
+        .back-btn:hover {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+            background: rgba(241, 196, 15, 0.05);
+        }
+
+        @media (max-width: 600px) {
+            .classical-frame { padding: 40px 20px; width: 85%; }
+            h1 { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 动态背景 -->
+    <canvas id="math-canvas"></canvas>
+
+    <!-- 静态纹理层 -->
+    <div class="texture-overlay">
+        <!-- 随机散落的数学符号 -->
+        <div class="math-watermark" style="top: 10%; left: 5%; font-size: 8rem;">∫</div>
+        <div class="math-watermark" style="bottom: 15%; right: 10%; font-size: 6rem;">∑</div>
+        <div class="math-watermark" style="top: 20%; right: 15%; font-size: 4rem;">e^{i\pi}+1=0</div>
+        <div class="math-watermark" style="bottom: 25%; left: 10%; font-size: 5rem;">∂</div>
+        <div class="math-watermark" style="top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 15rem; opacity: 0.01;">∞</div>
+    </div>
+
+    <!-- 前景内容 -->
+    <div class="center-container">
+        <div class="classical-frame">
+            <div class="corner tl"></div>
+            <div class="corner tr"></div>
+            <div class="corner bl"></div>
+            <div class="corner br"></div>
+            
+            <h1>建设中</h1>
+            <h2>Under Construction</h2>
+            
+            <p style="font-style: italic; opacity: 0.6; margin-bottom: 30px;">
+                "Mathematics is the music of reason."
+            </p>
+
+            <a href="/" class="back-btn">Return Home</a>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * Math Canvas Animation
+         * Draws elegant Lissajous-like parametric curves that slowly evolve.
+         */
+        const canvas = document.getElementById('math-canvas');
+        const ctx = canvas.getContext('2d');
+
+        let width, height;
+        let t = 0;
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        // Configuration for the curves
+        const curves = [
+            { a: 1, b: 2, color: 'rgba(241, 196, 15, 0.15)', width: 1 }, // Gold
+            { a: 2, b: 3, color: 'rgba(100, 200, 255, 0.1)', width: 1 }, // Cyan
+            { a: 3, b: 5, color: 'rgba(255, 255, 255, 0.05)', width: 0.5 } // White
+        ];
+
+        function draw() {
+            // Fade out effect (trail)
+            // Instead of clearing, we draw a semi-transparent rect to create trails
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.05)'; // Match bg color with low opacity
+            ctx.fillRect(0, 0, width, height);
+
+            ctx.save();
+            ctx.translate(width / 2, height / 2);
+
+            // Draw curves
+            curves.forEach((curve, index) => {
+                ctx.beginPath();
+                ctx.strokeStyle = curve.color;
+                ctx.lineWidth = curve.width;
+
+                // Lissajous parameters that change slowly over time
+                // x = A * sin(a*t + delta)
+                // y = B * sin(b*t)
+                
+                const scale = Math.min(width, height) * 0.35;
+                const speed = 0.005;
+                const phaseSpeed = 0.0002;
+                
+                // Draw a segment
+                for (let i = 0; i < 200; i++) {
+                    // We draw a slightly longer segment to make it look like a continuous line
+                    // but actually we are just drawing the "head" of the curve moving
+                    // Wait, to make it look like a "chalk drawing", we should probably draw the whole curve
+                    // but animate its parameters.
+                    
+                    // Let's try animating the phase shift
+                    const angle = (t * speed) + (i * 0.05); 
+                    
+                    // Modulate parameters for "breathing" effect
+                    const modA = curve.a + Math.sin(t * phaseSpeed * (index+1)) * 0.5;
+                    const modB = curve.b + Math.cos(t * phaseSpeed * (index+1)) * 0.5;
+                    
+                    const x = Math.sin(angle * modA + t * phaseSpeed) * scale;
+                    const y = Math.cos(angle * modB) * scale;
+                    
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                
+                ctx.stroke();
+            });
+
+            ctx.restore();
+
+            t += 1;
+            requestAnimationFrame(draw);
+        }
+
+        draw();
+    </script>
+</body>
+</html>
