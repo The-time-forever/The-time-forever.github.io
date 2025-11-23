@@ -60,8 +60,40 @@
       color: #fff;
     }
 
+    /* 整体内容块，用于整体居中和避让箭头 */
+    .hero-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: -40px;
+      /* 视觉重心上移，避让底部箭头 */
+      gap: 24px;
+      /* 统一间距 */
+    }
+
+    /* 头像样式 */
+    .avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 3px solid rgba(255, 255, 255, 0.5);
+      /* 半透明边框 */
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+      /* 柔和阴影 */
+      object-fit: cover;
+      /* 填满圆形 */
+      object-position: 25% 15%;
+      /* 关键：聚焦左上侧人脸 */
+      transition: transform 0.3s ease;
+    }
+
+    .avatar:hover {
+      transform: scale(1.05);
+    }
+
     .header {
-      margin-bottom: 32px;
+      margin-bottom: 8px;
+      /* 减小 header 内部下边距，改用 gap 控制 */
     }
 
     .header h1 {
@@ -280,20 +312,25 @@
 
   <!-- 第一屏：封面 -->
   <div class="overlay">
-    <div class="header">
-      <!-- 这里改成你想要显示的大标题 -->
-      <h1>The Time Forever</h1>
-      <!-- 这里是副标题，可以随便改 -->
-      <p>欢迎来到我的博客，记录生活、学习与思考</p>
-    </div>
+    <div class="hero-content">
+      <!-- 头像 -->
+      <img src="images/avatar.jpg" alt="Avatar" class="avatar" />
 
-    <div class="nav-buttons">
-      <!-- 链接按你实际的路径改就行 -->
-      <a href="/posts">文章列表</a>
-      <a href="/about">关于我</a>
-      <a href="https://github.com/the-time-forever" target="_blank">GitHub</a>
-      <!-- 把下面这个邮箱改成你的 GitHub noreply 邮箱 -->
-      <a href="mailto:206166322+The-time-forever@users.noreply.github.com">联系我</a>
+      <div class="header">
+        <!-- 这里改成你想要显示的大标题 -->
+        <h1>The Time Forever</h1>
+        <!-- 这里是副标题，可以随便改 -->
+        <p>欢迎来到我的博客，记录生活、学习与思考</p>
+      </div>
+
+      <div class="nav-buttons">
+        <!-- 链接按你实际的路径改就行 -->
+        <a href="/posts">文章列表</a>
+        <a href="/about">关于我</a>
+        <a href="https://github.com/the-time-forever" target="_blank">GitHub</a>
+        <!-- 把下面这个邮箱改成你的 GitHub noreply 邮箱 -->
+        <a href="mailto:206166322+The-time-forever@users.noreply.github.com">联系我</a>
+      </div>
     </div>
 
     <!-- 下拉箭头 -->
