@@ -1,30 +1,124 @@
 
 <!-- Canvas 背景：不影响可访问性 -->
 <canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+<!-- 返回首页按钮 -->
+<a href="/" class="home-btn">← 返回首页</a>
+
+<div class="glass-container">
+  <h1>文章列表</h1>
+
+  <p>这里以后是我的博客文章目录。</p>
+
+  <ul>
+    <li><a href="my-first-post.md">第一篇文章</a></li>
+  </ul>
+
+  <p style="font-size:0.9rem;color:#bbb;margin-top:2rem;">提示：鼠标移动会产生拖尾并影响周围粒子；按住 <strong>Alt</strong> 可切换吸引（Alt）/排斥（默认）效果。</p>
+</div>
+
 <style>
-	/* Canvas 放到页面最底层，不接收鼠标事件 */
-	#bg-canvas{
-		position:fixed;
-		inset:0;
-		width:100%;
-		height:100%;
-		z-index:-1;
-		display:block;
-		background:#000000;
-		pointer-events:none;
-	}
-	/* 页面内容保持可见且在 canvas 之上 */
-	body, main, .content {
-		background: transparent !important;
-	}
+  /* 全局重置与字体颜色 */
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #ffffff; /* 全局白色字体 */
+    overflow-x: hidden;
+  }
+
+  /* Canvas 放到页面最底层 */
+  #bg-canvas {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    display: block;
+    background: #000000;
+    pointer-events: none;
+  }
+
+  /* 确保原有容器背景透明 */
+  body, main, .content {
+    background: transparent !important;
+  }
+
+  /* 返回首页按钮 */
+  .home-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    padding: 8px 16px;
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    backdrop-filter: blur(4px);
+    transition: all 0.3s ease;
+    z-index: 100;
+    font-size: 0.9rem;
+  }
+  .home-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border-color: #fff;
+  }
+
+  /* 毛玻璃容器 (Glassmorphism) */
+  .glass-container {
+    max-width: 800px;
+    margin: 80px auto 40px; /* 上边距留给返回按钮 */
+    padding: 40px;
+    background: rgba(255, 255, 255, 0.05); /* 极淡的白色背景 */
+    backdrop-filter: blur(12px); /* 毛玻璃模糊 */
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1); /* 淡淡的边框 */
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  }
+
+  /* 标题样式 */
+  .glass-container h1 {
+    margin-top: 0;
+    font-weight: 300;
+    letter-spacing: 1px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 16px;
+    margin-bottom: 24px;
+  }
+
+  /* 列表样式 */
+  .glass-container ul {
+    list-style: none;
+    padding: 0;
+  }
+  .glass-container li {
+    margin-bottom: 12px;
+  }
+
+  /* 链接样式 */
+  .glass-container a {
+    color: #00ffff; /* 亮青色 */
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .glass-container a:hover {
+    color: #fff;
+    text-decoration: underline;
+    text-shadow: 0 0 8px rgba(0, 255, 255, 0.6);
+  }
+
+  /* 响应式调整 */
+  @media (max-width: 600px) {
+    .glass-container {
+      margin: 70px 16px 20px;
+      padding: 24px;
+    }
+    .home-btn {
+      top: 16px;
+      left: 16px;
+    }
+  }
 </style>
-
-# 文章列表
-
-这里以后是我的博客文章目录。
-
-- [第一篇文章](my-first-post.md)
-
-<p style="font-size:0.9rem;color:#bbb">提示：鼠标移动会产生拖尾并影响周围粒子；按住 <strong>Alt</strong> 可切换吸引（Alt）/排斥（默认）效果。</p>
 
 <script src="/assets/js/space-particles.js" defer></script>
