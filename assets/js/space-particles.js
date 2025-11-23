@@ -1,177 +1,203 @@
-// Lightweight space / starfield particles for a canvas background
-// Designed to be responsive and efficient. No external libs.
+// Cyberpunk Space Warp / Starfield Effect
+// Responsive, lightweight, native JS.
 (function () {
     const canvas = document.getElementById('bg-canvas');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
 
-    let DPR = Math.max(1, window.devicePixelRatio || 1);
-    let W = 0, H = 0, cx = 0, cy = 0;
+    let DPR = window.devicePixelRatio || 1;
+    let W = window.innerWidth;
+    let H = window.innerHeight;
+    let cx = W / 2;
+    let cy = H / 2;
+
+    // Configuration
+    const CONFIG = {
+        count: 400,           // Max particle count
+        zMax: 1000,           // Max depth (spawn distance)
+        fov: 300,             // Field of view
+        speedBase: 2,         // Base speed
+        speedVar: 3,          // Speed variation
+        colors: ['#00FFFF', '#1E90FF', '#9400D3'], // Cyan, Deep Blue, Bright Purple
+        streakChance: 0.2,    // Chance for a particle to be a streak
+    };
 
     function resize() {
-        DPR = Math.max(1, window.devicePixelRatio || 1);
-        W = canvas.width = Math.floor(window.innerWidth * DPR);
-        H = canvas.height = Math.floor(window.innerHeight * DPR);
-        canvas.style.width = window.innerWidth + 'px';
-        canvas.style.height = window.innerHeight + 'px';
-        cx = W / 2; cy = H / 2;
-        const area = (W / DPR) * (H / DPR);
-        maxParticles = Math.min(600, Math.max(80, Math.floor(area / 1500)));
+        DPR = window.devicePixelRatio || 1;
+        W = window.innerWidth;
+        H = window.innerHeight;
+        canvas.width = W * DPR;
+        canvas.height = H * DPR;
+        canvas.style.width = W + 'px';
+        canvas.style.height = H + 'px';
+        ctx.scale(DPR, DPR);
+        cx = W / 2;
+        cy = H / 2;
+
+        // Adjust count based on screen area
+        const area = W * H;
+        CONFIG.count = Math.min(600, Math.max(150, Math.floor(area / 2000)));
     }
 
-    // particle storage
-    let particles = [];
-    let maxParticles = 200;
+    // Mouse State
+    const mouse = { x: cx, y: cy, down: false, active: false };
 
-    const palette = [
-        { r: 120, g: 255, b: 255 }, // cyan
-        { r: 100, g: 180, b: 255 }, // blue
-        { r: 255, g: 255, b: 255 }  // white
-    ];
-
-    function rand(min, max) { return Math.random() * (max - min) + min }
-
-    function createParticle(x, y, initial) {
-        const depth = Math.random(); // 0..1, smaller = farther
-        const size = Math.pow(1 - depth, 1.5) * rand(0.8, 3.8) * DPR;
-        // initial velocity — by default radiate from center
-        let angle = Math.atan2(y - cy, x - cx);
-        let speed = initial ? rand(0.2, 1.8) * (1 - depth) : rand(-0.2, 0.2);
-        const vx = Math.cos(angle) * speed;
-        const vy = Math.sin(angle) * speed;
-        return {
-            x, y, vx, vy, size, depth,
-            alpha: rand(0.2, 1.0) * (1 - depth * 0.6)
-        };
-    }
-
-    function seedParticles() {
-        particles.length = 0;
-        for (let i = 0; i < maxParticles; i++) {
-            const r = rand(0, Math.min(W, H) * 0.35);
-            const a = rand(0, Math.PI * 2);
-            const x = cx + Math.cos(a) * r;
-            const y = cy + Math.sin(a) * r;
-            particles.push(createParticle(x, y, true));
-        }
-    }
-
-    // mouse interactivity
-    const mouse = { x: 0, y: 0, down: false, moved: false };
-    let lastMoveTime = 0;
-
-    window.addEventListener('mousemove', (e) => {
+    window.addEventListener('mousemove', e => {
         const rect = canvas.getBoundingClientRect();
-        mouse.x = (e.clientX - rect.left) * DPR;
-        mouse.y = (e.clientY - rect.top) * DPR;
-        mouse.moved = true;
-        lastMoveTime = performance.now();
-        const spawn = Math.min(6, Math.floor(6 * DPR));
-        for (let i = 0; i < spawn; i++) {
-            if (particles.length < maxParticles) particles.push(createParticle(mouse.x + rand(-6, 6), mouse.y + rand(-6, 6), true));
-        }
-    }, { passive: true });
-
-    window.addEventListener('resize', () => {
-        resize();
-        seedParticles();
+        mouse.x = e.clientX - rect.left;
+        mouse.y = e.clientY - rect.top;
+        mouse.active = true;
     });
+    window.addEventListener('mousedown', () => mouse.down = true);
+    window.addEventListener('mouseup', () => mouse.down = false);
+    window.addEventListener('keydown', e => { if (e.key === 'Alt') mouse.down = true; });
+    window.addEventListener('keyup', e => { if (e.key === 'Alt') mouse.down = false; });
+    window.addEventListener('resize', resize);
 
-    // hold Alt to attract, otherwise mouse repels
-    window.addEventListener('keydown', (e) => { if (e.key === 'Alt') mouse.down = true; });
-    window.addEventListener('keyup', (e) => { if (e.key === 'Alt') mouse.down = false; });
+    class Particle {
+        constructor() {
+            this.reset(true);
+        }
 
-    function update(dt) {
-        const now = performance.now();
-        const moving = (now - lastMoveTime) < 2000 && mouse.moved;
+        reset(randomZ = false) {
+            // Random position in a wide cone
+            // We use a large range so they don't all clump in the center
+            const spread = 2.0;
+            this.x = (Math.random() - 0.5) * W * spread;
+            this.y = (Math.random() - 0.5) * H * spread;
 
-        for (let i = particles.length - 1; i >= 0; i--) {
-            const p = particles[i];
-            p.vx += rand(-0.02, 0.02) * (1 - p.depth);
-            p.vy += rand(-0.02, 0.02) * (1 - p.depth);
+            // Z represents depth. High Z = far away.
+            this.z = randomZ ? Math.random() * CONFIG.zMax : CONFIG.zMax;
 
-            const dx = p.x - cx, dy = p.y - cy;
-            const dist = Math.sqrt(dx * dx + dy * dy) + 0.0001;
-            const push = 0.0006 * (1 - p.depth);
-            p.vx += (dx / dist) * push * dt * 60;
-            p.vy += (dy / dist) * push * dt * 60;
+            this.speed = CONFIG.speedBase + Math.random() * CONFIG.speedVar;
+            this.color = CONFIG.colors[Math.floor(Math.random() * CONFIG.colors.length)];
+            this.sizeBase = 0.8 + Math.random() * 2.0;
+            this.isStreak = Math.random() < CONFIG.streakChance;
+            this.alpha = 0;
+        }
 
-            if (moving) {
-                const mx = mouse.x, my = mouse.y;
-                const mdx = p.x - mx, mdy = p.y - my;
-                const md = Math.sqrt(mdx * mdx + mdy * mdy) + 0.0001;
-                const influence = Math.max(0, 1 - md / (120 * DPR));
-                if (influence > 0) {
-                    const strength = (mouse.down ? -1 : 1) * 0.12 * influence * (1 - p.depth);
-                    p.vx += (mdx / md) * strength;
-                    p.vy += (mdy / md) * strength;
+        update(dt) {
+            // Move towards camera
+            this.z -= this.speed * (dt * 60);
+
+            // Reset if passed camera
+            if (this.z <= 1) {
+                this.reset();
+                return;
+            }
+
+            // 3D Projection
+            const scale = CONFIG.fov / this.z;
+            let sx = cx + this.x * scale;
+            let sy = cy + this.y * scale;
+
+            // Mouse Interaction (Gravity/Repulsion)
+            if (mouse.active) {
+                const dx = sx - mouse.x;
+                const dy = sy - mouse.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                const radius = 250; // Interaction radius
+
+                if (dist < radius) {
+                    // Calculate force (stronger when closer)
+                    const force = (1 - dist / radius) * 80;
+                    const angle = Math.atan2(dy, dx);
+
+                    // Alt/Click = Attract (-1), Default = Repel (1)
+                    const dir = mouse.down ? -1 : 1;
+
+                    sx += Math.cos(angle) * force * dir;
+                    sy += Math.sin(angle) * force * dir;
                 }
             }
 
-            p.x += p.vx * dt * 60;
-            p.y += p.vy * dt * 60;
+            this.sx = sx;
+            this.sy = sy;
+            this.scale = scale;
 
-            if (p.x < -50 * DPR || p.x > W + 50 * DPR || p.y < -50 * DPR || p.y > H + 50 * DPR) {
-                if (Math.random() < 0.5) particles[i] = createParticle(cx + rand(-8 * DPR, 8 * DPR), cy + rand(-8 * DPR, 8 * DPR), true);
-                else particles.splice(i, 1);
-            }
+            // Fade in/out
+            // Fade in quickly at start, fade out if very close to edges (optional)
+            const progress = 1 - (this.z / CONFIG.zMax);
+            this.alpha = Math.min(1, progress * 3);
         }
 
-        while (particles.length < maxParticles) {
-            const angle = Math.random() * Math.PI * 2;
-            const r = rand(0, Math.min(W, H) * 0.08);
-            const x = cx + Math.cos(angle) * r + rand(-10, 10);
-            const y = cy + Math.sin(angle) * r + rand(-10, 10);
-            particles.push(createParticle(x, y, true));
+        draw(ctx) {
+            if (this.z > CONFIG.zMax || this.z <= 1) return;
+
+            ctx.globalAlpha = this.alpha;
+            ctx.fillStyle = this.color;
+            ctx.strokeStyle = this.color;
+
+            const r = this.sizeBase * this.scale;
+
+            // Calculate distance from center for streak stretching
+            const dx = this.sx - cx;
+            const dy = this.sy - cy;
+            const distFromCenter = Math.sqrt(dx * dx + dy * dy);
+
+            // Stretch based on speed (scale) and distance from center
+            // Particles at edges move visually faster -> longer streaks
+            const stretch = Math.max(1, this.scale * distFromCenter * 0.02);
+
+            if (this.isStreak && stretch > 1.5) {
+                // Draw Streak
+                const angle = Math.atan2(dy, dx);
+                const tailLen = Math.min(150, r * stretch * 2);
+
+                ctx.beginPath();
+                // Start at current pos
+                ctx.moveTo(this.sx, this.sy);
+                // Line back towards center
+                ctx.lineTo(
+                    this.sx - Math.cos(angle) * tailLen,
+                    this.sy - Math.sin(angle) * tailLen
+                );
+                ctx.lineWidth = r;
+                ctx.lineCap = 'round';
+                ctx.stroke();
+            } else {
+                // Draw Glowy Circle
+                ctx.beginPath();
+                ctx.arc(this.sx, this.sy, r, 0, Math.PI * 2);
+                ctx.fill();
+            }
         }
     }
 
-    const gradientCache = {};
-    function draw() {
-        ctx.clearRect(0, 0, W, H);
-        ctx.fillStyle = '#000000';
-        ctx.fillRect(0, 0, W, H);
+    // Init
+    resize();
+    const particles = [];
+    for (let i = 0; i < CONFIG.count; i++) {
+        particles.push(new Particle());
+    }
 
-        ctx.save();
+    // Loop
+    let lastTime = performance.now();
+    function loop() {
+        const now = performance.now();
+        const dt = Math.min(0.1, (now - lastTime) / 1000);
+        lastTime = now;
+
+        // Clear with slight fade for trails? No, user wants clean background usually, 
+        // but "Glow" is requested.
+        ctx.clearRect(0, 0, W * DPR, H * DPR);
+
+        // Background
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(0, 0, W * DPR, H * DPR);
+
+        // Additive blending for glow effect
         ctx.globalCompositeOperation = 'lighter';
 
         for (const p of particles) {
-            const key = Math.max(1, Math.round(p.size));
-            let g = gradientCache[key];
-            if (!g) {
-                g = ctx.createRadialGradient(0, 0, key, 0, 0, key * 3);
-                g.addColorStop(0, `rgba(255,255,255,1)`);
-                g.addColorStop(0.15, `rgba(200,230,255,0.9)`);
-                g.addColorStop(0.45, `rgba(100,160,255,0.25)`);
-                g.addColorStop(1, `rgba(0,0,0,0)`);
-                gradientCache[key] = g;
-            }
-
-            ctx.save();
-            ctx.translate(p.x, p.y);
-            ctx.globalAlpha = p.alpha;
-            ctx.fillStyle = g;
-            ctx.beginPath();
-            ctx.arc(0, 0, p.size * 2, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.restore();
+            p.update(dt);
+            p.draw(ctx);
         }
 
-        ctx.restore();
-    }
-
-    let last = performance.now();
-    function loop() {
-        const now = performance.now();
-        const dt = Math.min(0.05, (now - last) / 1000);
-        last = now;
-        update(dt);
-        draw();
+        ctx.globalCompositeOperation = 'source-over';
         requestAnimationFrame(loop);
     }
 
-    resize();
-    seedParticles();
     loop();
 
 })();
