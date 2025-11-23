@@ -3,6 +3,7 @@ layout: null
 ---
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,9 +13,11 @@ layout: null
     body {
       margin: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      color: #ffffff; /* 全局白色字体 */
+      color: #ffffff;
+      /* 全局白色字体 */
       overflow-x: hidden;
-      background-color: #000000; /* 确保背景黑 */
+      background-color: #000000;
+      /* 确保背景黑 */
     }
 
     /* Canvas 放到页面最底层 */
@@ -44,6 +47,7 @@ layout: null
       z-index: 100;
       font-size: 0.9rem;
     }
+
     .home-btn:hover {
       background: rgba(255, 255, 255, 0.1);
       color: #fff;
@@ -53,24 +57,32 @@ layout: null
     /* 毛玻璃容器 (Glassmorphism) */
     .glass-container {
       max-width: 800px;
-      margin: 80px auto 40px; /* 上边距留给返回按钮 */
+      margin: 80px auto 40px;
+      /* 上边距留给返回按钮 */
       padding: 40px;
-      background: rgba(255, 255, 255, 0.05); /* 极淡的白色背景 */
-      backdrop-filter: blur(12px); /* 毛玻璃模糊 */
-      -webkit-backdrop-filter: blur(12px);
+      background: rgba(20, 20, 30, 0.4);
+      /* 更通透的深色背景 */
+      backdrop-filter: blur(20px);
+      /* 高强度背景模糊 */
+      -webkit-backdrop-filter: blur(20px);
       border-radius: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.1); /* 淡淡的边框 */
-      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      /* 极细的亮色边框 */
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+      /* 深度感阴影 */
     }
 
     /* 标题样式 */
     .glass-container h1 {
       margin-top: 0;
       font-weight: 300;
-      letter-spacing: 1px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
       padding-bottom: 16px;
       margin-bottom: 24px;
+      text-align: center;
+      color: #00f2ff;
+      text-shadow: 0 0 5px rgba(0, 242, 255, 0.7), 0 0 15px rgba(0, 242, 255, 0.5);
+      letter-spacing: 2px;
     }
 
     /* 列表样式 */
@@ -78,16 +90,19 @@ layout: null
       list-style: none;
       padding: 0;
     }
+
     .glass-container li {
       margin-bottom: 12px;
     }
 
     /* 链接样式 */
     .glass-container a {
-      color: #00ffff; /* 亮青色 */
+      color: #00ffff;
+      /* 亮青色 */
       text-decoration: none;
       transition: color 0.2s;
     }
+
     .glass-container a:hover {
       color: #fff;
       text-decoration: underline;
@@ -100,6 +115,7 @@ layout: null
         margin: 70px 16px 20px;
         padding: 24px;
       }
+
       .home-btn {
         top: 16px;
         left: 16px;
@@ -107,6 +123,7 @@ layout: null
     }
   </style>
 </head>
+
 <body>
 
   <!-- Canvas 背景：不影响可访问性 -->
@@ -118,15 +135,15 @@ layout: null
   <div class="glass-container">
     <h1>文章列表</h1>
 
-    <p>这里以后是我的博客文章目录。</p>
-
     <ul>
       <li><a href="my-first-post.md">第一篇文章</a></li>
     </ul>
 
-    <p style="font-size:0.9rem;color:#bbb;margin-top:2rem;">提示：鼠标移动会产生拖尾并影响周围粒子；按住 <strong>Alt</strong> 可切换吸引（Alt）/排斥（默认）效果。</p>
+    <p style="font-size:0.9rem;color:#bbb;margin-top:2rem;">提示：鼠标移动会产生拖尾并影响周围粒子；按住 <strong>Alt</strong>
+      可切换吸引（Alt）/排斥（默认）效果。</p>
   </div>
 
   <script src="/assets/js/space-particles.js" defer></script>
 </body>
+
 </html>
