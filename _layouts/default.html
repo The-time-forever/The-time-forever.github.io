@@ -342,7 +342,16 @@
         <div class="content-inner">
             <h2>最新博客</h2>
             <ul class="post-list">
-                {{ content }}
+                {% for post in site.posts limit:2 %}
+                <li>
+                    {% if post.redirect_to %}
+                    <a href="{{ post.redirect_to }}" target="_blank">{{ post.title }}</a>
+                    {% else %}
+                    <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+                    {% endif %}
+                    <span>{{ post.date | date: "%Y-%m-%d" }}</span>
+                </li>
+                {% endfor %}
             </ul>
 
             <h2>我的其他平台</h2>
