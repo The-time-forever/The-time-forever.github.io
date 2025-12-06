@@ -3,7 +3,11 @@ layout: default
 ---
 {% for post in site.posts limit:10 %}
 <li>
+  {% if post.redirect_to %}
+  <a href="{{ post.redirect_to }}" target="_blank">{{ post.title }}</a>
+  {% else %}
   <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+  {% endif %}
   <span>{{ post.date | date: "%Y-%m-%d" }}</span>
 </li>
 {% endfor %}

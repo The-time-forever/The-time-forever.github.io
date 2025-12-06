@@ -136,8 +136,15 @@ layout: null
     <h1>文章列表</h1>
 
     <ul>
-      <li><a href="https://blog.csdn.net/MATH9/article/details/154921111?spm=1001.2014.3001.5501">Git/GitHub基本教学</a>
+      {% for post in site.posts %}
+      <li>
+        {% if post.redirect_to %}
+        <a href="{{ post.redirect_to }}" target="_blank">{{ post.title }}</a>
+        {% else %}
+        <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+        {% endif %}
       </li>
+      {% endfor %}
     </ul>
 
     <p style="font-size:0.9rem;color:#bbb;margin-top:2rem;">提示：鼠标移动会产生拖尾并影响周围粒子；按住 <strong>Alt</strong>
