@@ -1,0 +1,4 @@
+theme: null
+markdown: kramdown
+permalink: /posts/:year/:month/:day/:title/
+exclude: [README.md]
