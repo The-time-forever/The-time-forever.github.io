@@ -1,4 +1,6 @@
 theme: null
 markdown: kramdown
+kramdown:
+  math_engine: mathjax
 permalink: /posts/:year/:month/:day/:title/
 exclude: [README.md]
