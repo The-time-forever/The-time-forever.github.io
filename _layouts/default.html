@@ -46,6 +46,47 @@
             opacity: 1;
         }
 
+        /* 轮播切换按钮 */
+        .prev-slide,
+        .next-slide {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 60px;
+            font-weight: 100;
+            cursor: pointer;
+            z-index: 20;
+            /* 高于背景，且高于 overlay 的部分内容 */
+            opacity: 0;
+            transition: opacity 0.3s ease, color 0.3s ease;
+            padding: 50px 20px;
+            /* 扩大点击热区 */
+            height: 30vh;
+            /* 垂直方向的大感应区 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            outline: none;
+        }
+
+        .prev-slide:hover,
+        .next-slide:hover {
+            opacity: 1;
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        .prev-slide {
+            left: 0;
+        }
+
+        .next-slide {
+            right: 0;
+        }
+
         /* 前景遮罩和整体布局 */
         .overlay {
             position: relative;
@@ -324,7 +365,13 @@
         <img src="images/bgz10.jpg" alt="background 10" />
         <img src="images/bgz11.jpg" alt="background 11" />
         <img src="images/bgz12.jpg" alt="background 12" />
-    </div> <!-- 第一屏：封面 -->
+    </div>
+
+    <!-- 轮播手动切换按钮 -->
+    <button class="prev-slide" aria-label="Previous Slide">&#10094;</button>
+    <button class="next-slide" aria-label="Next Slide">&#10095;</button>
+
+    <!-- 第一屏：封面 -->
     <div class="overlay">
         <div class="hero-content">
             <!-- 头像 -->
@@ -385,12 +432,54 @@
     <script>
         const slides = document.querySelectorAll(".bg-slideshow img");
         let index = 0;
+        let slideInterval;
 
-        setInterval(() => {
+        // 显示第 n 张图片
+        function showSlide(n) {
+            // 移除当前激活状态
             slides[index].classList.remove("active");
-            index = (index + 1) % slides.length;
+
+            // 计算新索引（支持负数循环）
+            index = (n + slides.length) % slides.length;
+
+            // 添加新激活状态
             slides[index].classList.add("active");
-        }, 5000); // 每 8 秒切换一张
+        }
+
+        // 下一张
+        function nextSlide() {
+            showSlide(index + 1);
+        }
+
+        // 上一张
+        function prevSlide() {
+            showSlide(index - 1);
+        }
+
+        // 启动自动播放
+        function startAutoPlay() {
+            slideInterval = setInterval(nextSlide, 5000); // 每 5 秒切换
+        }
+
+        // 重置计时器（手动切换时调用）
+        function resetTimer() {
+            clearInterval(slideInterval);
+            startAutoPlay();
+        }
+
+        // 绑定按钮事件
+        document.querySelector('.prev-slide').addEventListener('click', () => {
+            prevSlide();
+            resetTimer();
+        });
+
+        document.querySelector('.next-slide').addEventListener('click', () => {
+            nextSlide();
+            resetTimer();
+        });
+
+        // 初始化自动播放
+        startAutoPlay();
     </script>
 </body>
 
