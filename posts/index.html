@@ -93,6 +93,19 @@ layout: null
 
     .glass-container li {
       margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 8px;
+    }
+
+    .glass-container .post-date {
+      font-size: 0.85rem;
+      color: rgba(255, 255, 255, 0.6);
+      margin-left: 16px;
+      white-space: nowrap;
+      font-family: monospace;
     }
 
     /* 链接样式 */
@@ -143,6 +156,7 @@ layout: null
         {% else %}
         <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
         {% endif %}
+        <span class="post-date">{{ post.date | date: "%Y-%m-%d" }}</span>
       </li>
       {% endfor %}
     </ul>
