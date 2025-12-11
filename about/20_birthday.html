@@ -12,10 +12,15 @@
             background-color: #050505;
             /* 深邃宇宙黑 */
             font-family: 'Microsoft YaHei', sans-serif;
+            min-height: 100vh;
         }
 
         canvas {
             display: block;
+            position: fixed;
+            inset: 0;
+            width: 100vw;
+            height: 100vh;
         }
 
         #instruction {
@@ -26,6 +31,13 @@
             color: rgba(255, 255, 255, 0.3);
             font-size: 12px;
             pointer-events: none;
+            padding: 0 12px;
+        }
+
+        @supports (padding: env(safe-area-inset-bottom)) {
+            #instruction {
+                bottom: calc(16px + env(safe-area-inset-bottom));
+            }
         }
     </style>
 </head>
@@ -45,16 +57,38 @@
         let timer = 0;
 
         const config = {
+            baseParticleCount: 5000,
             particleCount: 5000, // 增加粒子数，支撑更大的画面
             rocketSpeed: 13,     // 稍微加快上升速度
+            currentRocketSpeed: 13,
             textDuration: 60,
+            sampleScale: 0.25,
+            bigNumberRatio: 0.45,
+            textSizeCap: 250,
             // 调整配色，使用高对比度的荧光色，确保清晰
             colors: ['#FFC0CB', '#FFD700', '#00FFFF', '#FFFFFF', '#FF69B4']
         };
 
         function resize() {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            const displayWidth = window.innerWidth;
+            const displayHeight = window.innerHeight;
+
+            canvas.style.width = `${displayWidth}px`;
+            canvas.style.height = `${displayHeight}px`;
+            canvas.width = Math.round(displayWidth * dpr);
+            canvas.height = Math.round(displayHeight * dpr);
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+            width = displayWidth;
+            height = displayHeight;
+
+            const sizeFactor = Math.min(Math.max(Math.min(width, height) / 1080, 0.55), 1);
+            config.particleCount = Math.round(config.baseParticleCount * sizeFactor);
+            config.currentRocketSpeed = config.rocketSpeed * (width < 768 ? 0.8 : 1);
+            config.bigNumberRatio = width < 768 ? 0.36 : 0.45;
+            config.textSizeCap = width < 768 ? 180 : 250;
+            config.sampleScale = width < 768 ? 0.22 : 0.25;
         }
         window.addEventListener('resize', resize);
         resize();
@@ -65,7 +99,7 @@
 
         function getTextPoints(text, fontSize) {
             // 提高采样精度，获取更多细节
-            const sampleScale = 0.25;
+            const sampleScale = config.sampleScale || 0.25;
             const tempCanvas = document.createElement('canvas');
             const tempCtx = tempCanvas.getContext('2d');
 
@@ -163,7 +197,7 @@
                 p.isRocket = true;
                 p.x = width / 2 + (Math.random() - 0.5) * 10;
                 p.y = height + Math.random() * 50;
-                p.vy = -config.rocketSpeed - Math.random() * 2;
+                p.vy = -config.currentRocketSpeed - Math.random() * 2;
                 p.vx = (Math.random() - 0.5) * 0.5;
                 p.color = '#fff';
                 p.size = Math.random() * 3 + 2;
@@ -252,7 +286,7 @@
 
                         const angle = Math.random() * Math.PI * 2;
                         // 加大爆炸力度，填满屏幕
-                        const speed = Math.random() * 35 + 5;
+                        const speed = (Math.random() * 35 + 5) * (width < 768 ? 0.8 : 1);
                         p.vx = Math.cos(angle) * speed;
                         p.vy = Math.sin(angle) * speed;
                         p.color = randomColor();
@@ -285,8 +319,8 @@
                 timer++;
 
                 // 动态字号计算
-                const bigNumberSize = Math.min(width, height) * 0.45;
-                const textSize = Math.min(width / 3, 250); // 最后的文字也加大
+                const bigNumberSize = Math.min(width, height) * (config.bigNumberRatio || 0.45);
+                const textSize = Math.min(width / 3, config.textSizeCap || 250); // 最后的文字也加大
 
                 if (state === 'COUNTDOWN_3') {
                     if (timer > config.textDuration) {
@@ -307,7 +341,7 @@
                 else if (state === 'COUNTDOWN_1') {
                     if (timer > config.textDuration) {
                         state = 'TEXT';
-                        const pts = getTextPoints("20岁 生日快乐", textSize);
+                        const pts = getTextPoints("20岁生日快乐", textSize);
                         assignTargets(pts);
                     }
                 }
@@ -323,6 +357,10 @@
             state = 'LAUNCH';
             initParticles();
         });
+        document.addEventListener('touchstart', () => {
+            state = 'LAUNCH';
+            initParticles();
+        }, { passive: true });
 
     </script>
 </body>
