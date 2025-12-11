@@ -349,6 +349,117 @@
                 font-size: 24px;
             }
         }
+
+        /* --- 悬浮留言板样式 --- */
+        #guestbook-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: rgba(20, 20, 30, 0.8);
+            border: 2px solid #00f3ff;
+            /* 霓虹青色 */
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 0 15px #00f3ff, inset 0 0 10px rgba(0, 243, 255, 0.3);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            color: #00f3ff;
+        }
+
+        #guestbook-btn:hover {
+            transform: scale(1.1) rotate(10deg);
+            box-shadow: 0 0 25px #00f3ff, inset 0 0 15px rgba(0, 243, 255, 0.5);
+            background: rgba(0, 243, 255, 0.1);
+        }
+
+        /* 侧滑面板 */
+        #guestbook-panel {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 400px;
+            max-width: 90%;
+            height: 100%;
+            background: rgba(20, 20, 30, 0.6);
+            /* 深色半透明 */
+            backdrop-filter: blur(20px);
+            /* 毛玻璃 */
+            -webkit-backdrop-filter: blur(20px);
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #guestbook-panel.active {
+            transform: translateX(0);
+        }
+
+        /* 面板头部 */
+        .guestbook-header {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .guestbook-header h3 {
+            color: #fff;
+            margin: 0;
+            font-size: 1.2rem;
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+        }
+
+        #guestbook-close {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 2rem;
+            cursor: pointer;
+            line-height: 1;
+            transition: color 0.3s;
+        }
+
+        #guestbook-close:hover {
+            color: #00f3ff;
+        }
+
+        /* 面板内容 */
+        .guestbook-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        /* 遮罩层 */
+        #guestbook-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s;
+            backdrop-filter: blur(2px);
+        }
+
+        #guestbook-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
     </style>
 </head>
 
@@ -430,6 +541,26 @@
         © 2025 The Time Forever · Hosted on GitHub Pages
     </div>
 
+    <!-- 悬浮留言板按钮 -->
+    <div id="guestbook-btn" title="留言板">
+        <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+    </div>
+
+    <!-- 侧滑留言板面板 -->
+    <div id="guestbook-panel">
+        <div class="guestbook-header">
+            <h3>留言板</h3>
+            <button id="guestbook-close">&times;</button>
+        </div>
+        <div class="guestbook-content">
+            <div class="giscus"></div>
+        </div>
+    </div>
+    <div id="guestbook-overlay"></div>
+
     <!-- 简单的 JS，用来轮播背景图片 -->
     <script>
         const slides = document.querySelectorAll(".bg-slideshow img");
@@ -482,6 +613,50 @@
 
         // 初始化自动播放
         startAutoPlay();
+
+        // --- 留言板逻辑 ---
+        const guestbookBtn = document.getElementById('guestbook-btn');
+        const guestbookPanel = document.getElementById('guestbook-panel');
+        const guestbookClose = document.getElementById('guestbook-close');
+        const guestbookOverlay = document.getElementById('guestbook-overlay');
+        let giscusLoaded = false;
+
+        function openGuestbook() {
+            guestbookPanel.classList.add('active');
+            guestbookOverlay.classList.add('active');
+
+            // 首次打开时加载 Giscus
+            if (!giscusLoaded) {
+                const script = document.createElement('script');
+                script.src = "https://giscus.app/client.js";
+                script.setAttribute('data-repo', "The-time-forever/The-time-forever.github.io");
+                script.setAttribute('data-repo-id', "R_kgDOQXvq9w");
+                script.setAttribute('data-category', "General");
+                script.setAttribute('data-category-id', "DIC_kwDOQXvq984CzpQ2");
+                script.setAttribute('data-mapping', "specific");
+                script.setAttribute('data-term', "Guestbook");
+                script.setAttribute('data-strict', "0");
+                script.setAttribute('data-reactions-enabled', "1");
+                script.setAttribute('data-emit-metadata', "0");
+                script.setAttribute('data-input-position', "top");
+                script.setAttribute('data-theme', "dark"); // 配合深色面板
+                script.setAttribute('data-lang', "zh-CN");
+                script.setAttribute('crossorigin', "anonymous");
+                script.async = true;
+
+                document.querySelector('.giscus').appendChild(script);
+                giscusLoaded = true;
+            }
+        }
+
+        function closeGuestbook() {
+            guestbookPanel.classList.remove('active');
+            guestbookOverlay.classList.remove('active');
+        }
+
+        guestbookBtn.addEventListener('click', openGuestbook);
+        guestbookClose.addEventListener('click', closeGuestbook);
+        guestbookOverlay.addEventListener('click', closeGuestbook);
     </script>
 </body>
 
