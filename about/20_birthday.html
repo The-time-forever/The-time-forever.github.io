@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>20岁生日快乐 - 星空粒子</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #050505;
+            /* 深邃宇宙黑 */
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        #instruction {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 12px;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="instruction">点击屏幕重播动画</div>
+    <canvas id="canvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        let width, height;
+        let particles = [];
+        let state = 'LAUNCH';
+        let timer = 0;
+
+        const config = {
+            particleCount: 5000, // 增加粒子数，支撑更大的画面
+            rocketSpeed: 13,     // 稍微加快上升速度
+            textDuration: 60,
+            // 调整配色，使用高对比度的荧光色，确保清晰
+            colors: ['#FFC0CB', '#FFD700', '#00FFFF', '#FFFFFF', '#FF69B4']
+        };
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        function randomColor() {
+            return config.colors[Math.floor(Math.random() * config.colors.length)];
+        }
+
+        function getTextPoints(text, fontSize) {
+            // 提高采样精度，获取更多细节
+            const sampleScale = 0.25;
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+
+            const sampleWidth = Math.floor(width * sampleScale);
+            const sampleHeight = Math.floor(height * sampleScale);
+            tempCanvas.width = sampleWidth;
+            tempCanvas.height = sampleHeight;
+
+            const scaledFontSize = Math.floor(fontSize * sampleScale);
+
+            tempCtx.font = `bold ${scaledFontSize}px "Microsoft YaHei", sans-serif`;
+            tempCtx.fillStyle = 'white';
+            tempCtx.textAlign = 'center';
+            tempCtx.textBaseline = 'middle';
+            tempCtx.fillText(text, sampleWidth / 2, sampleHeight / 2);
+
+            const imageData = tempCtx.getImageData(0, 0, sampleWidth, sampleHeight);
+            const data = imageData.data;
+            const points = [];
+
+            // 稍微减小步长，增加采样点密度
+            const step = 1;
+
+            for (let y = 0; y < sampleHeight; y += step) {
+                for (let x = 0; x < sampleWidth; x += step) {
+                    const index = (y * sampleWidth + x) * 4;
+                    if (data[index + 3] > 128) {
+                        points.push({
+                            x: x / sampleScale,
+                            y: y / sampleScale
+                        });
+                    }
+                }
+            }
+            return points;
+        }
+
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.x = width / 2;
+                this.y = height + 10;
+                this.vx = 0;
+                this.vy = 0;
+                this.size = Math.random() * 2 + 1; // 粒子稍微调大一点点
+                this.color = randomColor();
+                this.alpha = 1;
+                this.targetX = null;
+                this.targetY = null;
+                this.isRocket = false;
+            }
+
+            updatePhysics() {
+                this.x += this.vx;
+                this.y += this.vy;
+
+                if (this.isRocket) {
+                    // 保持速度
+                } else {
+                    this.vx *= 0.93; // 稍微减小阻力，让爆炸飞得更远
+                    this.vy *= 0.93;
+                }
+            }
+
+            updateTarget() {
+                if (this.targetX !== null && this.targetY !== null) {
+                    const dx = this.targetX - this.x;
+                    const dy = this.targetY - this.y;
+
+                    // 缓动系数，越大飞得越快
+                    const ease = 0.08;
+
+                    this.x += dx * ease;
+                    this.y += dy * ease;
+                }
+                // 移除了“else”分支里的随机漂浮逻辑，所有粒子都会有目标
+            }
+
+            draw() {
+                ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            for (let i = 0; i < 30; i++) {
+                const p = new Particle();
+                p.isRocket = true;
+                p.x = width / 2 + (Math.random() - 0.5) * 10;
+                p.y = height + Math.random() * 50;
+                p.vy = -config.rocketSpeed - Math.random() * 2;
+                p.vx = (Math.random() - 0.5) * 0.5;
+                p.color = '#fff';
+                p.size = Math.random() * 3 + 2;
+                particles.push(p);
+            }
+        }
+
+        // 核心修改：确保所有粒子都有去处
+        function assignTargets(targetPoints) {
+            // 如果文字点太少（比如数字'1'），防止粒子无处可去
+            if (targetPoints.length === 0) return;
+
+            // 如果现有粒子不够，补齐
+            if (targetPoints.length > particles.length) {
+                const diff = targetPoints.length - particles.length;
+                for (let i = 0; i < diff; i++) {
+                    const p = new Particle();
+                    p.x = width / 2;
+                    p.y = height / 2;
+                    p.alpha = 0;
+                    particles.push(p);
+                }
+            }
+
+            // 打乱粒子顺序，让变换更随机自然
+            const shuffledParticles = [...particles].sort(() => Math.random() - 0.5);
+
+            shuffledParticles.forEach((p, i) => {
+                let target;
+
+                if (i < targetPoints.length) {
+                    // 如果粒子数量在目标点范围内，一对一分配
+                    target = targetPoints[i];
+                } else {
+                    // 【关键修改】如果粒子多了，随机分配到任意一个目标点上
+                    // 这样所有粒子都会聚集成文字，不会有背景杂点
+                    target = targetPoints[Math.floor(Math.random() * targetPoints.length)];
+                }
+
+                // 给一点点随机偏移，让文字看起来更厚实，而不是单纯的线条
+                p.targetX = target.x + (Math.random() - 0.5) * 2;
+                p.targetY = target.y + (Math.random() - 0.5) * 2;
+
+                p.alpha = 1;
+                p.color = randomColor();
+            });
+        }
+
+        function animate() {
+            // 使用更深的拖尾，让黑色更纯净
+            ctx.fillStyle = 'rgba(5, 5, 5, 0.3)';
+            ctx.fillRect(0, 0, width, height);
+
+            if (state === 'LAUNCH') {
+                let headY = height;
+
+                particles.forEach(p => {
+                    if (p.isRocket) {
+                        p.updatePhysics();
+                        p.draw();
+                        if (Math.random() > 0.5) {
+                            ctx.fillStyle = `rgba(255, 200, 100, ${Math.random() * 0.5})`;
+                            ctx.fillRect(p.x, p.y + Math.random() * 20, 2, 2);
+                        }
+                        if (p.y < headY) headY = p.y;
+                    }
+                });
+
+                if (headY < height / 2) {
+                    state = 'EXPLODE';
+
+                    const currentCount = particles.length;
+                    const needed = config.particleCount - currentCount;
+
+                    for (let i = 0; i < needed; i++) {
+                        const p = new Particle();
+                        p.x = width / 2;
+                        p.y = height / 2;
+                        particles.push(p);
+                    }
+
+                    particles.forEach(p => {
+                        p.isRocket = false;
+                        p.x = width / 2 + (Math.random() - 0.5) * 5;
+                        p.y = height / 2 + (Math.random() - 0.5) * 5;
+
+                        const angle = Math.random() * Math.PI * 2;
+                        // 加大爆炸力度，填满屏幕
+                        const speed = Math.random() * 35 + 5;
+                        p.vx = Math.cos(angle) * speed;
+                        p.vy = Math.sin(angle) * speed;
+                        p.color = randomColor();
+                        p.alpha = 1;
+                    });
+                    timer = 0;
+                }
+            }
+            else if (state === 'EXPLODE') {
+                particles.forEach(p => {
+                    p.updatePhysics();
+                    p.draw();
+                });
+                timer++;
+                if (timer > 50) {
+                    state = 'COUNTDOWN_3';
+                    // 使用动态字号，约占屏幕高度的 45%
+                    const size = Math.min(width, height) * 0.45;
+                    const pts = getTextPoints("3", size);
+                    assignTargets(pts);
+                    timer = 0;
+                }
+            }
+            else {
+                particles.forEach(p => {
+                    p.updateTarget();
+                    p.draw();
+                });
+
+                timer++;
+
+                // 动态字号计算
+                const bigNumberSize = Math.min(width, height) * 0.45;
+                const textSize = Math.min(width / 3, 250); // 最后的文字也加大
+
+                if (state === 'COUNTDOWN_3') {
+                    if (timer > config.textDuration) {
+                        state = 'COUNTDOWN_2';
+                        const pts = getTextPoints("2", bigNumberSize);
+                        assignTargets(pts);
+                        timer = 0;
+                    }
+                }
+                else if (state === 'COUNTDOWN_2') {
+                    if (timer > config.textDuration) {
+                        state = 'COUNTDOWN_1';
+                        const pts = getTextPoints("1", bigNumberSize);
+                        assignTargets(pts);
+                        timer = 0;
+                    }
+                }
+                else if (state === 'COUNTDOWN_1') {
+                    if (timer > config.textDuration) {
+                        state = 'TEXT';
+                        const pts = getTextPoints("20岁 生日快乐", textSize);
+                        assignTargets(pts);
+                    }
+                }
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        initParticles();
+        animate();
+
+        document.addEventListener('click', () => {
+            state = 'LAUNCH';
+            initParticles();
+        });
+
+    </script>
+</body>
+
+</html>
