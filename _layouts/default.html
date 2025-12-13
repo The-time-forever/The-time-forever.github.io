@@ -389,18 +389,21 @@
             width: 400px;
             max-width: 90%;
             height: 100%;
-            background: rgba(20, 20, 30, 0.6);
-            /* 深色半透明 */
-            backdrop-filter: blur(20px);
-            /* 毛玻璃 */
-            -webkit-backdrop-filter: blur(20px);
-            border-left: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+            /* 清透亮色毛玻璃背景 */
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            /* 冰霜边缘高光 */
+            border-left: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.2);
             transform: translateX(100%);
             transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 1001;
             display: flex;
             flex-direction: column;
+            /* 强制文字白色并增加阴影 */
+            color: #fff;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
         }
 
         #guestbook-panel.active {
