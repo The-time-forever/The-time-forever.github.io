@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 
 <head>
@@ -7,6 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="shortcut icon" href="/favicon.ico?v=2" type="image/x-icon">
     <link rel="icon" href="/images/favicon.png?v=2" type="image/png">
+    {% if page.url == "/" %}
+    <link rel="stylesheet" href="/assets/css/intro.css">
+    {% endif %}
 
     <style>
         * {
@@ -467,9 +470,31 @@
             visibility: visible;
         }
     </style>
+    {% if page.url == "/" %}
+    <link rel="stylesheet" href="/assets/css/intro.css">
+    {% endif %}
 </head>
 
 <body>
+    {% if page.url == "/" %}
+    <div class="intro-screen">
+        <div class="intro-stage" id="introStage">
+            <img id="introBgImage" class="intro-bg-image" src="/intro-animation/calendar202602.png"
+                alt="calendar background" />
+            <div class="intro-bg-reveal" aria-hidden="true"></div>
+
+            <div id="introHighlighter" class="intro-highlighter"></div>
+            <div id="introPullArrow" class="intro-pull-arrow" aria-label="Pull up"></div>
+
+            <div class="intro-json-loader" id="introJsonLoader">
+                <button id="introPickJsonBtn" type="button">选择坐标 JSON</button>
+                <input id="introJsonFileInput" type="file" accept=".json,application/json" hidden />
+            </div>
+        </div>
+    </div>
+    <script src="/assets/js/intro.js"></script>
+    {% endif %}
+
     <!-- 背景轮播图片：images/bg1.jpg/bg2.jpg/bg3.jpg 需与你仓库中的图片文件名一致 -->
     <div class="bg-slideshow">
         <img src="images/bgz1.jpg" class="active" alt="background 1" />
