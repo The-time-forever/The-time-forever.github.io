@@ -7,9 +7,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="shortcut icon" href="/favicon.ico?v=2" type="image/x-icon">
     <link rel="icon" href="/images/favicon.png?v=2" type="image/png">
+    {% comment %}
     {% if page.url == "/" %}
     <link rel="stylesheet" href="/assets/css/intro.css">
     {% endif %}
+    {% endcomment %}
 
     <style>
         * {
@@ -470,12 +472,15 @@
             visibility: visible;
         }
     </style>
+    {% comment %}
     {% if page.url == "/" %}
     <link rel="stylesheet" href="/assets/css/intro.css">
     {% endif %}
+    {% endcomment %}
 </head>
 
 <body>
+    {% comment %}
     {% if page.url == "/" %}
     <div class="intro-screen">
         <div class="intro-stage" id="introStage">
@@ -494,6 +499,7 @@
     </div>
     <script src="/assets/js/intro.js"></script>
     {% endif %}
+    {% endcomment %}
 
     <!-- 背景轮播图片：images/bg1.jpg/bg2.jpg/bg3.jpg 需与你仓库中的图片文件名一致 -->
     <div class="bg-slideshow">
