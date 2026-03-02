@@ -212,6 +212,16 @@
             text-shadow: 0 0 8px rgba(0, 255, 255, 0.6);
         }
 
+        /* Mermaid 图表样式 */
+        .glass-container .mermaid {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 1.5em 0;
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            overflow-x: auto;
+        }
+
         /* 响应式调整 */
         @media (max-width: 600px) {
             .glass-container {
@@ -240,6 +250,23 @@
         };
     </script>
     <script type="text/javascript" id="MathJax-script" async src="/assets/js/mathjax.js">
+    </script>
+
+    <!-- Mermaid Configuration -->
+    <script type="module">
+        import mermaid from '/assets/js/mermaid.min.js';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'dark',
+            themeVariables: {
+                primaryColor: '#00f2ff',
+                primaryTextColor: '#fff',
+                primaryBorderColor: '#00f2ff',
+                lineColor: '#00f2ff',
+                secondaryColor: '#1a1a2e',
+                tertiaryColor: '#16213e'
+            }
+        });
     </script>
 </head>
 
