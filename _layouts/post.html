@@ -217,9 +217,20 @@
             background: rgba(0, 0, 0, 0.3);
             padding: 20px;
             border-radius: 8px;
-            margin: 1.5em 0;
+            margin: 1.5em auto;
             border: 1px solid rgba(0, 242, 255, 0.2);
             overflow-x: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Mermaid SVG 居中 */
+        .glass-container .mermaid svg {
+            display: block;
+            margin: 0 auto;
+            max-width: 100%;
+            height: auto;
         }
 
         /* 响应式调整 */
