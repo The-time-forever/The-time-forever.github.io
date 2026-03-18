@@ -1,0 +1,700 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calendar Intro</title>
+  <style>
+    :root {
+      --bg: #121212;
+      --accent: #adff2f;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--accent);
+      font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+
+    .home-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      display: grid;
+      place-items: center;
+      background: radial-gradient(circle at 20% 20%, #1f2a1f 0%, #121212 55%, #0a0a0a 100%);
+      color: #98d84a;
+      letter-spacing: 0.08em;
+      font-size: 18px;
+    }
+
+    .screen {
+      position: fixed;
+      inset: 0;
+      z-index: 2;
+    }
+
+    .stage {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      transition: transform 700ms cubic-bezier(0.2, 0.75, 0.2, 1);
+      touch-action: none;
+    }
+
+    .stage.pulled {
+      transform: translateY(-100vh);
+    }
+
+    .bg-image {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      user-select: none;
+      -webkit-user-drag: none;
+      pointer-events: none;
+    }
+
+    .bg-reveal {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      backdrop-filter: blur(30px) saturate(1.08) brightness(1);
+      -webkit-backdrop-filter: blur(30px) saturate(1.08) brightness(1);
+      background:
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%),
+        radial-gradient(140% 100% at 50% 50%, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.04) 42%, rgba(255, 255, 255, 0.02) 100%);
+      transform: translateY(0);
+      opacity: 1;
+      transition: transform 2500ms cubic-bezier(0.16, 0.74, 0.16, 1), opacity 520ms linear 1850ms;
+      will-change: transform, opacity;
+    }
+
+    .stage.ready .bg-reveal {
+      transform: translateY(-112%);
+      opacity: 0;
+    }
+
+    .highlighter {
+      position: absolute;
+      border: 2px solid var(--accent);
+      border-radius: 6px;
+      background: rgba(173, 255, 47, 0.1);
+      box-shadow: 0 0 10px rgba(173, 255, 47, 0.4);
+      pointer-events: none;
+      opacity: 0;
+      visibility: hidden;
+      transition: left 280ms linear, top 280ms linear, width 280ms linear, height 280ms linear, opacity 220ms ease;
+    }
+
+    .highlighter.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .pull-arrow {
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      border-left: 3px solid var(--accent);
+      border-top: 3px solid var(--accent);
+      transform: rotate(45deg);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 260ms ease;
+      filter: drop-shadow(0 0 6px rgba(173, 255, 47, 0.45));
+      cursor: pointer;
+      z-index: 4;
+      will-change: opacity, transform;
+    }
+
+    .pull-arrow.visible {
+      opacity: 1;
+      visibility: visible;
+      animation: arrowBlink 1.2s ease-in-out infinite;
+    }
+
+    @keyframes arrowBlink {
+      0% {
+        opacity: 0.2;
+        transform: rotate(45deg) translateY(0);
+      }
+      50% {
+        opacity: 1;
+        transform: rotate(45deg) translateY(-3px);
+      }
+      100% {
+        opacity: 0.2;
+        transform: rotate(45deg) translateY(0);
+      }
+    }
+
+    .status {
+      position: absolute;
+      left: 50%;
+      top: 2%;
+      transform: translateX(-50%);
+      font-size: 12px;
+      color: #c3f47b;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: 1px solid rgba(173, 255, 47, 0.3);
+      white-space: nowrap;
+      z-index: 4;
+    }
+
+    .json-loader {
+      position: absolute;
+      right: 2%;
+      top: 2%;
+      display: none;
+      gap: 8px;
+      align-items: center;
+      z-index: 4;
+    }
+
+    .json-loader button,
+    .calib-btn {
+      border: 1px solid rgba(173, 255, 47, 0.6);
+      background: rgba(0, 0, 0, 0.45);
+      color: var(--accent);
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .calib-panel {
+      position: absolute;
+      left: 2%;
+      top: 2%;
+      z-index: 4;
+      width: min(320px, 42vw);
+      background: rgba(0, 0, 0, 0.55);
+      border: 1px solid rgba(173, 255, 47, 0.35);
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: #d8f8a8;
+      font-size: 12px;
+      display: none;
+    }
+
+    .calib-panel.show { display: block; }
+
+    .calib-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+
+    .calib-row {
+      display: grid;
+      grid-template-columns: 80px 1fr 48px;
+      align-items: center;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .calib-row input[type="range"] { width: 100%; }
+
+    .calib-date {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .calib-date input {
+      width: 64px;
+      border: 1px solid rgba(173, 255, 47, 0.5);
+      border-radius: 6px;
+      padding: 4px 6px;
+      color: #e7ffd0;
+      background: rgba(0, 0, 0, 0.4);
+    }
+  </style>
+</head>
+<body>
+  <div class="home-layer" id="homeLayer">HOME PLACEHOLDER</div>
+
+  <div class="screen">
+    <div class="stage" id="stage">
+      <img id="bgImage" class="bg-image" src="./calendar202602.png" alt="calendar background" />
+      <div class="bg-reveal" aria-hidden="true"></div>
+
+      <div id="highlighter" class="highlighter"></div>
+      <div id="pullArrow" class="pull-arrow" aria-label="Pull up"></div>
+
+      <div id="status" class="status">Loading...</div>
+
+      <div class="json-loader" id="jsonLoader">
+        <button id="pickJsonBtn" type="button">选择坐标 JSON</button>
+        <input id="jsonFileInput" type="file" accept=".json,application/json" hidden />
+      </div>
+
+      <button id="toggleCalibBtn" class="calib-btn" type="button" style="position:absolute;left:2%;bottom:2%;z-index:4;">手动校准</button>
+
+      <div class="calib-panel" id="calibPanel">
+        <div class="calib-top">
+          <strong>高亮框校准</strong>
+          <button id="resetCalibBtn" class="calib-btn" type="button">重置</button>
+        </div>
+        <div class="calib-row">
+          <span>left偏移</span>
+          <input id="leftShiftInput" type="range" min="-4" max="4" step="0.1" />
+          <span id="leftShiftVal"></span>
+        </div>
+        <div class="calib-row">
+          <span>top偏移</span>
+          <input id="topShiftInput" type="range" min="-6" max="2" step="0.1" />
+          <span id="topShiftVal"></span>
+        </div>
+        <div class="calib-row">
+          <span>宽度%</span>
+          <input id="widthInput" type="range" min="2" max="5" step="0.1" />
+          <span id="widthVal"></span>
+        </div>
+        <div class="calib-row">
+          <span>高度%</span>
+          <input id="heightInput" type="range" min="3.5" max="8.5" step="0.1" />
+          <span id="heightVal"></span>
+        </div>
+        <div class="calib-date">
+          <span>预览日期</span>
+          <input id="previewDayInput" type="number" min="1" max="31" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const statusEl = document.getElementById("status");
+    const stageEl = document.getElementById("stage");
+    const bgImageEl = document.getElementById("bgImage");
+    const highlighterEl = document.getElementById("highlighter");
+    const pullArrowEl = document.getElementById("pullArrow");
+
+    const jsonLoaderEl = document.getElementById("jsonLoader");
+    const pickJsonBtn = document.getElementById("pickJsonBtn");
+    const jsonFileInput = document.getElementById("jsonFileInput");
+
+    const toggleCalibBtn = document.getElementById("toggleCalibBtn");
+    const calibPanel = document.getElementById("calibPanel");
+    const resetCalibBtn = document.getElementById("resetCalibBtn");
+    const leftShiftInput = document.getElementById("leftShiftInput");
+    const topShiftInput = document.getElementById("topShiftInput");
+    const widthInput = document.getElementById("widthInput");
+    const heightInput = document.getElementById("heightInput");
+    const previewDayInput = document.getElementById("previewDayInput");
+    const leftShiftVal = document.getElementById("leftShiftVal");
+    const topShiftVal = document.getElementById("topShiftVal");
+    const widthVal = document.getElementById("widthVal");
+    const heightVal = document.getElementById("heightVal");
+
+    const CALIB_KEY = "calendar_highlighter_calib_v2";
+    const LEGACY_CALIB_KEY = "calendar_highlighter_calib_v1";
+    const NORMAL_TRANSITION = "left 280ms linear, top 280ms linear, width 280ms linear, height 280ms linear, opacity 220ms ease";
+    const INTRO_TRANSITION = "left 620ms cubic-bezier(0.2, 0.65, 0.2, 1), top 620ms cubic-bezier(0.2, 0.65, 0.2, 1), width 280ms linear, height 280ms linear, opacity 420ms ease";
+
+    const defaultCalib = { leftShift: 0.0, topShift: 0.0, width: 3.0, height: 5.2 };
+
+    let calib = { ...defaultCalib };
+    let currentData = null;
+    let currentSourceLabel = "";
+    let currentRect = null;
+    let animToken = 0;
+    let revealStarted = false;
+    let stagePulled = false;
+    let dragState = null;
+
+    async function loadCoordinates() {
+      const candidates = ["./calendar-coordinates-python.json", "./calendar202602-coordinates-python.json"];
+      for (const file of candidates) {
+        try {
+          const res = await fetch(file, { cache: "no-store" });
+          if (!res.ok) continue;
+          return { data: await res.json(), file };
+        } catch (_) {}
+      }
+      throw new Error("坐标 JSON 读取失败");
+    }
+
+    function enableManualJsonLoader() {
+      jsonLoaderEl.style.display = "flex";
+      pickJsonBtn.onclick = () => jsonFileInput.click();
+    }
+
+    function readJsonFromFile(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            resolve(JSON.parse(String(reader.result || "")));
+          } catch (e) {
+            reject(e);
+          }
+        };
+        reader.onerror = () => reject(reader.error || new Error("文件读取失败"));
+        reader.readAsText(file, "utf-8");
+      });
+    }
+
+    function getCoverMetrics(data) {
+      const rect = stageEl.getBoundingClientRect();
+      const imgW = Number(bgImageEl.naturalWidth) || Number(data?.imageNaturalSize?.width) || 2560;
+      const imgH = Number(bgImageEl.naturalHeight) || Number(data?.imageNaturalSize?.height) || 1440;
+      const scale = Math.max(rect.width / imgW, rect.height / imgH);
+      const renderW = imgW * scale;
+      const renderH = imgH * scale;
+      const offsetX = (rect.width - renderW) / 2;
+      const offsetY = (rect.height - renderH) / 2;
+      return { renderW, renderH, offsetX, offsetY };
+    }
+
+    function calcHighlighterRect(item, data) {
+      const m = getCoverMetrics(data);
+      const widthPx = (calib.width / 100) * m.renderW;
+      const heightPx = (calib.height / 100) * m.renderH;
+      const anchorX = m.offsetX + (item.leftPercent / 100) * m.renderW;
+      const anchorY = m.offsetY + (item.topPercent / 100) * m.renderH;
+      const leftPx = anchorX - widthPx * 0.5 + (calib.leftShift / 100) * m.renderW;
+      const topPx = anchorY - heightPx * 0.63 + (calib.topShift / 100) * m.renderH;
+      return { leftPx, topPx, widthPx, heightPx };
+    }
+
+    function applyRect(rect, visible = true) {
+      currentRect = rect;
+      highlighterEl.style.left = `${rect.leftPx}px`;
+      highlighterEl.style.top = `${rect.topPx}px`;
+      highlighterEl.style.width = `${rect.widthPx}px`;
+      highlighterEl.style.height = `${rect.heightPx}px`;
+      if (visible) highlighterEl.classList.add("visible");
+      else highlighterEl.classList.remove("visible");
+    }
+
+    function positionPullArrow(rectOverride) {
+      const rect = rectOverride || currentRect;
+      if (!rect) return;
+      const x = rect.leftPx + rect.widthPx * 0.5 - 9;
+      const y = rect.topPx + rect.heightPx * 0.5 - 9;
+      pullArrowEl.style.left = `${x}px`;
+      pullArrowEl.style.top = `${y}px`;
+    }
+
+    function showPullArrow(rectOverride) {
+      if (rectOverride) {
+        positionPullArrow(rectOverride);
+      }
+      pullArrowEl.classList.add("visible");
+    }
+
+    function hidePullArrow() {
+      pullArrowEl.classList.remove("visible");
+    }
+
+    function getTargetDay() {
+      return Number(previewDayInput.value) || new Date().getDate();
+    }
+
+    function getDayItem(data, day) {
+      if (!Array.isArray(data?.numbers)) return null;
+      return data.numbers.find(n => Number(n.value) === Number(day)) || null;
+    }
+
+    function getLastAvailableDay(data) {
+      if (!Array.isArray(data?.numbers) || data.numbers.length === 0) return 31;
+      return Math.max(...data.numbers.map(n => Number(n.value) || 0));
+    }
+
+    function getIntroSlotRect(data) {
+      const first = getDayItem(data, 1) || getDayItem(data, getTargetDay());
+      if (!first) return null;
+      const firstRect = calcHighlighterRect(first, data);
+      const day2 = getDayItem(data, 2);
+      const day2Rect = day2 ? calcHighlighterRect(day2, data) : null;
+      const stepX = day2Rect ? (day2Rect.leftPx - firstRect.leftPx) : firstRect.widthPx * 1.05;
+      return {
+        ...firstRect,
+        leftPx: firstRect.leftPx - stepX,
+      };
+    }
+
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function animateToDay(data, targetDay, sourceLabel) {
+      if (!data || stagePulled) return;
+      const token = ++animToken;
+      hidePullArrow();
+
+      const maxDay = getLastAvailableDay(data);
+      const endDay = Math.max(1, Math.min(Number(targetDay) || 1, maxDay));
+      const first = getDayItem(data, 1) || getDayItem(data, endDay);
+      if (!first) {
+        statusEl.textContent = `日期 ${endDay} 在 JSON 中未找到对应坐标`;
+        return;
+      }
+
+      const firstRect = calcHighlighterRect(first, data);
+      const day2 = getDayItem(data, 2);
+      const day2Rect = day2 ? calcHighlighterRect(day2, data) : null;
+      const stepX = day2Rect ? (day2Rect.leftPx - firstRect.leftPx) : firstRect.widthPx * 1.05;
+      const preRect = {
+        ...firstRect,
+        leftPx: firstRect.leftPx - stepX,
+        topPx: firstRect.topPx + firstRect.heightPx * 0.55,
+      };
+      const riseRect = { ...preRect, topPx: firstRect.topPx };
+
+      highlighterEl.style.transition = "none";
+      applyRect(preRect, false);
+      await sleep(34);
+      if (token !== animToken) return;
+
+      highlighterEl.style.transition = INTRO_TRANSITION;
+      applyRect(riseRect, true);
+      await sleep(700);
+      if (token !== animToken) return;
+
+      await sleep(220);
+      if (token !== animToken) return;
+
+      highlighterEl.style.transition = NORMAL_TRANSITION;
+      applyRect(firstRect, true);
+      await sleep(280);
+      if (token !== animToken) return;
+
+      statusEl.textContent = `Day: 1 -> ${endDay} | Source: ${sourceLabel}`;
+      for (let d = 2; d <= endDay; d++) {
+        if (token !== animToken) return;
+        const item = getDayItem(data, d);
+        if (item) {
+          applyRect(calcHighlighterRect(item, data), true);
+        }
+        await sleep(170);
+      }
+      if (token !== animToken) return;
+
+      statusEl.textContent = `Day: ${endDay} | Source: ${sourceLabel}`;
+      const introRect = getIntroSlotRect(data);
+      // Wait for last highlighter transition to settle, then place arrow.
+      await sleep(300);
+      if (token !== animToken) return;
+      showPullArrow(introRect || currentRect);
+    }
+
+    function renderCurrent(sourceLabelOverride) {
+      if (!currentData || stagePulled) return;
+      highlighterEl.style.transition = NORMAL_TRANSITION;
+      const sourceLabel = sourceLabelOverride || currentSourceLabel || "unknown";
+      const day = getTargetDay();
+      const item = getDayItem(currentData, day);
+      if (!item) {
+        statusEl.textContent = `日期 ${day} 在 JSON 中未找到对应坐标`;
+        return;
+      }
+      const rect = calcHighlighterRect(item, currentData);
+      applyRect(rect, true);
+      const introRect = getIntroSlotRect(currentData);
+      positionPullArrow(introRect || rect);
+      statusEl.textContent = `Day: ${day} | Source: ${sourceLabel}`;
+    }
+
+    function applyData(data, sourceLabel) {
+      currentData = data;
+      currentSourceLabel = sourceLabel;
+      setTimeout(() => {
+        if (!currentData) return;
+        animateToDay(currentData, getTargetDay(), sourceLabel);
+      }, 2080);
+    }
+
+    function loadCalib() {
+      try {
+        const raw = localStorage.getItem(CALIB_KEY);
+        if (raw) {
+          calib = { ...defaultCalib, ...JSON.parse(raw) };
+          return;
+        }
+
+        const legacyRaw = localStorage.getItem(LEGACY_CALIB_KEY);
+        if (!legacyRaw) return;
+        const old = JSON.parse(legacyRaw);
+        const oldW = Number(old.width ?? defaultCalib.width);
+        const oldH = Number(old.height ?? defaultCalib.height);
+        calib = {
+          width: oldW,
+          height: oldH,
+          leftShift: Number(old.leftShift ?? 0) + oldW * 0.5,
+          topShift: Number(old.topShift ?? 0) + oldH * 0.63,
+        };
+        localStorage.setItem(CALIB_KEY, JSON.stringify(calib));
+      } catch (_) {}
+    }
+
+    function saveCalib() {
+      localStorage.setItem(CALIB_KEY, JSON.stringify(calib));
+    }
+
+    function triggerRevealCurtain() {
+      if (revealStarted) return;
+      revealStarted = true;
+      stageEl.classList.remove("ready");
+      void stageEl.offsetWidth;
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          stageEl.classList.add("ready");
+        });
+      });
+    }
+
+    function syncCalibInputs() {
+      leftShiftInput.value = String(calib.leftShift);
+      topShiftInput.value = String(calib.topShift);
+      widthInput.value = String(calib.width);
+      heightInput.value = String(calib.height);
+      leftShiftVal.textContent = `${calib.leftShift.toFixed(1)}%`;
+      topShiftVal.textContent = `${calib.topShift.toFixed(1)}%`;
+      widthVal.textContent = `${calib.width.toFixed(1)}%`;
+      heightVal.textContent = `${calib.height.toFixed(1)}%`;
+      if (!previewDayInput.value) previewDayInput.value = String(new Date().getDate());
+    }
+
+    function onCalibChanged() {
+      animToken++;
+      calib.leftShift = Number(leftShiftInput.value);
+      calib.topShift = Number(topShiftInput.value);
+      calib.width = Number(widthInput.value);
+      calib.height = Number(heightInput.value);
+      syncCalibInputs();
+      saveCalib();
+      renderCurrent("manual");
+    }
+
+    function setStagePullOffset(px) {
+      if (stagePulled) return;
+      const y = Math.max(0, Math.min(window.innerHeight, px));
+      stageEl.style.transform = `translateY(${-y}px)`;
+    }
+
+    function openHome() {
+      if (stagePulled) return;
+      stagePulled = true;
+      hidePullArrow();
+      stageEl.style.transform = "";
+      stageEl.classList.add("pulled");
+    }
+
+    async function init() {
+      loadCalib();
+      syncCalibInputs();
+
+      try {
+        const { data, file } = await loadCoordinates();
+        applyData(data, file);
+      } catch (err) {
+        enableManualJsonLoader();
+        if (location.protocol === "file:") {
+          statusEl.textContent = "检测到 file:// 打开，fetch 会被拦截。请点右上角“选择坐标 JSON”。";
+        } else {
+          statusEl.textContent = `加载失败: ${err.message || err}（可点右上角手动选择 JSON）`;
+        }
+      }
+    }
+
+    toggleCalibBtn.addEventListener("click", () => {
+      calibPanel.classList.toggle("show");
+    });
+
+    resetCalibBtn.addEventListener("click", () => {
+      calib = { ...defaultCalib };
+      syncCalibInputs();
+      saveCalib();
+      animToken++;
+      renderCurrent("reset");
+    });
+
+    [leftShiftInput, topShiftInput, widthInput, heightInput].forEach(el => {
+      el.addEventListener("input", onCalibChanged);
+    });
+
+    previewDayInput.addEventListener("input", () => {
+      hidePullArrow();
+      animateToDay(currentData, getTargetDay(), "preview-day");
+    });
+
+    window.addEventListener("resize", () => {
+      animToken++;
+      renderCurrent("resize");
+    });
+
+    bgImageEl.addEventListener("load", () => {
+      triggerRevealCurtain();
+    });
+
+    if (bgImageEl.complete) {
+      triggerRevealCurtain();
+    }
+
+    pullArrowEl.addEventListener("click", () => {
+      openHome();
+    });
+
+    stageEl.addEventListener("pointerdown", (e) => {
+      if (stagePulled) return;
+      if (e.target.closest(".calib-panel") || e.target.closest(".calib-btn") || e.target.closest(".json-loader")) return;
+      dragState = { startY: e.clientY, pulled: 0 };
+      stageEl.style.transition = "none";
+    });
+
+    stageEl.addEventListener("pointermove", (e) => {
+      if (!dragState || stagePulled) return;
+      const dy = e.clientY - dragState.startY;
+      const pulled = Math.max(0, -dy);
+      dragState.pulled = pulled;
+      setStagePullOffset(pulled);
+    });
+
+    function endDrag() {
+      if (!dragState || stagePulled) return;
+      const pulled = dragState.pulled;
+      dragState = null;
+      stageEl.style.transition = "transform 700ms cubic-bezier(0.2, 0.75, 0.2, 1)";
+      if (pulled > 130) {
+        openHome();
+      } else {
+        stageEl.style.transform = "translateY(0)";
+      }
+    }
+
+    stageEl.addEventListener("pointerup", endDrag);
+    stageEl.addEventListener("pointercancel", endDrag);
+    stageEl.addEventListener("pointerleave", endDrag);
+
+    jsonFileInput.addEventListener("change", async (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      try {
+        const data = await readJsonFromFile(file);
+        applyData(data, file.name);
+      } catch (err) {
+        statusEl.textContent = `JSON 解析失败: ${err.message || err}`;
+      }
+    });
+
+    init();
+  </script>
+</body>
+</html>

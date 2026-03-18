@@ -97,7 +97,14 @@ layout: null
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      gap: 12px;
       padding-bottom: 8px;
+    }
+
+    .glass-container li a {
+      flex: 1;
+      min-width: 0;
+      line-height: 1.6;
     }
 
     .glass-container .post-date {
@@ -125,13 +132,30 @@ layout: null
     /* 响应式调整 */
     @media (max-width: 600px) {
       .glass-container {
-        margin: 70px 16px 20px;
-        padding: 24px;
+        margin: 72px 12px 20px;
+        padding: 20px;
       }
 
       .home-btn {
         top: 16px;
         left: 16px;
+        padding: 8px 14px;
+      }
+
+      .glass-container h1 {
+        font-size: 1.8rem;
+        letter-spacing: 1px;
+      }
+
+      .glass-container li {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 4px;
+        padding-bottom: 12px;
+      }
+
+      .glass-container .post-date {
+        margin-left: 0;
       }
     }
   </style>

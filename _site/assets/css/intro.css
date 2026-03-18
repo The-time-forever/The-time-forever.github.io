@@ -1,0 +1,124 @@
+:root {
+  --intro-bg: #121212;
+  --intro-accent: #adff2f;
+}
+
+.intro-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999; /* High z-index to cover everything */
+  pointer-events: none; /* Let clicks pass through if hidden, but we handle visibility with 'pulled' and 'ready' */
+}
+
+/* Ensure the stage blocks interactions while active */
+.intro-stage {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  transition: transform 700ms cubic-bezier(0.2, 0.75, 0.2, 1);
+  touch-action: none;
+  background: var(--intro-bg);
+  pointer-events: auto; /* Re-enable pointer events for the stage itself */
+}
+
+.intro-stage.pulled {
+  transform: translateY(-100vh);
+  pointer-events: none; /* Pass through when pulled up */
+}
+
+.intro-bg-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: none;
+}
+
+.intro-bg-reveal {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  backdrop-filter: blur(30px) saturate(1.08) brightness(1);
+  -webkit-backdrop-filter: blur(30px) saturate(1.08) brightness(1);
+  background:
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%),
+    radial-gradient(140% 100% at 50% 50%, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.04) 42%, rgba(255, 255, 255, 0.02) 100%);
+  transform: translateY(0);
+  opacity: 1;
+  transition: transform 2500ms cubic-bezier(0.16, 0.74, 0.16, 1), opacity 520ms linear 1850ms;
+  will-change: transform, opacity;
+}
+
+.intro-stage.ready .intro-bg-reveal {
+  transform: translateY(-112%);
+  opacity: 0;
+}
+
+.intro-highlighter {
+  position: absolute;
+  border: 2px solid var(--intro-accent);
+  border-radius: 6px;
+  background: rgba(173, 255, 47, 0.1);
+  box-shadow: 0 0 10px rgba(173, 255, 47, 0.4);
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: left 280ms linear, top 280ms linear, width 280ms linear, height 280ms linear, opacity 220ms ease;
+}
+
+.intro-highlighter.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.intro-pull-arrow {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-left: 3px solid var(--intro-accent);
+  border-top: 3px solid var(--intro-accent);
+  transform: rotate(45deg);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 260ms ease;
+  filter: drop-shadow(0 0 6px rgba(173, 255, 47, 0.45));
+  cursor: pointer;
+  z-index: 10000;
+  will-change: opacity, transform;
+}
+
+.intro-pull-arrow.visible {
+  opacity: 1;
+  visibility: visible;
+  animation: introArrowBlink 1.2s ease-in-out infinite;
+}
+
+@keyframes introArrowBlink {
+  0% { opacity: 0.2; transform: rotate(45deg) translateY(0); }
+  50% { opacity: 1; transform: rotate(45deg) translateY(-3px); }
+  100% { opacity: 0.2; transform: rotate(45deg) translateY(0); }
+}
+
+.intro-json-loader {
+  position: absolute;
+  right: 2%;
+  top: 2%;
+  display: none;
+  gap: 8px;
+  align-items: center;
+  z-index: 10000;
+}
+
+.intro-json-loader button {
+  border: 1px solid rgba(173, 255, 47, 0.6);
+  background: rgba(0, 0, 0, 0.45);
+  color: var(--intro-accent);
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+}

@@ -1,0 +1,2317 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>复变函数与积分变换 | The Time Forever</title>
+    <link rel="icon" href="/images/favicon.png" type="image/png">
+    <style>
+        /* 全局重置与字体颜色 */
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: #ffffff;
+            /* 全局白色字体 */
+            overflow-x: hidden;
+            background-color: #000000;
+            /* 确保背景黑 */
+        }
+
+        /* Canvas 放到页面最底层 */
+        #bg-canvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            display: block;
+            background: #000000;
+            pointer-events: none;
+        }
+
+        /* 返回首页按钮 */
+        .home-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 8px 16px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            backdrop-filter: blur(4px);
+            transition: all 0.3s ease;
+            z-index: 100;
+            font-size: 0.9rem;
+        }
+
+        .home-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border-color: #fff;
+        }
+
+        /* 毛玻璃容器 (Glassmorphism) */
+        .glass-container {
+            max-width: 900px;
+            margin: 80px auto 40px;
+            /* 上边距留给返回按钮 */
+            padding: 40px;
+            background: rgba(20, 20, 30, 0.4);
+            /* 更通透的深色背景 */
+            backdrop-filter: blur(20px);
+            /* 高强度背景模糊 */
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            /* 极细的亮色边框 */
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            /* 深度感阴影 */
+        }
+
+        /* 标题样式 */
+        .glass-container h1 {
+            margin-top: 0;
+            font-weight: 300;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 16px;
+            margin-bottom: 10px;
+            text-align: center;
+            color: #00f2ff;
+            text-shadow: 0 0 5px rgba(0, 242, 255, 0.7), 0 0 15px rgba(0, 242, 255, 0.5);
+            letter-spacing: 2px;
+        }
+
+        /* Markdown Content Styles */
+        .glass-container h2 {
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+            color: #00f2ff;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 5px;
+        }
+
+        .glass-container h3 {
+            margin-top: 1.2em;
+            margin-bottom: 0.5em;
+            color: #e0e0e0;
+        }
+
+        .glass-container h4 {
+            margin-top: 1em;
+            margin-bottom: 0.5em;
+            color: #ccc;
+        }
+
+        .glass-container p {
+            line-height: 1.8;
+            margin-bottom: 1em;
+            color: #ddd;
+            font-size: 1.05rem;
+        }
+
+        .glass-container ul,
+        .glass-container ol {
+            margin-left: 20px;
+            margin-bottom: 1em;
+            color: #ddd;
+        }
+
+        .glass-container li {
+            margin-bottom: 5px;
+        }
+
+        .glass-container blockquote {
+            border-left: 4px solid #00f2ff;
+            padding-left: 15px;
+            color: #aaa;
+            margin: 1em 0;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px 15px;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .glass-container pre {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1em 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-container code {
+            font-family: Consolas, Monaco, 'Andale Mono', monospace;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 5px;
+            border-radius: 3px;
+            color: #ff79c6;
+        }
+
+        .glass-container pre code {
+            background: transparent;
+            color: #f8f8f2;
+            padding: 0;
+        }
+
+        .glass-container img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin: 1em 0;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .post-meta {
+            text-align: center;
+            color: #888;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+
+        /* Table Styles */
+        .glass-container table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1em 0;
+            color: #ddd;
+        }
+
+        .glass-container th,
+        .glass-container td {
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        .glass-container th {
+            background: rgba(255, 255, 255, 0.1);
+            color: #00f2ff;
+        }
+
+        /* MathJax Overflow Handling */
+        mjx-container[display="true"] {
+            overflow-x: auto;
+            overflow-y: hidden;
+            max-width: 100%;
+            padding: 10px 0;
+        }
+
+        /* 链接样式 */
+        .glass-container a {
+            color: #00ffff;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .glass-container a:hover {
+            color: #fff;
+            text-decoration: underline;
+            text-shadow: 0 0 8px rgba(0, 255, 255, 0.6);
+        }
+
+        /* Mermaid 图表样式 */
+        .glass-container .mermaid {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 1.5em auto;
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            overflow-x: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Mermaid SVG 居中 */
+        .glass-container .mermaid svg {
+            display: block;
+            margin: 0 auto;
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 600px) {
+            .glass-container {
+                margin: 72px 12px 20px;
+                padding: 20px;
+            }
+
+            .home-btn {
+                top: 16px;
+                left: 16px;
+                padding: 8px 14px;
+            }
+
+            .glass-container h1 {
+                font-size: 1.8rem;
+                letter-spacing: 1px;
+            }
+
+            .glass-container h2 {
+                font-size: 1.35rem;
+            }
+
+            .glass-container h3 {
+                font-size: 1.15rem;
+            }
+
+            .glass-container p,
+            .glass-container li {
+                font-size: 1rem;
+                line-height: 1.75;
+            }
+
+            .post-meta {
+                margin-bottom: 22px;
+            }
+
+            .glass-container pre {
+                padding: 12px;
+                font-size: 0.9rem;
+            }
+
+            .glass-container table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .glass-container th,
+            .glass-container td {
+                padding: 8px 10px;
+            }
+
+            .glass-container .mermaid {
+                padding: 12px;
+            }
+        }
+    </style>
+
+    <!-- MathJax Configuration -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async src="/assets/js/mathjax.js">
+    </script>
+
+    <!-- Mermaid Configuration -->
+    <script src="/assets/js/mermaid.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            mermaid.initialize({
+                startOnLoad: true,
+                theme: 'dark',
+                themeVariables: {
+                    // 主要颜色 - 使用亮青色
+                    primaryColor: '#00d4ff',
+                    primaryTextColor: '#ffffff',
+                    primaryBorderColor: '#00f2ff',
+
+                    // 次要颜色 - 使用深色但不太暗
+                    secondaryColor: '#2a3f5f',
+                    secondaryTextColor: '#ffffff',
+                    secondaryBorderColor: '#00d4ff',
+
+                    // 第三颜色
+                    tertiaryColor: '#1e3a5f',
+                    tertiaryTextColor: '#ffffff',
+                    tertiaryBorderColor: '#00d4ff',
+
+                    // 线条颜色
+                    lineColor: '#00f2ff',
+
+                    // 文字颜色 - 确保所有文字都是白色
+                    textColor: '#ffffff',
+                    mainBkg: '#1a2332',
+
+                    // Git 图表特定颜色
+                    git0: '#00d4ff',
+                    git1: '#7c4dff',
+                    git2: '#ff6b6b',
+                    git3: '#4ecdc4',
+                    git4: '#ffd93d',
+                    git5: '#95e1d3',
+                    git6: '#f38181',
+                    git7: '#aa96da',
+
+                    // Git 分支名称文字颜色（gitInv 控制分支名称标签的文字颜色）
+                    gitInv0: '#000000',
+                    gitInv1: '#000000',
+                    gitInv2: '#000000',
+                    gitInv3: '#000000',
+                    gitInv4: '#000000',
+                    gitInv5: '#000000',
+                    gitInv6: '#000000',
+                    gitInv7: '#000000',
+
+                    // 提交点颜色 - 使用黑色文字以便在亮色背景上显示
+                    commitLabelColor: '#000000',
+                    commitLabelBackground: '#00d4ff',
+                    commitLabelFontSize: '14px',
+
+                    // 标签颜色 - 使用黑色文字
+                    tagLabelColor: '#000000',
+                    tagLabelBackground: '#00d4ff',
+                    tagLabelBorder: '#00f2ff',
+                    tagLabelFontSize: '12px',
+
+                    // Git 标签文字颜色（确保所有标签都是黑色）
+                    gitTagLabelColor: '#000000',
+                    gitTagLabelBackground: '#00d4ff',
+                    gitTagLabelBorder: '#00f2ff',
+
+                    // 分支标签颜色
+                    gitBranchLabel0: '#000000',
+                    gitBranchLabel1: '#000000',
+                    gitBranchLabel2: '#000000',
+                    gitBranchLabel3: '#000000',
+                    gitBranchLabel4: '#000000',
+                    gitBranchLabel5: '#000000',
+                    gitBranchLabel6: '#000000',
+                    gitBranchLabel7: '#000000',
+
+                    // 节点颜色
+                    nodeBorder: '#00f2ff',
+                    nodeTextColor: '#ffffff',
+
+                    // 边框和背景
+                    clusterBkg: '#1a2332',
+                    clusterBorder: '#00d4ff',
+
+                    // 标题颜色
+                    titleColor: '#ffffff',
+
+                    // 边缘标签
+                    edgeLabelBackground: '#1a2332',
+
+                    // 活动状态
+                    activeTaskBkgColor: '#00d4ff',
+                    activeTaskBorderColor: '#00f2ff',
+
+                    // 网格颜色
+                    gridColor: '#333333',
+
+                    // 序列图颜色
+                    actorBorder: '#00f2ff',
+                    actorBkg: '#1a2332',
+                    actorTextColor: '#ffffff',
+                    actorLineColor: '#00d4ff',
+                    signalColor: '#ffffff',
+                    signalTextColor: '#ffffff',
+                    labelBoxBkgColor: '#1a2332',
+                    labelBoxBorderColor: '#00f2ff',
+                    labelTextColor: '#ffffff',
+                    loopTextColor: '#ffffff',
+                    noteBorderColor: '#00f2ff',
+                    noteBkgColor: '#1a2332',
+                    noteTextColor: '#ffffff',
+                    activationBorderColor: '#00f2ff',
+                    activationBkgColor: '#2a3f5f',
+                    sequenceNumberColor: '#ffffff'
+                }
+            });
+        });
+    </script>
+</head>
+
+<body>
+
+    <!-- Canvas 背景：不影响可访问性 -->
+    <canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+    <!-- 返回首页按钮 -->
+    <a href="/posts" class="home-btn">← 返回文章列表</a>
+
+    <div class="glass-container">
+        <h1>复变函数与积分变换</h1>
+        <p class="post-meta">发布于 2025-12-07</p>
+
+        <h1 id="工程数学复变函数与积分变换---复习全书-完整版">工程数学：复变函数与积分变换 - 复习全书 (完整版)</h1>
+
+<blockquote>
+  <p><strong>教材版本</strong>：</p>
+
+  <ol>
+    <li>《复变函数》（第二版）- 西安交通大学 王绵森</li>
+    <li>《工程数学——积分变换》（第六版）- 东南大学 张元林</li>
+  </ol>
+
+</blockquote>
+
+<h2 id="目录">目录</h2>
+<ul id="markdown-toc">
+  <li><a href="#工程数学复变函数与积分变换---复习全书-完整版" id="markdown-toc-工程数学复变函数与积分变换---复习全书-完整版">工程数学：复变函数与积分变换 - 复习全书 (完整版)</a>    <ul>
+      <li><a href="#目录" id="markdown-toc-目录">目录</a></li>
+    </ul>
+  </li>
+  <li><a href="#第一部分复变函数论" id="markdown-toc-第一部分复变函数论">第一部分：复变函数论</a>    <ul>
+      <li><a href="#第一章-复数与复变函数" id="markdown-toc-第一章-复数与复变函数">第一章 复数与复变函数</a>        <ul>
+          <li><a href="#1-复数的概念与运算" id="markdown-toc-1-复数的概念与运算">1. 复数的概念与运算</a>            <ul>
+              <li><a href="#11-基本定义" id="markdown-toc-11-基本定义">1.1 基本定义</a></li>
+              <li><a href="#12-四则运算" id="markdown-toc-12-四则运算">1.2 四则运算</a></li>
+              <li><a href="#13-共轭复数-barz" id="markdown-toc-13-共轭复数-barz">1.3 共轭复数 ($\bar{z}$)</a></li>
+            </ul>
+          </li>
+          <li><a href="#2-复数的几何表示" id="markdown-toc-2-复数的几何表示">2. 复数的几何表示</a>            <ul>
+              <li><a href="#21-模与辐角" id="markdown-toc-21-模与辐角">2.1 模与辐角</a></li>
+              <li><a href="#22-三种表示形式" id="markdown-toc-22-三种表示形式">2.2 三种表示形式</a></li>
+              <li><a href="#23-乘积与商的几何意义" id="markdown-toc-23-乘积与商的几何意义">2.3 乘积与商的几何意义</a></li>
+            </ul>
+          </li>
+          <li><a href="#3-乘幂与方根-重点" id="markdown-toc-3-乘幂与方根-重点">3. 乘幂与方根 (重点)</a>            <ul>
+              <li><a href="#31-乘幂-棣莫弗公式" id="markdown-toc-31-乘幂-棣莫弗公式">3.1 乘幂 (棣莫弗公式)</a></li>
+              <li><a href="#32-方根" id="markdown-toc-32-方根">3.2 方根</a></li>
+            </ul>
+          </li>
+          <li><a href="#4--第一章习题中的重要结论" id="markdown-toc-4--第一章习题中的重要结论">4. 🎯 第一章习题中的重要结论</a></li>
+          <li><a href="#5-平面点集与区域" id="markdown-toc-5-平面点集与区域">5. 平面点集与区域</a></li>
+          <li><a href="#6-复变函数的极限与连续性" id="markdown-toc-6-复变函数的极限与连续性">6. 复变函数的极限与连续性</a>            <ul>
+              <li><a href="#61-极限" id="markdown-toc-61-极限">6.1 极限</a></li>
+              <li><a href="#62-连续性" id="markdown-toc-62-连续性">6.2 连续性</a></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><a href="#第二章-解析函数" id="markdown-toc-第二章-解析函数">第二章 解析函数</a>        <ul>
+          <li><a href="#1-导数与解析函数" id="markdown-toc-1-导数与解析函数">1. 导数与解析函数</a>            <ul>
+              <li><a href="#11-复变函数的导数" id="markdown-toc-11-复变函数的导数">1.1 复变函数的导数</a></li>
+              <li><a href="#12-解析函数的概念" id="markdown-toc-12-解析函数的概念">1.2 解析函数的概念</a></li>
+            </ul>
+          </li>
+          <li><a href="#2-解析的充要条件-柯西-黎曼方程" id="markdown-toc-2-解析的充要条件-柯西-黎曼方程">2. 解析的充要条件 (柯西-黎曼方程)</a>            <ul>
+              <li><a href="#21-c-r-方程-直角坐标形式" id="markdown-toc-21-c-r-方程-直角坐标形式">2.1 C-R 方程 (直角坐标形式)</a></li>
+              <li><a href="#22-导数的计算公式" id="markdown-toc-22-导数的计算公式">2.2 导数的计算公式</a></li>
+              <li><a href="#23-c-r-方程-极坐标形式---习题10结论" id="markdown-toc-23-c-r-方程-极坐标形式---习题10结论">2.3 C-R 方程 (极坐标形式) —— ★ 习题10结论</a></li>
+            </ul>
+          </li>
+          <li><a href="#3-解析函数与调和函数" id="markdown-toc-3-解析函数与调和函数">3. 解析函数与调和函数</a>            <ul>
+              <li><a href="#31-关系" id="markdown-toc-31-关系">3.1 关系</a></li>
+              <li><a href="#32-已知实部求虚部-偏积分法" id="markdown-toc-32-已知实部求虚部-偏积分法">3.2 已知实部求虚部 (偏积分法)</a></li>
+            </ul>
+          </li>
+          <li><a href="#4-初等函数" id="markdown-toc-4-初等函数">4. 初等函数</a>            <ul>
+              <li><a href="#41-指数函数-ez" id="markdown-toc-41-指数函数-ez">4.1 指数函数 $e^z$</a></li>
+              <li><a href="#42-对数函数-lnz-多值性" id="markdown-toc-42-对数函数-lnz-多值性">4.2 对数函数 $Lnz$ (多值性)</a></li>
+              <li><a href="#43-乘幂-zb" id="markdown-toc-43-乘幂-zb">4.3 乘幂 $z^b$</a></li>
+              <li><a href="#44-三角函数" id="markdown-toc-44-三角函数">4.4 三角函数</a></li>
+            </ul>
+          </li>
+          <li><a href="#5--第二章习题集中的重要结论" id="markdown-toc-5--第二章习题集中的重要结论">5. 🎯 第二章习题集中的重要结论</a>            <ul>
+              <li><a href="#51-判断解析函数恒为常数-习题-11" id="markdown-toc-51-判断解析函数恒为常数-习题-11">5.1 判断解析函数恒为常数 [习题 11]</a></li>
+              <li><a href="#52-解析函数的模的性质-习题-7" id="markdown-toc-52-解析函数的模的性质-习题-7">5.2 解析函数的模的性质 [习题 7]</a></li>
+              <li><a href="#53-共轭运算的穿透性-习题-13" id="markdown-toc-53-共轭运算的穿透性-习题-13">5.3 共轭运算的“穿透性” [习题 13]</a></li>
+              <li><a href="#54-导数公式的推广-习题-21" id="markdown-toc-54-导数公式的推广-习题-21">5.4 导数公式的推广 [习题 21]</a></li>
+              <li><a href="#55-柯西-黎曼方程的等价形式" id="markdown-toc-55-柯西-黎曼方程的等价形式">5.5 柯西-黎曼方程的等价形式</a></li>
+            </ul>
+          </li>
+          <li><a href="#6-常见易错点-checklist" id="markdown-toc-6-常见易错点-checklist">6. 常见易错点 Checklist</a></li>
+        </ul>
+      </li>
+      <li><a href="#第三章-复变函数的积分" id="markdown-toc-第三章-复变函数的积分">第三章 复变函数的积分</a>        <ul>
+          <li><a href="#1-积分的概念与基础计算" id="markdown-toc-1-积分的概念与基础计算">1. 积分的概念与基础计算</a>            <ul>
+              <li><a href="#11-复变函数积分定义" id="markdown-toc-11-复变函数积分定义">1.1 复变函数积分定义</a></li>
+              <li><a href="#12-积分计算法-i参数方程法-通用" id="markdown-toc-12-积分计算法-i参数方程法-通用">1.2 积分计算法 I：参数方程法 (通用)</a></li>
+              <li><a href="#13-积分估值定理-ml-不等式" id="markdown-toc-13-积分估值定理-ml-不等式">1.3 积分估值定理 (ML 不等式)</a></li>
+            </ul>
+          </li>
+          <li><a href="#2-柯西-古萨基本定理-积分理论基石" id="markdown-toc-2-柯西-古萨基本定理-积分理论基石">2. 柯西-古萨基本定理 (积分理论基石)</a>            <ul>
+              <li><a href="#21-单连通域情形" id="markdown-toc-21-单连通域情形">2.1 单连通域情形</a></li>
+              <li><a href="#22-积分计算法-ii牛顿-莱布尼茨公式" id="markdown-toc-22-积分计算法-ii牛顿-莱布尼茨公式">2.2 积分计算法 II：牛顿-莱布尼茨公式</a></li>
+              <li><a href="#23-复合闭路定理-多连通域推广" id="markdown-toc-23-复合闭路定理-多连通域推广">2.3 复合闭路定理 (多连通域推广)</a></li>
+              <li><a href="#24--两个重要积分结论" id="markdown-toc-24--两个重要积分结论">2.4 ★ 两个重要积分结论</a></li>
+            </ul>
+          </li>
+          <li><a href="#3-柯西积分公式-核心计算工具" id="markdown-toc-3-柯西积分公式-核心计算工具">3. 柯西积分公式 (核心计算工具)</a>            <ul>
+              <li><a href="#31-柯西积分公式-求函数值" id="markdown-toc-31-柯西积分公式-求函数值">3.1 柯西积分公式 (求函数值)</a></li>
+              <li><a href="#32-高阶导数公式-求导数高次幂分母积分" id="markdown-toc-32-高阶导数公式-求导数高次幂分母积分">3.2 高阶导数公式 (求导数/高次幂分母积分)</a></li>
+              <li><a href="#33-重要推论" id="markdown-toc-33-重要推论">3.3 重要推论</a></li>
+            </ul>
+          </li>
+          <li><a href="#4-解析函数与调和函数" id="markdown-toc-4-解析函数与调和函数">4. 解析函数与调和函数</a>            <ul>
+              <li><a href="#41-关系" id="markdown-toc-41-关系">4.1 关系</a></li>
+              <li><a href="#42-已知调和函数构建解析函数" id="markdown-toc-42-已知调和函数构建解析函数">4.2 已知调和函数构建解析函数</a></li>
+            </ul>
+          </li>
+          <li><a href="#5--第三章习题中的重要结论-考点补充" id="markdown-toc-5--第三章习题中的重要结论-考点补充">5. 🎯 第三章习题中的重要结论 (考点补充)</a>            <ul>
+              <li><a href="#51-模的平方的拉普拉斯算子-习题-26" id="markdown-toc-51-模的平方的拉普拉斯算子-习题-26">5.1 模的平方的拉普拉斯算子 [习题 26]</a></li>
+              <li><a href="#52-调和函数的性质-习题-23-25" id="markdown-toc-52-调和函数的性质-习题-23-25">5.2 调和函数的性质 [习题 23-25]</a></li>
+              <li><a href="#53-积分与共轭-习题-5" id="markdown-toc-53-积分与共轭-习题-5">5.3 积分与共轭 [习题 5]</a></li>
+            </ul>
+          </li>
+          <li><a href="#6-积分计算决策树-解题思路" id="markdown-toc-6-积分计算决策树-解题思路">6. 积分计算决策树 (解题思路)</a></li>
+        </ul>
+      </li>
+      <li><a href="#第四章-复变函数项级数" id="markdown-toc-第四章-复变函数项级数">第四章 复变函数项级数</a>        <ul>
+          <li><a href="#1-复数项级数" id="markdown-toc-1-复数项级数">1. 复数项级数</a>            <ul>
+              <li><a href="#11-收敛性判定" id="markdown-toc-11-收敛性判定">1.1 收敛性判定</a></li>
+              <li><a href="#12-几何级数-最常用模型" id="markdown-toc-12-几何级数-最常用模型">1.2 几何级数 (最常用模型)</a></li>
+            </ul>
+          </li>
+          <li><a href="#2-幂级数" id="markdown-toc-2-幂级数">2. 幂级数</a>            <ul>
+              <li><a href="#21-定义与阿贝尔定理" id="markdown-toc-21-定义与阿贝尔定理">2.1 定义与阿贝尔定理</a></li>
+              <li><a href="#22-收敛半径-r-的求法" id="markdown-toc-22-收敛半径-r-的求法">2.2 收敛半径 $R$ 的求法</a></li>
+            </ul>
+          </li>
+          <li><a href="#3-泰勒级数-taylor-series" id="markdown-toc-3-泰勒级数-taylor-series">3. 泰勒级数 (Taylor Series)</a>            <ul>
+              <li><a href="#31-展开定理" id="markdown-toc-31-展开定理">3.1 展开定理</a></li>
+              <li><a href="#32-常见函数的泰勒展开-需熟记" id="markdown-toc-32-常见函数的泰勒展开-需熟记">3.2 常见函数的泰勒展开 (需熟记)</a></li>
+            </ul>
+          </li>
+          <li><a href="#4-洛朗级数-laurent-series" id="markdown-toc-4-洛朗级数-laurent-series">4. 洛朗级数 (Laurent Series)</a>            <ul>
+              <li><a href="#41-定义与定理" id="markdown-toc-41-定义与定理">4.1 定义与定理</a></li>
+              <li><a href="#42-展开方法-间接法是核心" id="markdown-toc-42-展开方法-间接法是核心">4.2 展开方法 (间接法是核心)</a></li>
+              <li><a href="#43-奇点分类-与洛朗级数的关系" id="markdown-toc-43-奇点分类-与洛朗级数的关系">4.3 奇点分类 (与洛朗级数的关系)</a></li>
+            </ul>
+          </li>
+          <li><a href="#5--第四章习题中的重要结论-解题技巧" id="markdown-toc-5--第四章习题中的重要结论-解题技巧">5. 🎯 第四章习题中的重要结论 (解题技巧)</a></li>
+          <li><a href="#6-做题决策树" id="markdown-toc-6-做题决策树">6. 做题决策树</a></li>
+        </ul>
+      </li>
+      <li><a href="#第五章-留数及其应用" id="markdown-toc-第五章-留数及其应用">第五章 留数及其应用</a>        <ul>
+          <li><a href="#1-解析函数的孤立奇点" id="markdown-toc-1-解析函数的孤立奇点">1. 解析函数的孤立奇点</a>            <ul>
+              <li><a href="#11-孤立奇点的定义" id="markdown-toc-11-孤立奇点的定义">1.1 孤立奇点的定义</a></li>
+              <li><a href="#12-三类奇点的分类" id="markdown-toc-12-三类奇点的分类">1.2 三类奇点的分类</a></li>
+              <li><a href="#13-零点与极点的关系" id="markdown-toc-13-零点与极点的关系">1.3 零点与极点的关系</a></li>
+              <li><a href="#14-函数在无穷远点的性态" id="markdown-toc-14-函数在无穷远点的性态">1.4 函数在无穷远点的性态</a></li>
+            </ul>
+          </li>
+          <li><a href="#2-留数-residue-与-留数定理" id="markdown-toc-2-留数-residue-与-留数定理">2. 留数 (Residue) 与 留数定理</a>            <ul>
+              <li><a href="#21-留数的定义" id="markdown-toc-21-留数的定义">2.1 留数的定义</a></li>
+              <li><a href="#22-留数的计算方法-计算核心" id="markdown-toc-22-留数的计算方法-计算核心">2.2 留数的计算方法 (计算核心)</a></li>
+              <li><a href="#23-留数定理-residue-theorem" id="markdown-toc-23-留数定理-residue-theorem">2.3 留数定理 (Residue Theorem)</a></li>
+            </ul>
+          </li>
+          <li><a href="#3-留数在计算实积分中的应用" id="markdown-toc-3-留数在计算实积分中的应用">3. 留数在计算实积分中的应用</a></li>
+          <li><a href="#4--第五章习题中的重要结论-考研竞赛常考" id="markdown-toc-4--第五章习题中的重要结论-考研竞赛常考">4. 🎯 第五章习题中的重要结论 (考研/竞赛常考)</a></li>
+          <li><a href="#5-解题决策树-留数篇" id="markdown-toc-5-解题决策树-留数篇">5. 解题决策树 (留数篇)</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#第二部分积分变换" id="markdown-toc-第二部分积分变换">第二部分：积分变换</a>    <ul>
+      <li><a href="#第一章-fourier-变换" id="markdown-toc-第一章-fourier-变换">第一章 Fourier 变换</a>        <ul>
+          <li><a href="#1-fourier-变换的概念" id="markdown-toc-1-fourier-变换的概念">1. Fourier 变换的概念</a>            <ul>
+              <li><a href="#11-fourier-积分" id="markdown-toc-11-fourier-积分">1.1 Fourier 积分</a></li>
+              <li><a href="#12-fourier-变换定义" id="markdown-toc-12-fourier-变换定义">1.2 Fourier 变换定义</a></li>
+              <li><a href="#13-常用函数的-fourier-变换对-熟记" id="markdown-toc-13-常用函数的-fourier-变换对-熟记">1.3 常用函数的 Fourier 变换对 (熟记)</a></li>
+            </ul>
+          </li>
+          <li><a href="#2-单位脉冲函数-deltat" id="markdown-toc-2-单位脉冲函数-deltat">2. 单位脉冲函数 $\delta(t)$</a>            <ul>
+              <li><a href="#21-定义与筛选性质" id="markdown-toc-21-定义与筛选性质">2.1 定义与筛选性质</a></li>
+              <li><a href="#22-常用性质" id="markdown-toc-22-常用性质">2.2 常用性质</a></li>
+            </ul>
+          </li>
+          <li><a href="#3-fourier-变换的主要性质" id="markdown-toc-3-fourier-变换的主要性质">3. Fourier 变换的主要性质</a>            <ul>
+              <li><a href="#31-线性性质" id="markdown-toc-31-线性性质">3.1 线性性质</a></li>
+              <li><a href="#32-位移性质-考研期末必考" id="markdown-toc-32-位移性质-考研期末必考">3.2 位移性质 (考研/期末必考)</a></li>
+              <li><a href="#33-微分性质" id="markdown-toc-33-微分性质">3.3 微分性质</a></li>
+              <li><a href="#34-积分性质" id="markdown-toc-34-积分性质">3.4 积分性质</a></li>
+              <li><a href="#35-parseval-等式-能量积分" id="markdown-toc-35-parseval-等式-能量积分">3.5 Parseval 等式 (能量积分)</a></li>
+            </ul>
+          </li>
+          <li><a href="#4-卷积与卷积定理" id="markdown-toc-4-卷积与卷积定理">4. 卷积与卷积定理</a>            <ul>
+              <li><a href="#41-卷积定义" id="markdown-toc-41-卷积定义">4.1 卷积定义</a></li>
+              <li><a href="#42-卷积定理-解题核心" id="markdown-toc-42-卷积定理-解题核心">4.2 卷积定理 (解题核心)</a></li>
+            </ul>
+          </li>
+          <li><a href="#5--习题中的重要结论-补充性质" id="markdown-toc-5--习题中的重要结论-补充性质">5. 🎯 习题中的重要结论 (补充性质)</a>            <ul>
+              <li><a href="#51-对称性质-对偶性-习题三-2" id="markdown-toc-51-对称性质-对偶性-习题三-2">5.1 对称性质 (对偶性) [习题三 2]</a></li>
+              <li><a href="#52-相似性质-尺度变换-习题三-3" id="markdown-toc-52-相似性质-尺度变换-习题三-3">5.2 相似性质 (尺度变换) [习题三 3]</a></li>
+              <li><a href="#53-调制性质-习题三-7" id="markdown-toc-53-调制性质-习题三-7">5.3 调制性质 [习题三 7]</a></li>
+              <li><a href="#54-翻转性质-习题三-6" id="markdown-toc-54-翻转性质-习题三-6">5.4 翻转性质 [习题三 6]</a></li>
+            </ul>
+          </li>
+          <li><a href="#6-常见易错点-checklist-1" id="markdown-toc-6-常见易错点-checklist-1">6. 常见易错点 Checklist</a></li>
+        </ul>
+      </li>
+      <li><a href="#第二章-laplace-变换" id="markdown-toc-第二章-laplace-变换">第二章 Laplace 变换</a>        <ul>
+          <li><a href="#1-laplace-变换的概念" id="markdown-toc-1-laplace-变换的概念">1. Laplace 变换的概念</a>            <ul>
+              <li><a href="#11-定义" id="markdown-toc-11-定义">1.1 定义</a></li>
+              <li><a href="#12-常用函数的-laplace-变换对-熟记表" id="markdown-toc-12-常用函数的-laplace-变换对-熟记表">1.2 常用函数的 Laplace 变换对 (熟记表)</a></li>
+              <li><a href="#13-周期函数的变换" id="markdown-toc-13-周期函数的变换">1.3 周期函数的变换</a></li>
+            </ul>
+          </li>
+          <li><a href="#2-laplace-变换的主要性质" id="markdown-toc-2-laplace-变换的主要性质">2. Laplace 变换的主要性质</a>            <ul>
+              <li><a href="#21-线性性质" id="markdown-toc-21-线性性质">2.1 线性性质</a></li>
+              <li><a href="#22-微分性质-解微分方程的核心" id="markdown-toc-22-微分性质-解微分方程的核心">2.2 微分性质 (解微分方程的核心)</a></li>
+              <li><a href="#23-积分性质" id="markdown-toc-23-积分性质">2.3 积分性质</a></li>
+              <li><a href="#24-位移与延迟性质-必考" id="markdown-toc-24-位移与延迟性质-必考">2.4 位移与延迟性质 (必考)</a></li>
+              <li><a href="#25-象函数的微分与积分" id="markdown-toc-25-象函数的微分与积分">2.5 象函数的微分与积分</a></li>
+              <li><a href="#26-初值与终值定理" id="markdown-toc-26-初值与终值定理">2.6 初值与终值定理</a></li>
+            </ul>
+          </li>
+          <li><a href="#3-卷积与卷积定理" id="markdown-toc-3-卷积与卷积定理">3. 卷积与卷积定理</a>            <ul>
+              <li><a href="#31-卷积定义" id="markdown-toc-31-卷积定义">3.1 卷积定义</a></li>
+              <li><a href="#32-卷积定理" id="markdown-toc-32-卷积定理">3.2 卷积定理</a></li>
+            </ul>
+          </li>
+          <li><a href="#4-laplace-逆变换求法" id="markdown-toc-4-laplace-逆变换求法">4. Laplace 逆变换求法</a>            <ul>
+              <li><a href="#41-部分分式展开法-最常用" id="markdown-toc-41-部分分式展开法-最常用">4.1 部分分式展开法 (最常用)</a></li>
+              <li><a href="#42-留数公式法-heaviside-公式" id="markdown-toc-42-留数公式法-heaviside-公式">4.2 留数公式法 (Heaviside 公式)</a></li>
+            </ul>
+          </li>
+          <li><a href="#5--习题中的重要结论-补充性质-1" id="markdown-toc-5--习题中的重要结论-补充性质-1">5. 🎯 习题中的重要结论 (补充性质)</a>            <ul>
+              <li><a href="#51-相似性质-尺度变换-习题二-2" id="markdown-toc-51-相似性质-尺度变换-习题二-2">5.1 相似性质 (尺度变换) [习题二 2]</a></li>
+              <li><a href="#52-脉冲响应与传递函数" id="markdown-toc-52-脉冲响应与传递函数">5.2 脉冲响应与传递函数</a></li>
+              <li><a href="#53-微分方程解的结构" id="markdown-toc-53-微分方程解的结构">5.3 微分方程解的结构</a></li>
+            </ul>
+          </li>
+          <li><a href="#6-常见易错点-checklist-2" id="markdown-toc-6-常见易错点-checklist-2">6. 常见易错点 Checklist</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<hr />
+
+<h1 id="第一部分复变函数论">第一部分：复变函数论</h1>
+
+<h2 id="第一章-复数与复变函数">第一章 复数与复变函数</h2>
+
+<h3 id="1-复数的概念与运算">1. 复数的概念与运算</h3>
+
+<h4 id="11-基本定义">1.1 基本定义</h4>
+
+<ul>
+  <li><strong>代数形式</strong>：$z = x + iy$ （$x, y \in \mathbb{R}$，$i^2 = -1$）。</li>
+  <li><strong>相关概念</strong>：
+    <ul>
+      <li><strong>实部</strong>：$x = \text{Re}(z)$</li>
+      <li><strong>虚部</strong>：$y = \text{Im}(z)$</li>
+      <li><strong>纯虚数</strong>：$x=0$ 且 $y \neq 0$</li>
+    </ul>
+  </li>
+  <li><strong>相等条件</strong>：$x_1 + iy_1 = x_2 + iy_2 \iff x_1 = x_2 \text{ 且 } y_1 = y_2$。</li>
+</ul>
+
+<h4 id="12-四则运算">1.2 四则运算</h4>
+
+<p>设 $z_1 = x_1 + iy_1$，$z_2 = x_2 + iy_2$：</p>
+
+<ol>
+  <li>
+    <p><strong>加减法</strong>：
+\(z_1 \pm z_2 = (x_1 \pm x_2) + i(y_1 \pm y_2)\)</p>
+  </li>
+  <li>
+    <p><strong>乘法</strong>：
+\(z_1 z_2 = (x_1 x_2 - y_1 y_2) + i(x_1 y_2 + x_2 y_1)\)</p>
+  </li>
+  <li>
+    <p><strong>除法</strong>（分母实数化）：
+\(\frac{z_1}{z_2} = \frac{z_1 \bar{z}_2}{\|z_2\|^2} = \frac{x_1 x_2 + y_1 y_2}{x_2^2 + y_2^2} + i \frac{x_2 y_1 - x_1 y_2}{x_2^2 + y_2^2} \quad (z_2 \neq 0)\)</p>
+  </li>
+</ol>
+
+<h4 id="13-共轭复数-barz">1.3 共轭复数 ($\bar{z}$)</h4>
+
+<ul>
+  <li><strong>定义</strong>：$z = x + iy \implies \bar{z} = x - iy$。</li>
+  <li><strong>核心性质</strong>：
+    <ul>
+      <li>$\overline{z_1 \pm z_2} = \bar{z}_1 \pm \bar{z}_2$</li>
+      <li>$\overline{z_1 z_2} = \bar{z}_1 \bar{z}_2$</li>
+      <li>$\overline{\left(\frac{z_1}{z_2}\right)} = \frac{\bar{z}_1}{\bar{z}_2}$</li>
+      <li><strong>重要恒等式</strong>：$z \bar{z} = |z|^2 = x^2 + y^2$</li>
+      <li>实部虚部表示：$\text{Re}(z) = \frac{z + \bar{z}}{2}$，$\text{Im}(z) = \frac{z - \bar{z}}{2i}$</li>
+    </ul>
+  </li>
+</ul>
+
+<hr />
+
+<h3 id="2-复数的几何表示">2. 复数的几何表示</h3>
+
+<h4 id="21-模与辐角">2.1 模与辐角</h4>
+
+<ul>
+  <li>
+    <p><strong>模</strong>：$|z| = r = \sqrt{x^2 + y^2}$。</p>
+  </li>
+  <li>
+    <p><strong>三角不等式</strong>（几何意义：三角形两边之和大于第三边）：
+\(\|z_1 + z_2\| \le \|z_1\| + \|z_2\|\)</p>
+
+\[\|z_1 - z_2\| \ge \|\|z_1\| - \|z_2\|\|\]
+  </li>
+  <li>
+    <p><strong>辐角</strong>：</p>
+
+    <ul>
+      <li><strong>$Arg(z)$</strong>：集合 ${\theta + 2k\pi \mid k \in \mathbb{Z}}$。</li>
+      <li><strong>主值 $\arg(z)$</strong>：规定区间 <strong>$(-\pi, \pi]$</strong>。</li>
+      <li><strong>关系</strong>：$Arg(z) = \arg(z) + 2k\pi$。</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="22-三种表示形式">2.2 三种表示形式</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">名称</th>
+      <th style="text-align: center">形式</th>
+      <th style="text-align: center">适用场景</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><strong>代数式</strong></td>
+      <td style="text-align: center">$z = x + iy$</td>
+      <td style="text-align: center">加减法、解析几何</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>三角式</strong></td>
+      <td style="text-align: center">$z = r(\cos \theta + i \sin \theta)$</td>
+      <td style="text-align: center">乘除法、方根、旋转</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>指数式</strong></td>
+      <td style="text-align: center">$z = r e^{i\theta}$</td>
+      <td style="text-align: center">乘除法、乘方、理论推导</td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p><strong>欧拉公式</strong>：$e^{i\theta} = \cos \theta + i \sin \theta$</p>
+</blockquote>
+
+<h4 id="23-乘积与商的几何意义">2.3 乘积与商的几何意义</h4>
+
+<p>若 $z_1 = r_1 e^{i\theta_1}, z_2 = r_2 e^{i\theta_2}$：</p>
+
+<ul>
+  <li>
+    <p><strong>乘法</strong>：模相乘，辐角相加。
+\(z_1 z_2 = r_1 r_2 e^{i(\theta_1 + \theta_2)}\)</p>
+
+    <blockquote>
+      <p><strong>几何意义</strong>：$z$ 乘以 $e^{i\alpha}$ 相当于将向量 $z$ 逆时针旋转 $\alpha$ 角。</p>
+    </blockquote>
+  </li>
+  <li>
+    <p><strong>除法</strong>：模相除，辐角相减。</p>
+  </li>
+</ul>
+
+<hr />
+
+<h3 id="3-乘幂与方根-重点">3. 乘幂与方根 (重点)</h3>
+
+<h4 id="31-乘幂-棣莫弗公式">3.1 乘幂 (棣莫弗公式)</h4>
+
+\[z^n = r^n (\cos n\theta + i \sin n\theta) = r^n e^{in\theta}\]
+
+<h4 id="32-方根">3.2 方根</h4>
+
+<p>方程 $w^n = z$ ($z \neq 0$) 有 $n$ 个互不相同的根：
+\(\sqrt[n]{z} = \sqrt[n]{\|z\|} \left( \cos \frac{\theta + 2k\pi}{n} + i \sin \frac{\theta + 2k\pi}{n} \right)\)
+其中 $k = 0, 1, 2, \dots, n-1$。</p>
+
+<ul>
+  <li><strong>图形特征</strong>：这 $n$ 个根也就是内接于圆心在原点、半径为 $\sqrt[n]{|z|}$ 的圆的正 $n$ 边形的顶点。</li>
+</ul>
+
+<hr />
+
+<h3 id="4--第一章习题中的重要结论">4. 🎯 第一章习题中的重要结论</h3>
+
+<p>根据课后习题，以下结论常作为考题或解题工具出现：</p>
+
+<ol>
+  <li>
+    <p><strong>虚数单位性质</strong> [习题3]：
+\(-i = \frac{1}{i} = \bar{i}\)</p>
+  </li>
+  <li>
+    <p><strong>平行四边形恒等式</strong> [习题11]：
+\(\|z_1 + z_2\|^2 + \|z_1 - z_2\|^2 = 2(\|z_1\|^2 + \|z_2\|^2)\)</p>
+
+    <blockquote>
+      <p><strong>几何意义</strong>：平行四边形对角线长度的平方和等于四条边长度的平方和。</p>
+    </blockquote>
+  </li>
+  <li>
+    <p><strong>实系数方程的根</strong> [习题12]：
+若 $z = a + bi$ 是<strong>实系数</strong>代数方程 $a_0 z^n + \dots + a_n = 0$ 的根，则其共轭 $\bar{z} = a - bi$ 也是该方程的根。（即复根成对出现）。</p>
+  </li>
+  <li>
+    <p><strong>复平面上的直线与圆方程</strong> [习题23, 24]：</p>
+
+    <ul>
+      <li><strong>直线</strong>：$\alpha \bar{z} + \bar{\alpha} z = c$ （$\alpha \in \mathbb{C}, \alpha \neq 0, c \in \mathbb{R}$）</li>
+      <li><strong>圆</strong>：$z \bar{z} + \alpha \bar{z} + \bar{\alpha} z + c = 0$ （$\alpha \in \mathbb{C}, c \in \mathbb{R}$）</li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>极限模的性质</strong> [习题28]：
+若 $\displaystyle \lim_{z \to z_0} f(z) = A$，则 $\displaystyle \lim_{z \to z_0} |f(z)| = |A|$。</p>
+
+    <blockquote>
+      <p>注意：反之一般不成立，除非 $A=0$。</p>
+    </blockquote>
+  </li>
+  <li>
+    <p><strong>幅角的不连续性</strong> [习题32]：
+$\arg z$ 在原点及负实轴上是不连续的。</p>
+  </li>
+</ol>
+
+<hr />
+
+<h3 id="5-平面点集与区域">5. 平面点集与区域</h3>
+
+<ul>
+  <li><strong>邻域</strong>：$U(z_0, \delta) = {z : |z - z_0| &lt; \delta}$。</li>
+  <li><strong>区域 (Region/Domain)</strong>：
+    <ol>
+      <li><strong>开集</strong>（不含边界）。</li>
+      <li><strong>连通性</strong>（任意两点可用折线连接）。</li>
+    </ol>
+  </li>
+  <li><strong>单连通与多连通</strong>：
+    <ul>
+      <li><strong>单连通</strong>：区域内无“洞”，任何闭曲线内部都属于该区域。</li>
+      <li><strong>多连通</strong>：区域内有“洞”（例如圆环域 $r &lt; |z| &lt; R$）。</li>
+    </ul>
+  </li>
+</ul>
+
+<hr />
+
+<h3 id="6-复变函数的极限与连续性">6. 复变函数的极限与连续性</h3>
+
+<h4 id="61-极限">6.1 极限</h4>
+
+\[\lim_{z \to z_0} f(z) = A \iff \lim_{\substack{x \to x_0 \\ y \to y_0}} u(x,y) = \text{Re}(A) \text{ 且 } \lim_{\substack{x \to x_0 \\ y \to y_0}} v(x,y) = \text{Im}(A)\]
+
+<ul>
+  <li><strong>关键点</strong>：极限存在的充要条件是 $z$ 沿<strong>任意路径</strong>趋向于 $z_0$ 时，函数值都趋向于同一个数。</li>
+  <li><strong>反例法</strong>：若沿两条不同路径（如沿实轴 $y=0$ 和沿虚轴 $x=0$，或沿直线 $y=kx$）趋向 $z_0$ 时极限不相等，则极限不存在。（例题 1.10）</li>
+</ul>
+
+<h4 id="62-连续性">6.2 连续性</h4>
+
+<ul>
+  <li>定义：$\displaystyle \lim_{z \to z_0} f(z) = f(z_0)$。</li>
+  <li>判别：$f(z) = u + iv$ 在 $z_0$ 连续 $\iff u(x,y)$ 和 $v(x,y)$ 在 $(x_0, y_0)$ 处连续。</li>
+</ul>
+
+<hr />
+
+<h2 id="第二章-解析函数">第二章 解析函数</h2>
+
+<h3 id="1-导数与解析函数">1. 导数与解析函数</h3>
+
+<h4 id="11-复变函数的导数">1.1 复变函数的导数</h4>
+
+<ul>
+  <li>
+    <p><strong>定义</strong>：设 $w=f(z)$ 在 $z_0$ 的邻域内有定义，若极限存在，则称 $f(z)$ 在 $z_0$ <strong>可导</strong>。
+\(f'(z_0) = \lim_{\Delta z \to 0} \frac{f(z_0 + \Delta z) - f(z_0)}{\Delta z}\)</p>
+  </li>
+  <li>
+    <p><strong>核心区别</strong>：复变函数在一点可导的要求比实变函数苛刻。它要求 $\Delta z$ 以<strong>任意方式</strong>（沿任意路径）趋于 0 时，比值都趋于同一个数。</p>
+  </li>
+  <li>
+    <p><strong>反例</strong>：$f(z) = \bar{z}$ （共轭）在复平面上处处连续，但<strong>处处不可导</strong>。</p>
+  </li>
+</ul>
+
+<h4 id="12-解析函数的概念">1.2 解析函数的概念</h4>
+
+<ul>
+  <li><strong>定义</strong>：
+    <ol>
+      <li><strong>点解析</strong>：若 $f(z)$ 在 $z_0$ <strong>及其邻域内</strong>处处可导，称 $f(z)$ 在 $z_0$ 解析。</li>
+      <li><strong>区域解析</strong>：若 $f(z)$ 在区域 $D$ 内每一点都解析，称 $f(z)$ 在 $D$ 内解析。</li>
+    </ol>
+  </li>
+  <li><strong>奇点</strong>：$f(z)$ 不解析的点。</li>
+  <li><strong>关键辨析</strong>：
+    <ul>
+      <li>在一点 $z_0$ <strong>可导</strong> $\nRightarrow$ 在 $z_0$ <strong>解析</strong>。</li>
+      <li><strong>例</strong>：$f(z) = |z|^2$ 仅在 $z=0$ 处可导，但在复平面内<strong>处处不解析</strong>（因为没有一个邻域处处可导）。</li>
+    </ul>
+  </li>
+</ul>
+
+<hr />
+
+<h3 id="2-解析的充要条件-柯西-黎曼方程">2. 解析的充要条件 (柯西-黎曼方程)</h3>
+
+<h4 id="21-c-r-方程-直角坐标形式">2.1 C-R 方程 (直角坐标形式)</h4>
+
+<p>设 $f(z) = u(x, y) + i v(x, y)$，则 $f(z)$ 在 $D$ 内解析的充要条件是：</p>
+
+<ol>
+  <li>
+    <p>$u(x,y)$ 和 $v(x,y)$ 在 $D$ 内<strong>可微</strong>（有一阶连续偏导数）。</p>
+  </li>
+  <li>
+    <p>满足 <strong>柯西-黎曼 (C-R) 方程</strong>：
+\(\frac{\partial u}{\partial x} = \frac{\partial v}{\partial y}, \quad \frac{\partial u}{\partial y} = -\frac{\partial v}{\partial x}\)</p>
+  </li>
+</ol>
+
+<h4 id="22-导数的计算公式">2.2 导数的计算公式</h4>
+
+<p>当 $f(z)$ 解析时，导数可直接由偏导数求得：
+\(f'(z) = \frac{\partial u}{\partial x} + i \frac{\partial v}{\partial x} = \frac{\partial v}{\partial y} - i \frac{\partial u}{\partial y}\)</p>
+
+<h4 id="23-c-r-方程-极坐标形式---习题10结论">2.3 C-R 方程 (极坐标形式) —— ★ 习题10结论</h4>
+
+<p>当 $z = r e^{i\theta}$ 时，C-R 方程为：
+\(\frac{\partial u}{\partial r} = \frac{1}{r} \frac{\partial v}{\partial \theta}, \quad \frac{\partial v}{\partial r} = -\frac{1}{r} \frac{\partial u}{\partial \theta}\)
+对应的导数公式为：
+\(f'(z) = \left( \frac{\partial u}{\partial r} + i \frac{\partial v}{\partial r} \right) e^{-i\theta}\)</p>
+
+<hr />
+
+<h3 id="3-解析函数与调和函数">3. 解析函数与调和函数</h3>
+
+<h4 id="31-关系">3.1 关系</h4>
+
+<ul>
+  <li><strong>定理</strong>：解析函数 $f(z) = u + iv$ 的实部 $u$ 和虚部 $v$ 都是<strong>调和函数</strong>（满足拉普拉斯方程 $\Delta u = 0$）。</li>
+  <li><strong>共轭调和函数</strong>：若 $u, v$ 是调和函数且满足 C-R 方程，则称 $v$ 是 $u$ 的共轭调和函数。</li>
+</ul>
+
+<h4 id="32-已知实部求虚部-偏积分法">3.2 已知实部求虚部 (偏积分法)</h4>
+
+<p>若已知 $u(x,y)$，求解析函数 $f(z)$：</p>
+
+<ol>
+  <li>利用 $v_y = u_x$，对 $y$ 积分得 $v = \int u_x dy + \varphi(x)$。</li>
+  <li>利用 $v_x = -u_y$，对上式结果求偏导并列方程，解出 $\varphi’(x)$。</li>
+  <li>积分求出 $\varphi(x)$，代回即得 $v$。</li>
+</ol>
+
+<hr />
+
+<h3 id="4-初等函数">4. 初等函数</h3>
+
+<h4 id="41-指数函数-ez">4.1 指数函数 $e^z$</h4>
+
+<ul>
+  <li><strong>定义</strong>：$e^z = e^x (\cos y + i \sin y)$。</li>
+  <li><strong>性质</strong>：
+    <ul>
+      <li><strong>周期性</strong>：以 $2\pi i$ 为周期。</li>
+      <li><strong>无零点</strong>：$e^z \neq 0$ 恒成立。</li>
+      <li>$e^{z_1} e^{z_2} = e^{z_1 + z_2}$。</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="42-对数函数-lnz-多值性">4.2 对数函数 $Lnz$ (多值性)</h4>
+
+<ul>
+  <li>
+    <p><strong>定义</strong>：$w = \text{Ln} z \iff e^w = z$。</p>
+  </li>
+  <li>
+    <p><strong>通式</strong>：
+\(\text{Ln} z = \ln \|z\| + i \text{Arg} z = \ln \|z\| + i (\arg z + 2k\pi)\)</p>
+  </li>
+  <li>
+    <p><strong>主值</strong> ($\ln z$)：取 $k=0$ 的分支（虚部限制在 $(-\pi, \pi]$）。</p>
+  </li>
+  <li>
+    <p><strong>导数</strong>：$(\text{Ln} z)’ = \frac{1}{z}$ （在除去原点和负实轴的区域内）。</p>
+  </li>
+</ul>
+
+<h4 id="43-乘幂-zb">4.3 乘幂 $z^b$</h4>
+
+<ul>
+  <li><strong>定义</strong>：$z^b = e^{b \text{Ln} z}$。</li>
+  <li><strong>多值性讨论</strong>：
+    <ul>
+      <li>若 $b$ 是整数，单值。</li>
+      <li>若 $b$ 是有理数 $p/q$，有 $q$ 个值。</li>
+      <li>若 $b$ 是无理数或复数，有无穷多个值。</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="44-三角函数">4.4 三角函数</h4>
+
+<ul>
+  <li>
+    <p><strong>定义</strong>：
+\(\cos z = \frac{e^{iz} + e^{-iz}}{2}, \quad \sin z = \frac{e^{iz} - e^{-iz}}{2i}\)</p>
+  </li>
+  <li>
+    <p><strong>重要性质</strong>：</p>
+
+    <ul>
+      <li>$\sin z, \cos z$ <strong>无界</strong>（而在实数域中是有界的）。例如 $\cos(iy) = \cosh y \to \infty$。</li>
+      <li>$\sin^2 z + \cos^2 z = 1$ 依然成立。</li>
+      <li>零点与实数一致（$\sin z = 0 \Rightarrow z = k\pi$）。</li>
+    </ul>
+  </li>
+</ul>
+
+<hr />
+
+<h3 id="5--第二章习题集中的重要结论">5. 🎯 第二章习题集中的重要结论</h3>
+
+<p>以下结论来自课后习题（P47-49），常用于选择题、填空题或证明题：</p>
+
+<h4 id="51-判断解析函数恒为常数-习题-11">5.1 判断解析函数恒为常数 [习题 11]</h4>
+
+<p>若 $f(z) = u + iv$ 在区域 $D$ 内解析，且满足以下<strong>任一</strong>条件，则 $f(z)$ 在 $D$ 内恒为常数：</p>
+
+<ol>
+  <li><strong>实部恒定</strong>：$u(x,y) \equiv C$。</li>
+  <li><strong>虚部恒定</strong>：$v(x,y) \equiv C$。</li>
+  <li><strong>模恒定</strong>：$|f(z)| \equiv C$。</li>
+  <li><strong>幅角恒定</strong>：$\text{arg } f(z) \equiv C$。</li>
+  <li><strong>线性组合恒定</strong>：$au + bv = c$ （$a,b,c$ 为常数且 $a,b$ 不全为0）。</li>
+</ol>
+
+<h4 id="52-解析函数的模的性质-习题-7">5.2 解析函数的模的性质 [习题 7]</h4>
+
+<p>若 $f(z)$ 解析，则其模 $|f(z)|$ 的偏导数与导数模长有如下关系：
+\(\left(\frac{\partial \|f\|}{\partial x}\right)^2 + \left(\frac{\partial \|f\|}{\partial y}\right)^2 = \|f'(z)\|^2\)</p>
+
+<h4 id="53-共轭运算的穿透性-习题-13">5.3 共轭运算的“穿透性” [习题 13]</h4>
+
+<p>对于实系数的初等函数（如 $e^x, \sin x$ 等），推广到复域后满足：</p>
+
+<ul>
+  <li>$\overline{e^z} = e^{\bar{z}}$</li>
+  <li>$\overline{\cos z} = \cos \bar{z}$</li>
+  <li>$\overline{\sin z} = \sin \bar{z}$</li>
+</ul>
+
+<blockquote>
+  <p><strong>技巧</strong>：计算时可以将共轭符号直接移到自变量上。</p>
+</blockquote>
+
+<h4 id="54-导数公式的推广-习题-21">5.4 导数公式的推广 [习题 21]</h4>
+
+<p>若 $a$ 为实数，则幂函数的导数公式依然成立：
+\((z^a)' = a z^{a-1}\)</p>
+
+<h4 id="55-柯西-黎曼方程的等价形式">5.5 柯西-黎曼方程的等价形式</h4>
+
+\[f'(z) = u_x + i v_x = v_y - i u_y = u_x - i u_y = v_y + i v_x\]
+
+<p>（利用 C-R 方程代换可得多种形式，解题时灵活选用）。</p>
+
+<hr />
+
+<h3 id="6-常见易错点-checklist">6. 常见易错点 Checklist</h3>
+
+<ol class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>判断解析性</strong>：看到 $f(z) = \bar{z}$ 或含有 $|z|$，直接反应它一般不解析。</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>对数计算</strong>：计算 $\text{Ln}(-1)$ 时，别忘了 $\text{Arg}(-1) = \pi + 2k\pi$，而不是仅仅是 $\pi$。</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>解方程</strong>：解 $\sin z = 3$ 时，不要说无解！利用指数定义 $w + 1/w = 6i$ (令 $w=e^{iz}$) 求解。</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>区域判定</strong>：C-R 方程满足的点不一定解析，还需要在邻域内满足。如果仅在 $x=y=0$ 满足 C-R，则仅在该点可导，<strong>处处不解析</strong>。</li>
+</ol>
+
+<hr />
+
+<h2 id="第三章-复变函数的积分">第三章 复变函数的积分</h2>
+
+<h3 id="1-积分的概念与基础计算">1. 积分的概念与基础计算</h3>
+
+<h4 id="11-复变函数积分定义">1.1 复变函数积分定义</h4>
+
+\[\int_C f(z) dz = \lim_{\lambda \to 0} \sum_{k=1}^n f(\zeta_k) \Delta z_k\]
+
+<ul>
+  <li><strong>转化为实积分</strong>（令 $f=u+iv, z=x+iy$）：
+\(\int_C f(z) dz = \int_C (u dx - v dy) + i \int_C (v dx + u dy)\)
+（这实际上是两个第二类曲线积分的组合）。</li>
+</ul>
+
+<h4 id="12-积分计算法-i参数方程法-通用">1.2 积分计算法 I：参数方程法 (通用)</h4>
+
+<p>若曲线 $C$ 的参数方程为 $z = z(t)$ ($a \le t \le b$)，则：
+\(\int_C f(z) dz = \int_a^b f[z(t)] z'(t) dt\)</p>
+
+<blockquote>
+  <p><strong>适用场景</strong>：被积函数不解析（如含 $\bar{z}, |z|, \text{Re}(z)$）或路径不封闭时。</p>
+</blockquote>
+
+<h4 id="13-积分估值定理-ml-不等式">1.3 积分估值定理 (ML 不等式)</h4>
+
+\[\left| \int_C f(z) dz \right| \le \int_C \|f(z)\| ds \le M \cdot L\]
+
+<ul>
+  <li>$M = \displaystyle \max_{z \in C} |f(z)|$ 为函数在曲线上的最大模。</li>
+  <li>$L$ 为曲线 $C$ 的弧长。</li>
+</ul>
+
+<hr />
+
+<h3 id="2-柯西-古萨基本定理-积分理论基石">2. 柯西-古萨基本定理 (积分理论基石)</h3>
+
+<h4 id="21-单连通域情形">2.1 单连通域情形</h4>
+
+<p>若 $f(z)$ 在<strong>单连通域</strong> $D$ 内<strong>解析</strong>，则沿 $D$ 内任意闭曲线 $C$ 的积分为零：
+\(\oint_C f(z) dz = 0\)</p>
+
+<ul>
+  <li><strong>推论 (路径无关性)</strong>：解析函数的积分仅取决于起点和终点，与路径无关。
+\(\int_{C_1} f(z) dz = \int_{C_2} f(z) dz\)</li>
+</ul>
+
+<h4 id="22-积分计算法-ii牛顿-莱布尼茨公式">2.2 积分计算法 II：牛顿-莱布尼茨公式</h4>
+
+<p>若 $f(z)$ 在单连通域内解析，则存在原函数 $G(z)$（即 $G’(z) = f(z)$），积分可直接计算：
+\(\int_{z_0}^{z_1} f(z) dz = G(z_1) - G(z_0)\)</p>
+
+<blockquote>
+  <p><strong>适用场景</strong>：被积函数是初等函数且在积分路径所在区域解析。</p>
+</blockquote>
+
+<h4 id="23-复合闭路定理-多连通域推广">2.3 复合闭路定理 (多连通域推广)</h4>
+
+<p>若 $f(z)$ 在多连通域 $D$ 内解析（例如圆环域），$C$ 是外边界（正向），$C_1, \dots, C_n$ 是内边界（负向），则：
+\(\oint_C f(z) dz + \sum_{k=1}^n \oint_{C_k^{-}} f(z) dz = 0 \implies \oint_C f(z) dz = \sum_{k=1}^n \oint_{C_k} f(z) dz\)</p>
+
+<ul>
+  <li><strong>几何意义（闭路变形原理）</strong>：积分路径 $C$ 可以在解析区域内连续变形，只要不经过奇点，积分值不变。</li>
+</ul>
+
+<h4 id="24--两个重要积分结论">2.4 ★ 两个重要积分结论</h4>
+
+<p>设 $C$ 是<strong>包围</strong>点 $a$ 的正向简单闭曲线：</p>
+
+<ol>
+  <li>
+\[\oint_C \frac{1}{z-a} dz = 2\pi i\]
+  </li>
+  <li>
+\[\oint_C \frac{1}{(z-a)^{n+1}} dz = 0 \quad (n \ge 1, \text{整数})\]
+  </li>
+</ol>
+
+<blockquote>
+  <p><strong>记忆</strong>：只有一次幂的倒数积分不为0，高次幂倒数（具有原函数）积分为0。</p>
+</blockquote>
+
+<hr />
+
+<h3 id="3-柯西积分公式-核心计算工具">3. 柯西积分公式 (核心计算工具)</h3>
+
+<h4 id="31-柯西积分公式-求函数值">3.1 柯西积分公式 (求函数值)</h4>
+
+<p>若 $f(z)$ 在 $C$ 内部及边界上解析，$z_0$ 在 $C$ 内部，则：
+\(f(z_0) = \frac{1}{2\pi i} \oint_C \frac{f(z)}{z - z_0} dz\)</p>
+
+<ul>
+  <li><strong>计算应用</strong>：\(\oint_C \frac{f(z)}{z - z_0} dz = 2\pi i \cdot f(z_0)\)</li>
+</ul>
+
+<h4 id="32-高阶导数公式-求导数高次幂分母积分">3.2 高阶导数公式 (求导数/高次幂分母积分)</h4>
+
+\[f^{(n)}(z_0) = \frac{n!}{2\pi i} \oint_C \frac{f(z)}{(z - z_0)^{n+1}} dz\]
+
+<ul>
+  <li>
+    <p><strong>计算应用</strong>：
+\(\oint_C \frac{f(z)}{(z - z_0)^{n+1}} dz = \frac{2\pi i}{n!} f^{(n)}(z_0)\)</p>
+
+    <blockquote>
+      <p><strong>注意</strong>：分母是 $n+1$ 次方，对应求 $n$ 阶导，系数多一个 $n!$。</p>
+    </blockquote>
+  </li>
+</ul>
+
+<h4 id="33-重要推论">3.3 重要推论</h4>
+
+<ol>
+  <li><strong>解析函数的无限可微性</strong>：解析函数均有一阶导数，从而有任意阶导数。</li>
+  <li><strong>刘维尔定理</strong>：在全平面上有界且解析的函数必为常数。</li>
+  <li><strong>莫雷拉定理</strong>（柯西定理的逆定理）：若 $f(z)$ 连续且沿任一闭曲线积分为 0，则 $f(z)$ 解析。</li>
+</ol>
+
+<hr />
+
+<h3 id="4-解析函数与调和函数">4. 解析函数与调和函数</h3>
+
+<h4 id="41-关系">4.1 关系</h4>
+
+<p>解析函数 $f(z) = u + iv$ 的实部 $u$ 和虚部 $v$ 均为调和函数（$\Delta u = 0, \Delta v = 0$）。</p>
+
+<h4 id="42-已知调和函数构建解析函数">4.2 已知调和函数构建解析函数</h4>
+
+<p>已知 $u(x,y)$，求 $v(x,y)$ 使得 $f=u+iv$ 解析：</p>
+
+<ol>
+  <li><strong>偏积分法</strong>（推荐）：
+    <ul>
+      <li>由 C-R 方程 $v_y = u_x$，积分得 $v = \int u_x dy + \varphi(x)$。</li>
+      <li>求导 $\frac{\partial v}{\partial x}$，令其等于 $-u_y$，解出 $\varphi’(x)$。</li>
+      <li>积分得 $\varphi(x)$。</li>
+    </ul>
+  </li>
+  <li><strong>不定积分法</strong>（公式法）：
+\(f'(z) = u_x(z,0) - i u_y(z,0)\)
+然后积分 $f(z) = \int f’(z) dz + C$。
+<em>(注：仅适用于 $f(z)$ 在原点解析且展开方便的情况，通常偏积分法更稳妥)</em>。</li>
+</ol>
+
+<hr />
+
+<h3 id="5--第三章习题中的重要结论-考点补充">5. 🎯 第三章习题中的重要结论 (考点补充)</h3>
+
+<p>根据第三章习题（Page 75-79），以下结论常作为解题依据：</p>
+
+<h4 id="51-模的平方的拉普拉斯算子-习题-26">5.1 模的平方的拉普拉斯算子 [习题 26]</h4>
+
+<p>若 $f(z)$ 解析，则 $|f(z)|^2$ 满足：
+\(\frac{\partial^2 \|f(z)\|^2}{\partial x^2} + \frac{\partial^2 \|f(z)\|^2}{\partial y^2} = 4 \|f'(z)\|^2\)
+(这说明 $|f(z)|^2$ 一般不是调和函数，除非 $f’(z)=0$ 即 $f$ 为常数)。</p>
+
+<h4 id="52-调和函数的性质-习题-23-25">5.2 调和函数的性质 [习题 23-25]</h4>
+
+<ul>
+  <li><strong>线性组合</strong>：若 $u$ 是调和函数，则 $C \cdot u$ 也是。</li>
+  <li><strong>乘积非调和</strong>：若 $f=u+iv$ 解析，则乘积 $uv$ 是调和函数（因 $uv = \text{Im}(\frac{1}{2}f^2)$）。</li>
+  <li><strong>共轭调和</strong>：$v$ 是 $u$ 的共轭调和函数 $\nRightarrow$ $u$ 是 $v$ 的共轭调和函数（实际上 $-u$ 才是 $v$ 的共轭调和函数）。</li>
+</ul>
+
+<h4 id="53-积分与共轭-习题-5">5.3 积分与共轭 [习题 5]</h4>
+
+<p>\(\oint_{\|z\|=R} \frac{\bar{z}}{\|z\|} dz = \dots\)
+利用 $|z|=R \implies \bar{z} = R^2/z$ 转化：
+\(\oint \frac{R^2/z}{R} dz = R \oint \frac{1}{z} dz = R \cdot 2\pi i\)</p>
+
+<blockquote>
+  <p><strong>技巧</strong>：在圆周 $|z|=R$ 上，常用 $\bar{z} = \frac{R^2}{z}$ 来消除 $\bar{z}$，从而利用柯西公式。</p>
+</blockquote>
+
+<hr />
+
+<h3 id="6-积分计算决策树-解题思路">6. 积分计算决策树 (解题思路)</h3>
+
+<p>遇到积分 $\int_C g(z) dz$，按以下顺序思考：</p>
+
+<ol>
+  <li><strong>路径是否闭合？</strong>
+    <ul>
+      <li><strong>否 (开路)</strong>：
+        <ul>
+          <li>被积函数解析？ $\to$ <strong>牛顿-莱布尼茨公式</strong> (找原函数)。</li>
+          <li>被积函数不解析 (含 $\bar{z}$ 等)？ $\to$ <strong>参数方程法</strong> ($z=z(t)$)。</li>
+        </ul>
+      </li>
+      <li><strong>是 (闭路 $\oint_C$)</strong>：
+        <ul>
+          <li>函数在 $C$ 内部全解析？ $\to$ 结果为 <strong>0</strong> (柯西-古萨定理)。</li>
+          <li>函数在 $C$ 内部有奇点？
+            <ul>
+              <li>奇点形如 $\frac{f(z)}{z-z_0}$？ $\to$ <strong>柯西积分公式</strong>。</li>
+              <li>奇点形如 $\frac{f(z)}{(z-z_0)^n}$？ $\to$ <strong>高阶导数公式</strong>。</li>
+              <li>多个奇点？ $\to$ <strong>复合闭路定理</strong> (拆分成多个小圆分别算)。</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ol>
+
+<blockquote>
+  <p><strong>Tips</strong>: 考试中如果遇到分母是 $(z^2+1)$ 这种，记得拆解成 $(z-i)(z+i)$，然后判断哪个奇点在围线内部，只保留内部的那个作为 $(z-z_0)$，其余部分归入分子 $f(z)$。</p>
+</blockquote>
+
+<hr />
+
+<h2 id="第四章-复变函数项级数">第四章 复变函数项级数</h2>
+
+<h3 id="1-复数项级数">1. 复数项级数</h3>
+
+<h4 id="11-收敛性判定">1.1 收敛性判定</h4>
+
+<p>设复数项级数 $\displaystyle \sum_{n=1}^{\infty} \alpha_n$ （其中 $\alpha_n = a_n + i b_n$）：</p>
+
+<ol>
+  <li><strong>定理</strong>：级数 $\displaystyle \sum \alpha_n$ 收敛 $\iff$ 实部级数 $\displaystyle \sum a_n$ 和虚部级数 $\displaystyle \sum b_n$ 同时收敛。</li>
+  <li><strong>绝对收敛</strong>：若 $\displaystyle \sum |\alpha_n|$ 收敛，则 $\displaystyle \sum \alpha_n$ 必收敛（绝对收敛 $\implies$ 条件收敛）。</li>
+  <li><strong>必要条件</strong>：若级数收敛，则通项 $\displaystyle \lim_{n \to \infty} \alpha_n = 0$。</li>
+</ol>
+
+<h4 id="12-几何级数-最常用模型">1.2 几何级数 (最常用模型)</h4>
+
+\[\sum_{n=0}^{\infty} q^n = 1 + q + q^2 + \dots = \frac{1}{1-q} \quad (\|q\| &lt; 1)\]
+
+<blockquote>
+  <p><strong>注意</strong>：当 $|q| \ge 1$ 时，级数发散。这是后续展开级数最核心的公式。</p>
+</blockquote>
+
+<hr />
+
+<h3 id="2-幂级数">2. 幂级数</h3>
+
+<h4 id="21-定义与阿贝尔定理">2.1 定义与阿贝尔定理</h4>
+
+<ul>
+  <li><strong>形式</strong>：$\displaystyle \sum_{n=0}^{\infty} c_n (z-a)^n$。</li>
+  <li><strong>阿贝尔 (Abel) 定理</strong>：
+    <ul>
+      <li>若级数在 $z_0$ 收敛，则在圆域 $|z-a| &lt; |z_0-a|$ 内<strong>绝对收敛</strong>。</li>
+      <li>若级数在 $z_0$ 发散，则在圆域外部 $|z-a| &gt; |z_0-a|$ 处处发散。</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="22-收敛半径-r-的求法">2.2 收敛半径 $R$ 的求法</h4>
+
+<p>收敛圆 $|z-a| &lt; R$。</p>
+
+<ol>
+  <li>
+    <p><strong>比值法</strong>：
+\(R = \lim_{n \to \infty} \left\| \frac{c_n}{c_{n+1}} \right\|\)</p>
+  </li>
+  <li>
+    <p><strong>根值法</strong>：
+\(R = \lim_{n \to \infty} \frac{1}{\sqrt[n]{\|c_n\|}}\)</p>
+  </li>
+  <li>
+    <p><strong>性质</strong>：</p>
+
+    <ul>
+      <li>在收敛圆内，和函数 $f(z)$ 是<strong>解析函数</strong>。</li>
+      <li>在收敛圆内，可以<strong>逐项求导</strong>和<strong>逐项积分</strong>（半径 $R$ 不变）。</li>
+    </ul>
+  </li>
+</ol>
+
+<hr />
+
+<h3 id="3-泰勒级数-taylor-series">3. 泰勒级数 (Taylor Series)</h3>
+
+<h4 id="31-展开定理">3.1 展开定理</h4>
+
+<p>若 $f(z)$ 在圆域 $|z - z_0| &lt; R$ 内解析，则可唯一展开为幂级数：
+\(f(z) = \displaystyle \sum_{n=0}^{\infty} c_n (z - z_0)^n, \quad c_n = \frac{f^{(n)}(z_0)}{n!}\)</p>
+
+<ul>
+  <li><strong>收敛半径</strong>：$R$ 等于从中心 $z_0$ 到<strong>最近奇点</strong>的距离（这是判断收敛范围的几何直观方法）。</li>
+</ul>
+
+<h4 id="32-常见函数的泰勒展开-需熟记">3.2 常见函数的泰勒展开 (需熟记)</h4>
+
+<p>在 $z=0$ 处（麦克劳林级数）：</p>
+
+<ol>
+  <li>
+    <p><strong>$e^z$</strong>：
+\(e^z = \displaystyle \sum_{n=0}^{\infty} \frac{z^n}{n!} = 1 + z + \frac{z^2}{2!} + \dots \quad (\|z\| &lt; \infty)\)</p>
+  </li>
+  <li>
+    <p><strong>$\sin z$</strong> (奇函数，只有奇次项)：
+\(\sin z = \displaystyle \sum_{n=0}^{\infty} (-1)^n \frac{z^{2n+1}}{(2n+1)!} = z - \frac{z^3}{3!} + \dots \quad (\|z\| &lt; \infty)\)</p>
+  </li>
+  <li>
+    <p><strong>$\cos z$</strong> (偶函数，只有偶次项)：
+\(\cos z = \displaystyle \sum_{n=0}^{\infty} (-1)^n \frac{z^{2n}}{(2n)!} = 1 - \frac{z^2}{2!} + \dots \quad (\|z\| &lt; \infty)\)</p>
+  </li>
+  <li>
+    <p><strong>$\frac{1}{1-z}$</strong>：
+\(\frac{1}{1-z} = \displaystyle \sum_{n=0}^{\infty} z^n = 1 + z + z^2 + \dots \quad (\|z\| &lt; 1)\)</p>
+  </li>
+  <li>
+    <p><strong>$\ln(1+z)$</strong>：
+\(\ln(1+z) = \displaystyle \sum_{n=1}^{\infty} (-1)^{n-1} \frac{z^n}{n} = z - \frac{z^2}{2} + \dots \quad (\|z\| &lt; 1)\)</p>
+  </li>
+</ol>
+
+<hr />
+
+<h3 id="4-洛朗级数-laurent-series">4. 洛朗级数 (Laurent Series)</h3>
+
+<h4 id="41-定义与定理">4.1 定义与定理</h4>
+
+<p>当函数 $f(z)$ 在<strong>圆环域</strong> $r &lt; |z - z_0| &lt; R$ 内解析时，可展开为含有正负幂次的级数：
+\(f(z) = \sum_{n=-\infty}^{\infty} c_n (z - z_0)^n = \underbrace{\displaystyle \sum_{n=1}^{\infty} c_{-n} (z-z_0)^{-n}}_{\text{主要部分 (负幂项)}} + \underbrace{\displaystyle \sum_{n=0}^{\infty} c_n (z-z_0)^n}_{\text{解析部分 (正幂项)}}\)</p>
+
+<h4 id="42-展开方法-间接法是核心">4.2 展开方法 (间接法是核心)</h4>
+
+<p>通常不使用积分公式计算 $c_n$，而是利用已知级数（主要是 $\frac{1}{1-q}$）进行代数变形。</p>
+
+<p><strong>经典题型：将 $f(z) = \frac{1}{(z-1)(z-2)}$ 在不同区域展开</strong></p>
+
+<ul>
+  <li><strong>技巧</strong>：
+    <ol>
+      <li><strong>部分分式分解</strong>：$f(z) = \frac{1}{z-2} - \frac{1}{z-1}$。</li>
+      <li><strong>确定“公比”</strong>：
+        <ul>
+          <li>若 $|z| &lt; a$，则将 $a$ 提出来，凑成 $\frac{1}{a(1 - z/a)}$ 形式（按 $z/a$ 展开）。</li>
+          <li>若 $|z| &gt; a$，则将 $z$ 提出来，凑成 $\frac{1}{z(1 - a/z)}$ 形式（按 $a/z$ 展开）。</li>
+          <li><strong>口诀：小除以大</strong>（模小的量除以模大的量作为公比 $q$）。</li>
+        </ul>
+      </li>
+    </ol>
+  </li>
+</ul>
+
+<h4 id="43-奇点分类-与洛朗级数的关系">4.3 奇点分类 (与洛朗级数的关系)</h4>
+
+<p>设 $z_0$ 为孤立奇点，观察 $f(z)$ 在 $0 &lt; |z-z_0| &lt; \delta$ 的洛朗展开式：</p>
+
+<ol>
+  <li><strong>可去奇点</strong>：不含负幂项（主要部分为0）。$\displaystyle \lim_{z\to z_0} f(z)$ 存在且有限。</li>
+  <li><strong>极点 ($m$ 级)</strong>：含有有限项负幂项，且最低次幂为 $(z-z_0)^{-m}$。$\displaystyle \lim_{z\to z_0} f(z) = \infty$。</li>
+  <li><strong>本性奇点</strong>：含有无穷多项负幂项。$\displaystyle \lim_{z\to z_0} f(z)$ 不存在。</li>
+</ol>
+
+<hr />
+
+<h3 id="5--第四章习题中的重要结论-解题技巧">5. 🎯 第四章习题中的重要结论 (解题技巧)</h3>
+
+<p>根据第四章习题，以下点常考：</p>
+
+<ol>
+  <li><strong>级数收敛半径判定</strong> [习题 7]：
+    <ul>
+      <li>若幂级数 $\displaystyle \sum c_n z^n$ 的收敛半径为 $R$，则级数 $\displaystyle \sum (\text{Re } c_n) z^n$ 的收敛半径 $R’ \ge R$。</li>
+    </ul>
+  </li>
+  <li><strong>函数性质与级数系数</strong> [习题 13]：
+    <ul>
+      <li>若 $f(z)$ 是<strong>偶函数</strong>，则其泰勒展开式中只含偶次幂项（奇次项系数为0）。</li>
+      <li>若 $f(z)$ 是<strong>奇函数</strong>，则只含奇次幂项。</li>
+    </ul>
+  </li>
+  <li><strong>收敛半径的几何确定</strong> [习题 12]：
+    <ul>
+      <li>求 $f(z)$ 在 $z_0$ 处泰勒展开的收敛半径 $R$，无需计算系数，只需找出距 $z_0$ <strong>最近的奇点</strong> $z_1$，则 $R = |z_1 - z_0|$。</li>
+      <li><strong>例</strong>：$f(z) = \frac{1}{1+z^2}$ 在 $z=0$ 展开，奇点为 $\pm i$，则 $R = |i - 0| = 1$。</li>
+      <li><strong>例</strong>：同上函数在 $z=1$ 展开，奇点为 $\pm i$，则 $R = |i - 1| = \sqrt{2}$。</li>
+    </ul>
+  </li>
+  <li><strong>两个重要不等式</strong> [习题 14]：
+    <ul>
+      <li>$|e^z - 1| \le e^{|z|} - 1 \le |z| e^{|z|}$。</li>
+    </ul>
+  </li>
+</ol>
+
+<hr />
+
+<h3 id="6-做题决策树">6. 做题决策树</h3>
+
+<p>遇到“将函数 $f(z)$ 展开为级数”的题目：</p>
+
+<ol>
+  <li><strong>看中心</strong>：是绕 $z=0$ (麦克劳林) 还是 $z=z_0$？</li>
+  <li><strong>看区域</strong>：
+    <ul>
+      <li>是圆域 $|z-z_0| &lt; R$？ $\to$ <strong>泰勒展开</strong> (全正幂)。</li>
+      <li>是圆环域 $r &lt; |z-z_0| &lt; R$？ $\to$ <strong>洛朗展开</strong> (有正有负)。</li>
+    </ul>
+  </li>
+  <li><strong>定策略</strong>：
+    <ul>
+      <li>简单有理分式 $\to$ 部分分式分解 $\to$ 套用几何级数公式。</li>
+      <li>复合函数 (如 $e^{z^2}$) $\to$ 代换法。</li>
+      <li>乘积 (如 $e^z \cdot \frac{1}{1-z}$) $\to$ 级数相乘或长除法。</li>
+    </ul>
+  </li>
+</ol>
+
+<hr />
+
+<h2 id="第五章-留数及其应用">第五章 留数及其应用</h2>
+
+<h3 id="1-解析函数的孤立奇点">1. 解析函数的孤立奇点</h3>
+
+<h4 id="11-孤立奇点的定义">1.1 孤立奇点的定义</h4>
+
+<p>若函数 $f(z)$ 在 $z_0$ 处不解析，但在 $z_0$ 的去心邻域 $0 &lt; |z - z_0| &lt; \delta$ 内解析，则称 $z_0$ 为 <strong>孤立奇点</strong>。</p>
+
+<h4 id="12-三类奇点的分类">1.2 三类奇点的分类</h4>
+
+<p>根据 $f(z)$ 在 $z_0$ 处的 <strong>洛朗级数 (Laurent Series)</strong> 展开式中<strong>负幂项（主要部分）</strong>的情况进行分类：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">奇点类型</th>
+      <th style="text-align: center">洛朗级数特征</th>
+      <th style="text-align: center">极限特征 $\displaystyle \lim_{z \to z_0} f(z)$</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><strong>可去奇点</strong></td>
+      <td style="text-align: center"><strong>无</strong>负幂项 ($c_{-n} = 0$)</td>
+      <td style="text-align: center">存在且有限</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>极点 ($m$ 阶)</strong></td>
+      <td style="text-align: center">有<strong>有限项</strong>负幂项 (最高为 $(z-z_0)^{-m}$)</td>
+      <td style="text-align: center">$\infty$</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>本性奇点</strong></td>
+      <td style="text-align: center">有<strong>无穷多项</strong>负幂项</td>
+      <td style="text-align: center">不存在 (震荡/混沌)</td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p><strong>判别技巧</strong>：</p>
+
+  <ul>
+    <li>若 $\displaystyle \lim_{z \to z_0} (z-z_0)^m f(z) = C \neq 0$ (常数)，则 $z_0$ 是 $m$ 阶极点。</li>
+    <li>$e^{1/z}, \sin(1/z)$ 在 $z=0$ 处通常是本性奇点。</li>
+  </ul>
+</blockquote>
+
+<h4 id="13-零点与极点的关系">1.3 零点与极点的关系</h4>
+
+<ul>
+  <li>若 $z_0$ 是 $f(z)$ 的 $m$ 阶<strong>零点</strong>，则 $z_0$ 是 $\frac{1}{f(z)}$ 的 $m$ 阶<strong>极点</strong>。</li>
+  <li><strong>计算阶数</strong>：若 $f(z) = \frac{P(z)}{Q(z)}$，且 $P(z_0) \neq 0$，则 $z_0$ 作为极点的阶数等于它作为 $Q(z)$ 零点的阶数。</li>
+</ul>
+
+<h4 id="14-函数在无穷远点的性态">1.4 函数在无穷远点的性态</h4>
+
+<p>通过变换 $t = 1/z$ 将 $\infty$ 转化为 $t=0$ 来研究。</p>
+
+<ul>
+  <li>$z = \infty$ 是 $f(z)$ 的孤立奇点 $\iff$ $t=0$ 是 $\varphi(t) = f(1/t)$ 的孤立奇点。</li>
+</ul>
+
+<hr />
+
+<h3 id="2-留数-residue-与-留数定理">2. 留数 (Residue) 与 留数定理</h3>
+
+<h4 id="21-留数的定义">2.1 留数的定义</h4>
+
+<p>$f(z)$ 在孤立奇点 $z_0$ 的留数定义为洛朗展开式中 <strong>$(z-z_0)^{-1}$ 项的系数 $c_{-1}$</strong>：
+\(\text{Res}[f(z), z_0] = c_{-1} = \frac{1}{2\pi i} \oint_C f(z) dz\)</p>
+
+<h4 id="22-留数的计算方法-计算核心">2.2 留数的计算方法 (计算核心)</h4>
+
+<p><strong>规则一：极点计算法</strong></p>
+
+<ol>
+  <li>
+    <p><strong>一级极点 (单极点)</strong>：
+\(\text{Res}[f(z), z_0] = \lim_{z \to z_0} (z-z_0) f(z)\)</p>
+
+    <ul>
+      <li><strong>推论</strong>：若 $f(z) = \frac{P(z)}{Q(z)}$，$P(z_0) \neq 0, Q(z_0) = 0, Q’(z_0) \neq 0$，则：
+\(\text{Res}[f(z), z_0] = \frac{P(z_0)}{Q'(z_0)}\)</li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>$m$ 级极点 ($m &gt; 1$)</strong>：
+\(\text{Res}[f(z), z_0] = \frac{1}{(m-1)!} \lim_{z \to z_0} \frac{d^{m-1}}{dz^{m-1}} \left[ (z-z_0)^m f(z) \right]\)</p>
+  </li>
+</ol>
+
+<p><strong>规则二：级数展开法</strong>
+对于<strong>本性奇点</strong>（如 $z^3 e^{1/z}$），必须展开成洛朗级数，直接找 $c_{-1}$。</p>
+
+<p><strong>规则三：无穷远点留数</strong>
+\(\text{Res}[f(z), \infty] = -\text{Res}\left[ f(\frac{1}{t}) \cdot \frac{1}{t^2}, 0 \right] = -c_{-1} \text{ (注意负号)}\)</p>
+
+<ul>
+  <li>
+    <p><strong>定理</strong>：若 $f(z)$ 在扩充复平面上只有有限个奇点，则所有奇点（包括 $\infty$）的留数之和为 <strong>0</strong>。
+\(\sum_{k=1}^n \text{Res}[f(z), z_k] + \text{Res}[f(z), \infty] = 0\)</p>
+
+    <blockquote>
+      <p><strong>技巧</strong>：当有限远奇点很多或很难算时，可以尝试算无穷远点的留数，利用总和为0反求。</p>
+    </blockquote>
+  </li>
+</ul>
+
+<h4 id="23-留数定理-residue-theorem">2.3 留数定理 (Residue Theorem)</h4>
+
+<p>设 $C$ 为正向简单闭曲线，其内部含有限个孤立奇点 $z_1, \dots, z_n$，则：
+\(\oint_C f(z) dz = 2\pi i \sum_{k=1}^n \text{Res}[f(z), z_k]\)</p>
+
+<hr />
+
+<h3 id="3-留数在计算实积分中的应用">3. 留数在计算实积分中的应用</h3>
+
+<p><strong>类型 I：三角函数积分 $\int_0^{2\pi} R(\cos \theta, \sin \theta) d\theta$</strong></p>
+
+<ul>
+  <li>
+    <p><strong>换元</strong>：令 $z = e^{i\theta}$，则 $d\theta = \frac{dz}{iz}$。</p>
+  </li>
+  <li>
+    <p><strong>代换公式</strong>：
+\(\cos \theta = \frac{z + z^{-1}}{2}, \quad \sin \theta = \frac{z - z^{-1}}{2i}\)</p>
+  </li>
+  <li>
+    <p><strong>路径</strong>：单位圆 $|z|=1$。</p>
+  </li>
+  <li>
+    <p><strong>结果</strong>：$2\pi i \displaystyle \sum$ (单位圆内奇点的留数)。</p>
+  </li>
+</ul>
+
+<p><strong>类型 II：无穷区间积分 $\int_{-\infty}^{+\infty} R(x) dx$</strong></p>
+
+<ul>
+  <li><strong>条件</strong>：$R(x) = \frac{P(x)}{Q(x)}$，分母次数比分子高至少2次，且实轴上无奇点。</li>
+  <li><strong>路径</strong>：上半平面无穷大半圆。</li>
+  <li><strong>结果</strong>：$2\pi i \displaystyle \sum$ (上半平面奇点的留数)。</li>
+</ul>
+
+<p><strong>类型 III：傅里叶型积分 $\int_{-\infty}^{+\infty} R(x) e^{iax} dx$ ($a&gt;0$)</strong></p>
+
+<ul>
+  <li>
+    <p><strong>条件</strong>：分母次数比分子高至少1次。</p>
+  </li>
+  <li>
+    <p><strong>引理</strong>：<strong>约当引理 (Jordan’s Lemma)</strong> 保证了大圆弧上的积分为0。</p>
+  </li>
+  <li>
+    <p><strong>结果</strong>：$2\pi i \displaystyle \sum$ (<strong>上半平面</strong>奇点的留数)。</p>
+
+    <blockquote>
+      <p><strong>注意</strong>：若计算 $\int_{-\infty}^{+\infty} R(x) \cos(ax) dx$ 或 $\sin(ax)$，需取 $R(x)e^{iax}$ 的实部或虚部。</p>
+    </blockquote>
+  </li>
+</ul>
+
+<hr />
+
+<h3 id="4--第五章习题中的重要结论-考研竞赛常考">4. 🎯 第五章习题中的重要结论 (考研/竞赛常考)</h3>
+
+<p>根据第五章习题（Page 131-133），以下结论非常重要：</p>
+
+<ol>
+  <li><strong>奇偶函数的留数</strong>：
+    <ul>
+      <li>若 $f(z)$ 是<strong>偶函数</strong>，则 $\text{Res}[f(z), 0] = 0$（因为展开式只有偶次幂，缺 $1/z$ 项）。[习题 13]</li>
+      <li>同理，偶函数的洛朗展开式不含奇次幂项。</li>
+    </ul>
+  </li>
+  <li><strong>极点判定的充要条件</strong> [习题 2]：
+    <ul>
+      <li>$z_0$ 是 $f(z)$ 的 $m$ 级零点 $\iff z_0$ 是 $f’(z)/f(z)$ 的 <strong>一级极点</strong>，且留数为 $m$。</li>
+      <li>公式：$\text{Res}[\frac{f’(z)}{f(z)}, z_0] = m$ （参数原理的基础）。</li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>计算技巧</strong> [习题 16]：
+计算 $\oint_C \frac{1}{(z-a)^n (z-b)} dz$ 这类积分时，如果 $C$ 包围了所有奇点，可以直接用“无穷远点留数”法，结果往往是 0（如果分母次数够高）。</p>
+  </li>
+  <li><strong>复数极点分布</strong>：
+在计算实积分（如 $\frac{1}{1+x^4}$）时，必须准确找出<strong>上半平面</strong>的极点。例如 $z^4 = -1$ 的根有4个，只有 $e^{i\pi/4}, e^{i3\pi/4}$ 在上半平面。</li>
+</ol>
+
+<hr />
+
+<h3 id="5-解题决策树-留数篇">5. 解题决策树 (留数篇)</h3>
+
+<p><strong>Q: 拿到一个积分，如何下手？</strong></p>
+
+<ol>
+  <li><strong>是闭合曲线积分吗？</strong>
+    <ul>
+      <li><strong>是</strong> $\to$ <strong>留数定理</strong>。
+        <ul>
+          <li>找出曲线内部的所有奇点。</li>
+          <li>判断奇点类型（极点阶数）。</li>
+          <li>分别计算留数并求和，乘以 $2\pi i$。</li>
+          <li><em>技巧：如果内部奇点太难算，看外部和无穷远点是否简单？（反向留数定理）</em></li>
+        </ul>
+      </li>
+      <li><strong>否 (实积分)</strong> $\to$ <strong>构造围道</strong>。
+        <ul>
+          <li>区间 $[0, 2\pi]$ 三角函数 $\to$ 单位圆代换。</li>
+          <li>区间 $(-\infty, +\infty)$ 有理函数 $\to$ 上半平面围道。</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ol>
+
+<p><strong>Q: 如何快速算留数？</strong></p>
+
+<ol>
+  <li><strong>观察法</strong>：能直接看穿 $(z-z_0)^{-1}$ 的系数吗？（适用于本性奇点或简单函数）。</li>
+  <li><strong>公式法</strong>：
+    <ul>
+      <li>形如 $\frac{P}{Q}$ 且为一级极点？ $\to \frac{P}{Q’}$。</li>
+      <li>形如 $\frac{\phi(z)}{(z-z_0)^m}$？ $\to$ 对 $\phi(z)$ 求 $m-1$ 次导。</li>
+    </ul>
+  </li>
+</ol>
+
+<hr />
+
+<h1 id="第二部分积分变换">第二部分：积分变换</h1>
+
+<h2 id="第一章-fourier-变换">第一章 Fourier 变换</h2>
+
+<h3 id="1-fourier-变换的概念">1. Fourier 变换的概念</h3>
+
+<h4 id="11-fourier-积分">1.1 Fourier 积分</h4>
+
+<p>对于非周期函数 $f(t)$，若满足 Dirichlet 条件且在 $(-\infty, +\infty)$ 上绝对可积，则有 Fourier 积分公式：
+\(f(t) = \frac{1}{2\pi} \int_{-\infty}^{+\infty} \left[ \int_{-\infty}^{+\infty} f(\tau) e^{-j\omega \tau} d\tau \right] e^{j\omega t} d\omega\)</p>
+
+<blockquote>
+  <p><strong>注意</strong>：本书使用工程惯例，虚数单位用 <strong>$j$</strong> 表示 ($j^2 = -1$)。</p>
+</blockquote>
+
+<h4 id="12-fourier-变换定义">1.2 Fourier 变换定义</h4>
+
+<ul>
+  <li>
+    <p><strong>正变换 (求象函数)</strong>：
+\(F(\omega) = \mathscr{F}[f(t)] = \int_{-\infty}^{+\infty} f(t) e^{-j\omega t} dt\)</p>
+  </li>
+  <li>
+    <p><strong>逆变换 (求象原函数)</strong>：
+\(f(t) = \mathscr{F}^{-1}[F(\omega)] = \frac{1}{2\pi} \int_{-\infty}^{+\infty} F(\omega) e^{j\omega t} d\omega\)</p>
+  </li>
+  <li>
+    <p><strong>物理意义</strong>：$F(\omega)$ 称为 $f(t)$ 的<strong>频谱函数</strong>。$|F(\omega)|$ 是振幅频谱，$\arg F(\omega)$ 是相位频谱。</p>
+  </li>
+</ul>
+
+<h4 id="13-常用函数的-fourier-变换对-熟记">1.3 常用函数的 Fourier 变换对 (熟记)</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">信号名称</th>
+      <th style="text-align: center">时域信号 $f(t)$</th>
+      <th style="text-align: center">频域信号 $F(\omega)$</th>
+      <th style="text-align: center">备注</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><strong>指数衰减</strong></td>
+      <td style="text-align: center">$e^{-\beta t} u(t) \quad (\beta &gt; 0)$</td>
+      <td style="text-align: center">$\frac{1}{\beta + j\omega}$</td>
+      <td style="text-align: center">最基础模型</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>矩形脉冲</strong></td>
+      <td style="text-align: center">$1, \quad |t| &lt; \tau/2$ <br /> $0, \quad |t| &gt; \tau/2$</td>
+      <td style="text-align: center">$\frac{2}{\omega} \sin \frac{\omega \tau}{2} = \tau \text{Sa}(\frac{\omega \tau}{2})$</td>
+      <td style="text-align: center">也就是抽样函数形式</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>冲激函数</strong></td>
+      <td style="text-align: center">$\delta(t)$</td>
+      <td style="text-align: center">$1$</td>
+      <td style="text-align: center">频谱为常数（白谱）</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>常数</strong></td>
+      <td style="text-align: center">$1$</td>
+      <td style="text-align: center">$2\pi \delta(\omega)$</td>
+      <td style="text-align: center">能量集中在 0 频</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>符号函数</strong></td>
+      <td style="text-align: center">$\text{sgn}(t)$</td>
+      <td style="text-align: center">$\frac{2}{j\omega}$</td>
+      <td style="text-align: center"> </td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>阶跃函数</strong></td>
+      <td style="text-align: center">$u(t)$</td>
+      <td style="text-align: center">$\frac{1}{j\omega} + \pi \delta(\omega)$</td>
+      <td style="text-align: center">包含直流分量</td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p><strong>注</strong>：$u(t)$ 是单位阶跃函数，当 $t&gt;0$ 时为 1，当 $t&lt;0$ 时为 0。</p>
+</blockquote>
+
+<hr />
+
+<h3 id="2-单位脉冲函数-deltat">2. 单位脉冲函数 $\delta(t)$</h3>
+
+<h4 id="21-定义与筛选性质">2.1 定义与筛选性质</h4>
+
+<p>$\delta(t)$ 是广义函数，核心性质是<strong>筛选性质</strong>：
+\(\int_{-\infty}^{+\infty} \delta(t - t_0) f(t) dt = f(t_0)\)
+（前提：$f(t)$ 在 $t_0$ 处连续）。</p>
+
+<h4 id="22-常用性质">2.2 常用性质</h4>
+
+<ol>
+  <li><strong>偶函数</strong>：$\delta(t) = \delta(-t)$。</li>
+  <li><strong>缩放</strong>：$\delta(at) = \frac{1}{|a|} \delta(t)$。</li>
+  <li><strong>与阶跃的关系</strong>：$\frac{d}{dt} u(t) = \delta(t)$，$\int_{-\infty}^t \delta(\tau) d\tau = u(t)$。</li>
+  <li><strong>乘积</strong>：$f(t)\delta(t - t_0) = f(t_0)\delta(t - t_0)$。</li>
+  <li><strong>导数的筛选</strong>：$\int_{-\infty}^{+\infty} \delta’(t) f(t) dt = -f’(0)$。</li>
+</ol>
+
+<hr />
+
+<h3 id="3-fourier-变换的主要性质">3. Fourier 变换的主要性质</h3>
+
+<p>设 $\mathscr{F}[f(t)] = F(\omega)$，$\mathscr{F}[g(t)] = G(\omega)$。</p>
+
+<h4 id="31-线性性质">3.1 线性性质</h4>
+
+\[\mathscr{F}[\alpha f(t) + \beta g(t)] = \alpha F(\omega) + \beta G(\omega)\]
+
+<h4 id="32-位移性质-考研期末必考">3.2 位移性质 (考研/期末必考)</h4>
+
+<ol>
+  <li>
+    <p><strong>时移特性</strong> (时域平移 $\to$ 频域相移)：
+\(\mathscr{F}[f(t - t_0)] = e^{-j\omega t_0} F(\omega)\)</p>
+  </li>
+  <li>
+    <p><strong>频移特性</strong> (频域平移 $\to$ 时域调制)：
+\(\mathscr{F}^{-1}[F(\omega - \omega_0)] = f(t) e^{j\omega_0 t}\)</p>
+  </li>
+</ol>
+
+<h4 id="33-微分性质">3.3 微分性质</h4>
+
+<ol>
+  <li>
+    <p><strong>时域微分</strong>：
+\(\mathscr{F}[f'(t)] = j\omega F(\omega) \quad \Rightarrow \quad \mathscr{F}[f^{(n)}(t)] = (j\omega)^n F(\omega)\)
+<em>(前提：$t \to \infty$ 时 $f(t) \to 0$)</em></p>
+  </li>
+  <li>
+    <p><strong>频域微分</strong>：
+\(\mathscr{F}[(-jt) f(t)] = F'(\omega) \quad \Rightarrow \quad \mathscr{F}[t^n f(t)] = j^n \frac{d^n}{d\omega^n} F(\omega)\)</p>
+  </li>
+</ol>
+
+<h4 id="34-积分性质">3.4 积分性质</h4>
+
+\[\mathscr{F}\left[ \int_{-\infty}^t f(\tau) d\tau \right] = \frac{F(\omega)}{j\omega} + \pi F(0) \delta(\omega)\]
+
+<blockquote>
+  <p><strong>特例</strong>：若 $\int_{-\infty}^{+\infty} f(t) dt = 0$（即 $F(0)=0$），则右边只有 $\frac{F(\omega)}{j\omega}$。</p>
+</blockquote>
+
+<h4 id="35-parseval-等式-能量积分">3.5 Parseval 等式 (能量积分)</h4>
+
+\[\int_{-\infty}^{+\infty} \|f(t)\|^2 dt = \frac{1}{2\pi} \int_{-\infty}^{+\infty} \|F(\omega)\|^2 d\omega\]
+
+<p><em>物理意义：时域总能量等于频域总能量（系数取决于定义习惯，本书为 $1/2\pi$）。</em></p>
+
+<hr />
+
+<h3 id="4-卷积与卷积定理">4. 卷积与卷积定理</h3>
+
+<h4 id="41-卷积定义">4.1 卷积定义</h4>
+
+\[f_1(t) * f_2(t) = \int_{-\infty}^{+\infty} f_1(\tau) f_2(t - \tau) d\tau\]
+
+<h4 id="42-卷积定理-解题核心">4.2 卷积定理 (解题核心)</h4>
+
+<ol>
+  <li>
+    <p><strong>时域卷积定理</strong>：
+\(\mathscr{F}[f_1(t) * f_2(t)] = F_1(\omega) \cdot F_2(\omega)\)
+<em>应用：求线性系统的响应，即 $Y(\omega) = H(\omega) X(\omega)$，然后反变换。</em></p>
+  </li>
+  <li>
+    <p><strong>频域卷积定理</strong>：
+\(\mathscr{F}[f_1(t) \cdot f_2(t)] = \frac{1}{2\pi} F_1(\omega) * F_2(\omega)\)</p>
+  </li>
+</ol>
+
+<hr />
+
+<h3 id="5--习题中的重要结论-补充性质">5. 🎯 习题中的重要结论 (补充性质)</h3>
+
+<p>根据第一章习题（习题三 P39），以下性质在正文中未详细证明，但常作为公式使用：</p>
+
+<h4 id="51-对称性质-对偶性-习题三-2">5.1 对称性质 (对偶性) [习题三 2]</h4>
+
+<p>若 $\mathscr{F}[f(t)] = F(\omega)$，则：
+\(\mathscr{F}[F(t)] = 2\pi f(-\omega)\)</p>
+
+<blockquote>
+  <p><strong>应用</strong>：已知矩形脉冲的变换是 Sa 函数，可以利用对称性直接求 Sa 函数的变换是矩形脉冲。</p>
+</blockquote>
+
+<h4 id="52-相似性质-尺度变换-习题三-3">5.2 相似性质 (尺度变换) [习题三 3]</h4>
+
+<p>若 $\mathscr{F}[f(t)] = F(\omega)$，且 $a \neq 0$，则：
+\(\mathscr{F}[f(at)] = \frac{1}{\|a\|} F\left( \frac{\omega}{a} \right)\)</p>
+
+<blockquote>
+  <p><strong>物理意义</strong>：时域压缩（$a&gt;1$），频域展宽，且幅度减小。</p>
+</blockquote>
+
+<h4 id="53-调制性质-习题三-7">5.3 调制性质 [习题三 7]</h4>
+
+<p>利用频移性质和欧拉公式可推导：</p>
+
+<ol>
+  <li>
+    <p><strong>余弦调制</strong>：
+\(\mathscr{F}[f(t) \cos \omega_0 t] = \frac{1}{2} [F(\omega - \omega_0) + F(\omega + \omega_0)]\)</p>
+  </li>
+  <li>
+    <p><strong>正弦调制</strong>：
+\(\mathscr{F}[f(t) \sin \omega_0 t] = \frac{1}{2j} [F(\omega - \omega_0) - F(\omega + \omega_0)]\)</p>
+  </li>
+</ol>
+
+<h4 id="54-翻转性质-习题三-6">5.4 翻转性质 [习题三 6]</h4>
+
+\[\mathscr{F}[f(-t)] = F(-\omega)\]
+
+<p>对于实函数，$F(-\omega) = \overline{F(\omega)}$（共轭）。</p>
+
+<hr />
+
+<h3 id="6-常见易错点-checklist-1">6. 常见易错点 Checklist</h3>
+
+<ol class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>正负号</strong>：变换指数是 $e^{-j\omega t}$，反变换是 $e^{j\omega t}$。不要记反。</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>系数 $2\pi$</strong>：在使用对称性质、频域卷积定理、Parseval 等式时，注意系数 $2\pi$ 或 $1/2\pi$ 的位置。</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>阶跃函数</strong>：$u(t)$ 的变换不是简单的 $1/j\omega$，必须加上 $\pi\delta(\omega)$。只有双边衰减信号（如 $e^{-\beta|t|}$）或单边衰减信号才没有 $\delta$ 项。</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>卷积积分限</strong>：虽然定义是 $(-\infty, +\infty)$，但如果涉及 $u(t)$，积分限通常会变成 $(0, t)$ 或其他有限区间。</li>
+</ol>
+
+<hr />
+
+<h2 id="第二章-laplace-变换">第二章 Laplace 变换</h2>
+
+<h3 id="1-laplace-变换的概念">1. Laplace 变换的概念</h3>
+
+<h4 id="11-定义">1.1 定义</h4>
+
+<p>设函数 $f(t)$ 当 $t \ge 0$ 时有定义，复参数 $s = \beta + j\omega$，则 Laplace 变换定义为：
+\(F(s) = \mathscr{L}[f(t)] = \int_0^{+\infty} f(t) e^{-st} dt\)</p>
+
+<ul>
+  <li><strong>存在定理</strong>：若 $f(t)$ 在任一有限区间分段连续，且增长速度不超过指数级（即 $|f(t)| \le M e^{ct}$），则 $F(s)$ 在 $Re(s) &gt; c$ 的半平面内存在且解析。</li>
+</ul>
+
+<h4 id="12-常用函数的-laplace-变换对-熟记表">1.2 常用函数的 Laplace 变换对 (熟记表)</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">信号名称 $f(t) (t&gt;0)$</th>
+      <th style="text-align: center">象函数 $F(s)$</th>
+      <th style="text-align: center">收敛域</th>
+      <th style="text-align: center">备注</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><strong>单位脉冲</strong> $\delta(t)$</td>
+      <td style="text-align: center">$1$</td>
+      <td style="text-align: center">全平面</td>
+      <td style="text-align: center">极其重要</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>单位阶跃</strong> $u(t) = 1$</td>
+      <td style="text-align: center">$\frac{1}{s}$</td>
+      <td style="text-align: center">$Re(s)&gt;0$</td>
+      <td style="text-align: center"> </td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>幂函数</strong> $t^n$ ($n \in \mathbb{N}$)</td>
+      <td style="text-align: center">$\frac{n!}{s^{n+1}}$</td>
+      <td style="text-align: center">$Re(s)&gt;0$</td>
+      <td style="text-align: center">若非整数 $\nu &gt; -1$，则为 $\frac{\Gamma(\nu+1)}{s^{\nu+1}}$</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>指数函数</strong> $e^{kt}$</td>
+      <td style="text-align: center">$\frac{1}{s-k}$</td>
+      <td style="text-align: center">$Re(s)&gt;Re(k)$</td>
+      <td style="text-align: center">极点在 $s=k$</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>正弦</strong> $\sin kt$</td>
+      <td style="text-align: center">$\frac{k}{s^2 + k^2}$</td>
+      <td style="text-align: center">$Re(s)&gt;0$</td>
+      <td style="text-align: center"> </td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>余弦</strong> $\cos kt$</td>
+      <td style="text-align: center">$\frac{s}{s^2 + k^2}$</td>
+      <td style="text-align: center">$Re(s)&gt;0$</td>
+      <td style="text-align: center"> </td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>双曲正弦</strong> $\sinh kt$</td>
+      <td style="text-align: center">$\frac{k}{s^2 - k^2}$</td>
+      <td style="text-align: center">$Re(s)&gt;|k|$</td>
+      <td style="text-align: center"> </td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>双曲余弦</strong> $\cosh kt$</td>
+      <td style="text-align: center">$\frac{s}{s^2 - k^2}$</td>
+      <td style="text-align: center">$Re(s)&gt;|k|$</td>
+      <td style="text-align: center"> </td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p><strong>注意</strong>：$\mathscr{L}[1] = 1/s$ 与 $\mathscr{F}[1] = 2\pi \delta(\omega)$ 的区别。Laplace 变换主要处理 $t \ge 0$ 的因果信号。</p>
+</blockquote>
+
+<h4 id="13-周期函数的变换">1.3 周期函数的变换</h4>
+
+<p>若 $f(t)$ 是周期为 $T$ 的函数，则：
+\(\mathscr{L}[f(t)] = \frac{1}{1 - e^{-sT}} \int_0^T f(t) e^{-st} dt\)</p>
+
+<ul>
+  <li><strong>计算技巧</strong>：只需计算第一个周期内的积分，然后除以 $(1 - e^{-sT})$。</li>
+</ul>
+
+<hr />
+
+<h3 id="2-laplace-变换的主要性质">2. Laplace 变换的主要性质</h3>
+
+<h4 id="21-线性性质">2.1 线性性质</h4>
+
+\[\mathscr{L}[\alpha f_1(t) + \beta f_2(t)] = \alpha F_1(s) + \beta F_2(s)\]
+
+<h4 id="22-微分性质-解微分方程的核心">2.2 微分性质 (解微分方程的核心)</h4>
+
+<ul>
+  <li>
+    <p><strong>一阶导数</strong>：
+\(\mathscr{L}[f'(t)] = s F(s) - f(0)\)</p>
+  </li>
+  <li>
+    <p><strong>二阶导数</strong>：
+\(\mathscr{L}[f''(t)] = s^2 F(s) - s f(0) - f'(0)\)</p>
+  </li>
+  <li>
+    <p><strong>n 阶导数</strong>：
+\(\mathscr{L}[f^{(n)}(t)] = s^n F(s) - \sum_{k=0}^{n-1} s^{n-1-k} f^{(k)}(0)\)</p>
+
+    <blockquote>
+      <p><strong>应用</strong>：将微积分运算转化为代数运算。</p>
+    </blockquote>
+  </li>
+</ul>
+
+<h4 id="23-积分性质">2.3 积分性质</h4>
+
+\[\mathscr{L}\left[ \int_0^t f(\tau) d\tau \right] = \frac{1}{s} F(s)\]
+
+<ul>
+  <li><strong>推论</strong>：$\mathscr{L}^{-1} \left[ \frac{F(s)}{s} \right] = \int_0^t f(\tau) d\tau$（常用于求逆变换）。</li>
+</ul>
+
+<h4 id="24-位移与延迟性质-必考">2.4 位移与延迟性质 (必考)</h4>
+
+<ol>
+  <li>
+    <p><strong>位移性质 (s域平移)</strong>：
+\(\mathscr{L}[e^{at} f(t)] = F(s-a)\)</p>
+
+    <ul>
+      <li><strong>应用</strong>：$\mathscr{L}[e^{at} \sin bt] = \frac{b}{(s-a)^2 + b^2}$（阻尼振荡）。</li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>延迟性质 (t域平移)</strong>：
+\(\mathscr{L}[f(t-\tau) u(t-\tau)] = e^{-s\tau} F(s) \quad (\tau &gt; 0)\)</p>
+
+    <ul>
+      <li><strong>应用</strong>：处理阶梯波形或分段函数。计算时务必将函数凑成 $f(t-\tau)$ 的形式。</li>
+    </ul>
+  </li>
+</ol>
+
+<h4 id="25-象函数的微分与积分">2.5 象函数的微分与积分</h4>
+
+<ol>
+  <li>
+    <p><strong>微分 (乘 $-t$)</strong>：
+\(\mathscr{L}[-t f(t)] = F'(s) \quad \Rightarrow \quad \mathscr{L}[t f(t)] = -\frac{d}{ds} F(s)\)</p>
+
+    <ul>
+      <li><strong>推广</strong>：$\mathscr{L}[t^n f(t)] = (-1)^n \frac{d^n}{ds^n} F(s)$。</li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>积分 (除 $t$)</strong>：
+若 $\displaystyle \lim_{t\to 0} \frac{f(t)}{t}$ 存在，则：
+\(\mathscr{L}\left[ \frac{f(t)}{t} \right] = \int_s^{+\infty} F(u) du\)</p>
+  </li>
+</ol>
+
+<h4 id="26-初值与终值定理">2.6 初值与终值定理</h4>
+
+<ol>
+  <li>
+    <p><strong>初值定理</strong>：$f(0^+) = \displaystyle \lim_{s \to \infty} s F(s)$</p>
+  </li>
+  <li>
+    <p><strong>终值定理</strong>：$\displaystyle \lim_{t \to \infty} f(t) = \displaystyle \lim_{s \to 0} s F(s)$</p>
+
+    <blockquote>
+      <p><strong>条件</strong>：$sF(s)$ 的所有极点必须在 $s$ 平面左半部（除原点外）。若极点在虚轴或右半平面，终值定理失效（系统不稳定）。</p>
+    </blockquote>
+  </li>
+</ol>
+
+<hr />
+
+<h3 id="3-卷积与卷积定理">3. 卷积与卷积定理</h3>
+
+<h4 id="31-卷积定义">3.1 卷积定义</h4>
+
+<p>Laplace 变换中的卷积定义在 $[0, t]$ 区间上：
+\(f_1(t) * f_2(t) = \int_0^t f_1(\tau) f_2(t - \tau) d\tau\)</p>
+
+<h4 id="32-卷积定理">3.2 卷积定理</h4>
+
+\[\mathscr{L}[f_1(t) * f_2(t)] = F_1(s) \cdot F_2(s)\]
+
+<ul>
+  <li><strong>逆变换应用</strong>：$\mathscr{L}^{-1}[F_1(s) F_2(s)] = f_1(t) * f_2(t)$。</li>
+  <li><strong>应用</strong>：常用于求解 $Y(s) = H(s) X(s)$ 形式的系统响应。</li>
+</ul>
+
+<hr />
+
+<h3 id="4-laplace-逆变换求法">4. Laplace 逆变换求法</h3>
+
+<h4 id="41-部分分式展开法-最常用">4.1 部分分式展开法 (最常用)</h4>
+
+<p>对于有理分式 $F(s) = \frac{A(s)}{B(s)}$：</p>
+
+<ol>
+  <li><strong>单根 $s_k$</strong>：系数 $c_k = \displaystyle \lim_{s \to s_k} (s-s_k) F(s)$。对应项 $c_k e^{s_k t}$。</li>
+  <li><strong>重根 $s_k$ ($m$ 重)</strong>：
+系数 $c_{km} = \displaystyle \lim_{s \to s_k} (s-s_k)^m F(s)$。
+对应项包含 $e^{s_k t}, t e^{s_k t}, \dots, t^{m-1} e^{s_k t}$。</li>
+  <li><strong>共轭复根</strong>：配方成 $(s+\alpha)^2 + \beta^2$ 的形式，利用位移性质凑正余弦。</li>
+</ol>
+
+<h4 id="42-留数公式法-heaviside-公式">4.2 留数公式法 (Heaviside 公式)</h4>
+
+<p>若 $F(s) = \frac{A(s)}{B(s)}$，且 $B(s)=0$ 有 $n$ 个单根 $s_1, \dots, s_n$：
+\(f(t) = \sum_{k=1}^n \frac{A(s_k)}{B'(s_k)} e^{s_k t}\)</p>
+
+<hr />
+
+<h3 id="5--习题中的重要结论-补充性质-1">5. 🎯 习题中的重要结论 (补充性质)</h3>
+
+<p>根据第二章习题（习题二 P103），以下性质在正文中未详细强调，但考试中可能用到：</p>
+
+<h4 id="51-相似性质-尺度变换-习题二-2">5.1 相似性质 (尺度变换) [习题二 2]</h4>
+
+<p>若 $\mathscr{L}[f(t)] = F(s)$，且 $a &gt; 0$，则：
+\(\mathscr{L}[f(at)] = \frac{1}{a} F\left( \frac{s}{a} \right)\)</p>
+
+<blockquote>
+  <p><strong>应用</strong>：已知 $\mathscr{L}[\sin t] = \frac{1}{s^2+1}$，求 $\mathscr{L}[\sin 3t]$ 时，直接令 $a=3$ 代入公式。</p>
+</blockquote>
+
+<h4 id="52-脉冲响应与传递函数">5.2 脉冲响应与传递函数</h4>
+
+<ul>
+  <li><strong>传递函数</strong>：$G(s) = Y(s)/X(s)$（零初始条件下）。</li>
+  <li><strong>脉冲响应</strong>：$g(t) = \mathscr{L}^{-1}[G(s)]$。即当输入为 $\delta(t)$ 时的系统输出。</li>
+  <li><strong>阶跃响应</strong>：$h(t) = \mathscr{L}^{-1}[G(s)/s]$。即当输入为 $u(t)$ 时的系统输出。</li>
+</ul>
+
+<h4 id="53-微分方程解的结构">5.3 微分方程解的结构</h4>
+
+<p>求解 $y’’ + ay’ + by = f(t)$：</p>
+
+<ol>
+  <li>变换得 $(s^2 + as + b)Y(s) - (sy(0) + y’(0) + ay(0)) = F(s)$。</li>
+  <li>
+\[Y(s) = \underbrace{\frac{sy(0) + y'(0) + ay(0)}{s^2 + as + b}}_{\text{零输入响应}} + \underbrace{\frac{F(s)}{s^2 + as + b}}_{\text{零状态响应}}\]
+  </li>
+</ol>
+
+<hr />
+
+<h3 id="6-常见易错点-checklist-2">6. 常见易错点 Checklist</h3>
+
+<ol class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>初始条件</strong>：使用微分性质时，别忘了减去 $f(0)$ 和 $f’(0)$。特别是二阶导数 $\mathscr{L}[f’’] = s^2 F - s f(0) - f’(0)$，容易漏掉中间的 $s$。</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>阶跃函数位移</strong>：$\mathscr{L}[u(t-a)] = \frac{e^{-as}}{s}$，而 $\mathscr{L}[\delta(t-a)] = e^{-as}$。注意分母的区别。</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>分段函数处理</strong>：遇到分段函数，先用阶跃函数 $u(t)$ 表示。例如 $f(t)$ 在 $a&lt;t&lt;b$ 有值，写成 $f(t)[u(t-a) - u(t-b)]$，再利用延迟性质求解。</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>逆变换配方</strong>：分母为 $s^2 + 2s + 5$ 时，一定要配方成 $(s+1)^2 + 2^2$，然后凑 $s+1$ (余弦) 或 $2$ (正弦)，最后利用位移性质 $e^{-t}$。</li>
+</ol>
+
+
+        <!-- Giscus 评论区 -->
+        <div style="margin-top: 50px; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 30px;">
+            <script src="https://giscus.app/client.js" data-repo="The-time-forever/The-time-forever.github.io"
+                data-repo-id="R_kgDOQXvq9w" data-category="General" data-category-id="DIC_kwDOQXvq984CzpQ2"
+                data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0"
+                data-input-position="top" data-theme="transparent_dark" data-lang="zh-CN" data-loading="lazy"
+                crossorigin="anonymous" async>
+                </script>
+        </div>
+
+        <p
+            style="font-size:0.9rem;color:#bbb;margin-top:3rem;border-top:1px solid rgba(255,255,255,0.1);padding-top:20px;">
+            提示：鼠标移动会产生拖尾并影响周围粒子；按住 <strong>Alt</strong> 可切换吸引（Alt）/排斥（默认）效果。
+        </p>
+    </div>
+
+    <script src="/assets/js/space-particles.js" defer></script>
+
+    <!-- Mermaid 代码块转换脚本 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 查找所有 language-mermaid 的代码块
+            document.querySelectorAll('pre code.language-mermaid').forEach(function(block) {
+                // 获取 Mermaid 代码
+                const code = block.textContent;
+
+                // 创建一个新的 div 元素来替换 pre 标签
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = code;
+
+                // 替换原来的 pre 元素
+                block.parentElement.replaceWith(mermaidDiv);
+            });
+
+            // 重新初始化 Mermaid
+            if (typeof mermaid !== 'undefined') {
+                mermaid.init(undefined, document.querySelectorAll('.mermaid'));
+            }
+        });
+    </script>
+</body>
+
+</html>

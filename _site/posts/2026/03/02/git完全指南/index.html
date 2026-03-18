@@ -1,0 +1,1450 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Git 完全指南：从入门到精通 | The Time Forever</title>
+    <link rel="icon" href="/images/favicon.png" type="image/png">
+    <style>
+        /* 全局重置与字体颜色 */
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: #ffffff;
+            /* 全局白色字体 */
+            overflow-x: hidden;
+            background-color: #000000;
+            /* 确保背景黑 */
+        }
+
+        /* Canvas 放到页面最底层 */
+        #bg-canvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            display: block;
+            background: #000000;
+            pointer-events: none;
+        }
+
+        /* 返回首页按钮 */
+        .home-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 8px 16px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            backdrop-filter: blur(4px);
+            transition: all 0.3s ease;
+            z-index: 100;
+            font-size: 0.9rem;
+        }
+
+        .home-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border-color: #fff;
+        }
+
+        /* 毛玻璃容器 (Glassmorphism) */
+        .glass-container {
+            max-width: 900px;
+            margin: 80px auto 40px;
+            /* 上边距留给返回按钮 */
+            padding: 40px;
+            background: rgba(20, 20, 30, 0.4);
+            /* 更通透的深色背景 */
+            backdrop-filter: blur(20px);
+            /* 高强度背景模糊 */
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            /* 极细的亮色边框 */
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            /* 深度感阴影 */
+        }
+
+        /* 标题样式 */
+        .glass-container h1 {
+            margin-top: 0;
+            font-weight: 300;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 16px;
+            margin-bottom: 10px;
+            text-align: center;
+            color: #00f2ff;
+            text-shadow: 0 0 5px rgba(0, 242, 255, 0.7), 0 0 15px rgba(0, 242, 255, 0.5);
+            letter-spacing: 2px;
+        }
+
+        /* Markdown Content Styles */
+        .glass-container h2 {
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+            color: #00f2ff;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 5px;
+        }
+
+        .glass-container h3 {
+            margin-top: 1.2em;
+            margin-bottom: 0.5em;
+            color: #e0e0e0;
+        }
+
+        .glass-container h4 {
+            margin-top: 1em;
+            margin-bottom: 0.5em;
+            color: #ccc;
+        }
+
+        .glass-container p {
+            line-height: 1.8;
+            margin-bottom: 1em;
+            color: #ddd;
+            font-size: 1.05rem;
+        }
+
+        .glass-container ul,
+        .glass-container ol {
+            margin-left: 20px;
+            margin-bottom: 1em;
+            color: #ddd;
+        }
+
+        .glass-container li {
+            margin-bottom: 5px;
+        }
+
+        .glass-container blockquote {
+            border-left: 4px solid #00f2ff;
+            padding-left: 15px;
+            color: #aaa;
+            margin: 1em 0;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px 15px;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .glass-container pre {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1em 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-container code {
+            font-family: Consolas, Monaco, 'Andale Mono', monospace;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 5px;
+            border-radius: 3px;
+            color: #ff79c6;
+        }
+
+        .glass-container pre code {
+            background: transparent;
+            color: #f8f8f2;
+            padding: 0;
+        }
+
+        .glass-container img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin: 1em 0;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .post-meta {
+            text-align: center;
+            color: #888;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+
+        /* Table Styles */
+        .glass-container table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1em 0;
+            color: #ddd;
+        }
+
+        .glass-container th,
+        .glass-container td {
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        .glass-container th {
+            background: rgba(255, 255, 255, 0.1);
+            color: #00f2ff;
+        }
+
+        /* MathJax Overflow Handling */
+        mjx-container[display="true"] {
+            overflow-x: auto;
+            overflow-y: hidden;
+            max-width: 100%;
+            padding: 10px 0;
+        }
+
+        /* 链接样式 */
+        .glass-container a {
+            color: #00ffff;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .glass-container a:hover {
+            color: #fff;
+            text-decoration: underline;
+            text-shadow: 0 0 8px rgba(0, 255, 255, 0.6);
+        }
+
+        /* Mermaid 图表样式 */
+        .glass-container .mermaid {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 1.5em auto;
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            overflow-x: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Mermaid SVG 居中 */
+        .glass-container .mermaid svg {
+            display: block;
+            margin: 0 auto;
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 600px) {
+            .glass-container {
+                margin: 72px 12px 20px;
+                padding: 20px;
+            }
+
+            .home-btn {
+                top: 16px;
+                left: 16px;
+                padding: 8px 14px;
+            }
+
+            .glass-container h1 {
+                font-size: 1.8rem;
+                letter-spacing: 1px;
+            }
+
+            .glass-container h2 {
+                font-size: 1.35rem;
+            }
+
+            .glass-container h3 {
+                font-size: 1.15rem;
+            }
+
+            .glass-container p,
+            .glass-container li {
+                font-size: 1rem;
+                line-height: 1.75;
+            }
+
+            .post-meta {
+                margin-bottom: 22px;
+            }
+
+            .glass-container pre {
+                padding: 12px;
+                font-size: 0.9rem;
+            }
+
+            .glass-container table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .glass-container th,
+            .glass-container td {
+                padding: 8px 10px;
+            }
+
+            .glass-container .mermaid {
+                padding: 12px;
+            }
+        }
+    </style>
+
+    <!-- MathJax Configuration -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async src="/assets/js/mathjax.js">
+    </script>
+
+    <!-- Mermaid Configuration -->
+    <script src="/assets/js/mermaid.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            mermaid.initialize({
+                startOnLoad: true,
+                theme: 'dark',
+                themeVariables: {
+                    // 主要颜色 - 使用亮青色
+                    primaryColor: '#00d4ff',
+                    primaryTextColor: '#ffffff',
+                    primaryBorderColor: '#00f2ff',
+
+                    // 次要颜色 - 使用深色但不太暗
+                    secondaryColor: '#2a3f5f',
+                    secondaryTextColor: '#ffffff',
+                    secondaryBorderColor: '#00d4ff',
+
+                    // 第三颜色
+                    tertiaryColor: '#1e3a5f',
+                    tertiaryTextColor: '#ffffff',
+                    tertiaryBorderColor: '#00d4ff',
+
+                    // 线条颜色
+                    lineColor: '#00f2ff',
+
+                    // 文字颜色 - 确保所有文字都是白色
+                    textColor: '#ffffff',
+                    mainBkg: '#1a2332',
+
+                    // Git 图表特定颜色
+                    git0: '#00d4ff',
+                    git1: '#7c4dff',
+                    git2: '#ff6b6b',
+                    git3: '#4ecdc4',
+                    git4: '#ffd93d',
+                    git5: '#95e1d3',
+                    git6: '#f38181',
+                    git7: '#aa96da',
+
+                    // Git 分支名称文字颜色（gitInv 控制分支名称标签的文字颜色）
+                    gitInv0: '#000000',
+                    gitInv1: '#000000',
+                    gitInv2: '#000000',
+                    gitInv3: '#000000',
+                    gitInv4: '#000000',
+                    gitInv5: '#000000',
+                    gitInv6: '#000000',
+                    gitInv7: '#000000',
+
+                    // 提交点颜色 - 使用黑色文字以便在亮色背景上显示
+                    commitLabelColor: '#000000',
+                    commitLabelBackground: '#00d4ff',
+                    commitLabelFontSize: '14px',
+
+                    // 标签颜色 - 使用黑色文字
+                    tagLabelColor: '#000000',
+                    tagLabelBackground: '#00d4ff',
+                    tagLabelBorder: '#00f2ff',
+                    tagLabelFontSize: '12px',
+
+                    // Git 标签文字颜色（确保所有标签都是黑色）
+                    gitTagLabelColor: '#000000',
+                    gitTagLabelBackground: '#00d4ff',
+                    gitTagLabelBorder: '#00f2ff',
+
+                    // 分支标签颜色
+                    gitBranchLabel0: '#000000',
+                    gitBranchLabel1: '#000000',
+                    gitBranchLabel2: '#000000',
+                    gitBranchLabel3: '#000000',
+                    gitBranchLabel4: '#000000',
+                    gitBranchLabel5: '#000000',
+                    gitBranchLabel6: '#000000',
+                    gitBranchLabel7: '#000000',
+
+                    // 节点颜色
+                    nodeBorder: '#00f2ff',
+                    nodeTextColor: '#ffffff',
+
+                    // 边框和背景
+                    clusterBkg: '#1a2332',
+                    clusterBorder: '#00d4ff',
+
+                    // 标题颜色
+                    titleColor: '#ffffff',
+
+                    // 边缘标签
+                    edgeLabelBackground: '#1a2332',
+
+                    // 活动状态
+                    activeTaskBkgColor: '#00d4ff',
+                    activeTaskBorderColor: '#00f2ff',
+
+                    // 网格颜色
+                    gridColor: '#333333',
+
+                    // 序列图颜色
+                    actorBorder: '#00f2ff',
+                    actorBkg: '#1a2332',
+                    actorTextColor: '#ffffff',
+                    actorLineColor: '#00d4ff',
+                    signalColor: '#ffffff',
+                    signalTextColor: '#ffffff',
+                    labelBoxBkgColor: '#1a2332',
+                    labelBoxBorderColor: '#00f2ff',
+                    labelTextColor: '#ffffff',
+                    loopTextColor: '#ffffff',
+                    noteBorderColor: '#00f2ff',
+                    noteBkgColor: '#1a2332',
+                    noteTextColor: '#ffffff',
+                    activationBorderColor: '#00f2ff',
+                    activationBkgColor: '#2a3f5f',
+                    sequenceNumberColor: '#ffffff'
+                }
+            });
+        });
+    </script>
+</head>
+
+<body>
+
+    <!-- Canvas 背景：不影响可访问性 -->
+    <canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+    <!-- 返回首页按钮 -->
+    <a href="/posts" class="home-btn">← 返回文章列表</a>
+
+    <div class="glass-container">
+        <h1>Git 完全指南：从入门到精通</h1>
+        <p class="post-meta">发布于 2026-03-02</p>
+
+        <p>Git 是目前最流行的分布式版本控制系统，掌握 Git 是每个开发者的必备技能。本指南将从基础概念到高阶用法，帮助你全面理解和掌握 Git。</p>
+
+<h2 id="1-git-核心概念">1. Git 核心概念</h2>
+
+<h3 id="11-什么是版本控制">1.1 什么是版本控制</h3>
+
+<p>版本控制是一种记录文件内容变化，以便将来查阅特定版本修订情况的系统。Git 采用分布式版本控制，每个开发者都拥有完整的代码仓库。</p>
+
+<h3 id="12-git-的三个区域">1.2 Git 的三个区域</h3>
+
+<pre><code class="language-mermaid">graph LR
+    A[工作区&lt;br/&gt;Working Directory&lt;br/&gt;实际编辑文件] --&gt;|git add| B[暂存区&lt;br/&gt;Staging Area&lt;br/&gt;临时存放修改]
+    B --&gt;|git commit| C[版本库&lt;br/&gt;Repository&lt;br/&gt;所有提交历史]
+
+    style A fill:#1a1a2e,stroke:#00f2ff,stroke-width:2px,color:#fff
+    style B fill:#1a1a2e,stroke:#00f2ff,stroke-width:2px,color:#fff
+    style C fill:#1a1a2e,stroke:#00f2ff,stroke-width:2px,color:#fff
+</code></pre>
+
+<ul>
+  <li><strong>工作区（Working Directory）</strong>：你实际操作文件的目录</li>
+  <li><strong>暂存区（Staging Area/Index）</strong>：临时存放即将提交的修改</li>
+  <li><strong>版本库（Repository）</strong>：存储所有提交历史的地方（.git 目录）</li>
+</ul>
+
+<h3 id="13-文件的四种状态">1.3 文件的四种状态</h3>
+
+<pre><code class="language-mermaid">stateDiagram-v2
+    [*] --&gt; Untracked: 新建文件
+    Untracked --&gt; Staged: git add
+    Unmodified --&gt; Modified: 编辑文件
+    Modified --&gt; Staged: git add
+    Staged --&gt; Unmodified: git commit
+    Unmodified --&gt; [*]: git rm
+</code></pre>
+
+<ul>
+  <li><strong>未跟踪（Untracked）</strong>：新创建的文件，Git 还未开始跟踪</li>
+  <li><strong>未修改（Unmodified）</strong>：文件已提交，未做修改</li>
+  <li><strong>已修改（Modified）</strong>：文件已修改，但未暂存</li>
+  <li><strong>已暂存（Staged）</strong>：文件已修改并添加到暂存区</li>
+</ul>
+
+<h2 id="2-git-内部原理">2. Git 内部原理</h2>
+
+<p>理解 Git 的内部工作原理，能帮助你更好地掌握各种命令的本质。</p>
+
+<h3 id="21-git-对象模型">2.1 Git 对象模型</h3>
+
+<p>Git 使用四种核心对象类型来存储数据：</p>
+
+<h4 id="blob-对象文件内容">Blob 对象（文件内容）</h4>
+<p>存储文件的实际内容，不包含文件名和目录结构。</p>
+
+<pre><code class="language-mermaid">graph TD
+    Blob["Blob&lt;br/&gt;文件内容&lt;br/&gt; &lt;br/&gt;Hello&lt;br/&gt;World"]
+
+    style Blob fill:#1a2332,stroke:#00f2ff,stroke-width:2px,color:#fff
+</code></pre>
+
+<h4 id="tree-对象目录结构">Tree 对象（目录结构）</h4>
+<p>存储目录结构和文件名，指向 blob 对象或其他 tree 对象。</p>
+
+<pre><code class="language-mermaid">graph TD
+    Tree["Tree&lt;br/&gt;目录结构&lt;br/&gt;---&lt;br/&gt;100644 blob a906 README&lt;br/&gt;100644 blob 3b18 main.c&lt;br/&gt;040000 tree 5b9d src/"]
+
+    style Tree fill:#1a2332,stroke:#00f2ff,stroke-width:2px,color:#fff
+</code></pre>
+
+<h4 id="commit-对象提交信息">Commit 对象（提交信息）</h4>
+<p>存储提交的元数据，包括作者、时间、提交信息，以及指向 tree 对象和父提交的指针。</p>
+
+<pre><code class="language-mermaid">graph TD
+    Commit["Commit&lt;br/&gt;---&lt;br/&gt;tree: 5b9d...&lt;br/&gt;parent: a3f2...&lt;br/&gt;author: Zhang San&lt;br/&gt;committer: Zhang San&lt;br/&gt; &lt;br/&gt;commit message:&lt;br/&gt;添加新功能"]
+
+    style Commit fill:#1a2332,stroke:#00f2ff,stroke-width:2px,color:#fff
+</code></pre>
+
+<h4 id="完整的对象关系图">完整的对象关系图</h4>
+
+<pre><code class="language-mermaid">graph TD
+    Commit[Commit c3a8] --&gt; Tree[Tree 5b9d]
+    Commit --&gt; Parent[Parent Commit a3f2]
+    Tree --&gt; Blob1[Blob a906&lt;br/&gt;README.md]
+    Tree --&gt; Blob2[Blob 3b18&lt;br/&gt;main.c]
+    Tree --&gt; SubTree[Tree 7f3e&lt;br/&gt;src/]
+    SubTree --&gt; Blob3[Blob 2c4f&lt;br/&gt;utils.c]
+    SubTree --&gt; Blob4[Blob 9a1b&lt;br/&gt;config.h]
+
+    style Commit fill:#1a1a2e,stroke:#00f2ff,stroke-width:2px,color:#fff
+    style Tree fill:#1a1a2e,stroke:#00f2ff,stroke-width:2px,color:#fff
+    style SubTree fill:#1a1a2e,stroke:#00f2ff,stroke-width:2px,color:#fff
+    style Blob1 fill:#16213e,stroke:#00f2ff,stroke-width:1px,color:#fff
+    style Blob2 fill:#16213e,stroke:#00f2ff,stroke-width:1px,color:#fff
+    style Blob3 fill:#16213e,stroke:#00f2ff,stroke-width:1px,color:#fff
+    style Blob4 fill:#16213e,stroke:#00f2ff,stroke-width:1px,color:#fff
+    style Parent fill:#1a1a2e,stroke:#888,stroke-width:1px,color:#888
+</code></pre>
+
+<h3 id="22-引用references">2.2 引用（References）</h3>
+
+<p>Git 使用引用来给提交起一个易读的名字，而不是使用 SHA-1 哈希值。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>.git/refs/
+├── heads/              # 本地分支
+│   ├── main           → c3a8f2...
+│   └── feature        → 7d9e1a...
+├── remotes/           # 远程分支
+│   └── origin/
+│       └── main       → c3a8f2...
+└── tags/              # 标签
+    └── v1.0           → a3f29b...
+
+HEAD → refs/heads/main  # HEAD 指向当前分支
+</code></pre></div></div>
+
+<h3 id="23-分支的本质">2.3 分支的本质</h3>
+
+<p>分支只是指向某个提交对象的可变指针。创建分支非常轻量，只是创建一个 41 字节的文件（40 字符的 SHA-1 值加一个换行符）。</p>
+
+<pre><code class="language-mermaid">gitGraph
+    commit id: "A"
+    commit id: "B"
+    commit id: "C"
+    commit id: "D" tag: "main" tag: "HEAD"
+</code></pre>
+
+<p><strong>创建新分支 feature：</strong></p>
+<pre><code class="language-mermaid">gitGraph
+    commit id: "A"
+    commit id: "B"
+    commit id: "C"
+    commit id: "D" tag: "main" tag: "feature(HEAD)"
+</code></pre>
+
+<p><strong>在 feature 分支提交：</strong></p>
+<pre><code class="language-mermaid">gitGraph
+    commit id: "A"
+    commit id: "B"
+    commit id: "C"
+    commit id: "D" tag: "main"
+    branch feature
+    checkout feature
+    commit id: "E" tag: "HEAD"
+</code></pre>
+
+<h3 id="24-head-指针">2.4 HEAD 指针</h3>
+
+<p>HEAD 是一个特殊的指针，指向当前所在的分支（或提交）。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>正常状态（HEAD 指向分支）：
+HEAD → main → C3
+
+分离 HEAD 状态（HEAD 直接指向提交）：
+HEAD → C2
+</code></pre></div></div>
+
+<h3 id="25-查看-git-对象">2.5 查看 Git 对象</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 查看对象类型</span>
+git cat-file <span class="nt">-t</span> &lt;<span class="nb">hash</span><span class="o">&gt;</span>
+
+<span class="c"># 查看对象内容</span>
+git cat-file <span class="nt">-p</span> &lt;<span class="nb">hash</span><span class="o">&gt;</span>
+
+<span class="c"># 查看对象大小</span>
+git cat-file <span class="nt">-s</span> &lt;<span class="nb">hash</span><span class="o">&gt;</span>
+
+<span class="c"># 查看所有引用</span>
+git show-ref
+
+<span class="c"># 查看 HEAD 指向</span>
+<span class="nb">cat</span> .git/HEAD
+
+<span class="c"># 查看符号引用</span>
+git symbolic-ref HEAD
+</code></pre></div></div>
+
+<h3 id="26-git-存储原理">2.6 Git 存储原理</h3>
+
+<p>Git 使用内容寻址文件系统，所有对象都通过其内容的 SHA-1 哈希值来标识。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>文件存储流程：
+1. 计算内容的 SHA-1 哈希值
+2. 压缩内容
+3. 存储到 .git/objects/ 目录
+
+示例：
+SHA-1: a906cb2a4a904a152e80877d4088654daad0c859
+存储位置: .git/objects/a9/06cb2a4a904a152e80877d4088654daad0c859
+</code></pre></div></div>
+
+<h2 id="3-git-基础操作">3. Git 基础操作</h2>
+
+<h3 id="31-配置-git">3.1 配置 Git</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 配置用户信息</span>
+git config <span class="nt">--global</span> user.name <span class="s2">"Your Name"</span>
+git config <span class="nt">--global</span> user.email <span class="s2">"your.email@example.com"</span>
+
+<span class="c"># 查看配置</span>
+git config <span class="nt">--list</span>
+
+<span class="c"># 配置默认编辑器</span>
+git config <span class="nt">--global</span> core.editor <span class="s2">"code --wait"</span>
+
+<span class="c"># 配置别名</span>
+git config <span class="nt">--global</span> alias.st status
+git config <span class="nt">--global</span> alias.co checkout
+git config <span class="nt">--global</span> alias.br branch
+git config <span class="nt">--global</span> alias.ci commit
+</code></pre></div></div>
+
+<h3 id="32-创建仓库">3.2 创建仓库</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 初始化新仓库</span>
+git init
+
+<span class="c"># 克隆现有仓库</span>
+git clone &lt;repository-url&gt;
+git clone &lt;repository-url&gt; &lt;directory-name&gt;
+</code></pre></div></div>
+
+<h3 id="33-基本工作流程">3.3 基本工作流程</h3>
+
+<p><strong>工作流程可视化：</strong></p>
+
+<pre><code class="language-mermaid">flowchart TD
+    A[修改文件] --&gt; B[git add&lt;br/&gt;将修改添加到暂存区]
+    B --&gt; C[git commit&lt;br/&gt;将暂存区内容提交到版本库]
+    C --&gt; D[git push&lt;br/&gt;推送到远程仓库]
+
+    style A fill:#1a1a2e,stroke:#00f2ff,stroke-width:2px,color:#fff
+    style B fill:#1a1a2e,stroke:#00f2ff,stroke-width:2px,color:#fff
+    style C fill:#1a1a2e,stroke:#00f2ff,stroke-width:2px,color:#fff
+    style D fill:#1a1a2e,stroke:#00f2ff,stroke-width:2px,color:#fff
+</code></pre>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 查看状态</span>
+git status
+git status <span class="nt">-s</span>  <span class="c"># 简洁输出</span>
+
+<span class="c"># 添加文件到暂存区</span>
+git add &lt;file&gt;           <span class="c"># 添加指定文件</span>
+git add <span class="nb">.</span>                <span class="c"># 添加所有修改</span>
+git add <span class="k">*</span>.js             <span class="c"># 添加所有 js 文件</span>
+git add <span class="nt">-p</span>               <span class="c"># 交互式添加（部分修改）</span>
+
+<span class="c"># 提交更改</span>
+git commit <span class="nt">-m</span> <span class="s2">"提交信息"</span>
+git commit <span class="nt">-am</span> <span class="s2">"提交信息"</span>  <span class="c"># 跳过暂存区直接提交已跟踪文件</span>
+git commit <span class="nt">--amend</span>       <span class="c"># 修改最后一次提交</span>
+
+<span class="c"># 查看差异</span>
+git diff                 <span class="c"># 工作区与暂存区的差异</span>
+git diff <span class="nt">--staged</span>        <span class="c"># 暂存区与最后一次提交的差异</span>
+git diff HEAD            <span class="c"># 工作区与最后一次提交的差异</span>
+git diff &lt;commit1&gt; &lt;commit2&gt;  <span class="c"># 两次提交之间的差异</span>
+
+<span class="c"># 查看提交历史</span>
+git log                  <span class="c"># 查看提交历史</span>
+git log <span class="nt">--oneline</span>        <span class="c"># 单行显示</span>
+git log <span class="nt">--graph</span>          <span class="c"># 图形化显示分支</span>
+git log <span class="nt">--all</span> <span class="nt">--graph</span> <span class="nt">--decorate</span> <span class="nt">--oneline</span>  <span class="c"># 完整图形化历史</span>
+git log <span class="nt">-p</span>               <span class="c"># 显示每次提交的差异</span>
+git log <span class="nt">--stat</span>           <span class="c"># 显示每次提交的统计信息</span>
+git log <span class="nt">--author</span><span class="o">=</span><span class="s2">"name"</span>  <span class="c"># 查看特定作者的提交</span>
+git log <span class="nt">--since</span><span class="o">=</span><span class="s2">"2 weeks ago"</span>  <span class="c"># 查看最近两周的提交</span>
+git log <span class="nt">--grep</span><span class="o">=</span><span class="s2">"关键词"</span>   <span class="c"># 搜索提交信息</span>
+
+<span class="c"># 撤销操作</span>
+git restore &lt;file&gt;       <span class="c"># 撤销工作区的修改</span>
+git restore <span class="nt">--staged</span> &lt;file&gt;  <span class="c"># 取消暂存</span>
+git reset HEAD &lt;file&gt;    <span class="c"># 取消暂存（旧方法）</span>
+git checkout <span class="nt">--</span> &lt;file&gt;   <span class="c"># 撤销工作区修改（旧方法）</span>
+</code></pre></div></div>
+
+<h3 id="34-删除和移动文件">3.4 删除和移动文件</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 删除文件</span>
+git <span class="nb">rm</span> &lt;file&gt;            <span class="c"># 删除文件并暂存</span>
+git <span class="nb">rm</span> <span class="nt">--cached</span> &lt;file&gt;   <span class="c"># 从 Git 中删除但保留在工作区</span>
+git <span class="nb">rm</span> <span class="nt">-r</span> &lt;directory&gt;    <span class="c"># 递归删除目录</span>
+
+<span class="c"># 移动/重命名文件</span>
+git <span class="nb">mv</span> &lt;old-name&gt; &lt;new-name&gt;
+</code></pre></div></div>
+
+<h2 id="4-分支管理">4. 分支管理</h2>
+
+<h3 id="41-分支基础">4.1 分支基础</h3>
+
+<p><strong>分支可视化：</strong></p>
+
+<pre><code class="language-mermaid">%%{init: {'theme':'dark'}}%%
+gitGraph
+    commit id: "A"
+    commit id: "B"
+    commit id: "C" tag: "main(HEAD)"
+    branch feature
+    checkout feature
+    commit id: "D" tag: "feature(HEAD)"
+    checkout main
+    commit id: "E" tag: "main"
+</code></pre>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 查看分支</span>
+git branch               <span class="c"># 查看本地分支</span>
+git branch <span class="nt">-r</span>            <span class="c"># 查看远程分支</span>
+git branch <span class="nt">-a</span>            <span class="c"># 查看所有分支</span>
+git branch <span class="nt">-v</span>            <span class="c"># 查看各分支最后一次提交</span>
+
+<span class="c"># 创建分支</span>
+git branch &lt;branch-name&gt;
+git checkout <span class="nt">-b</span> &lt;branch-name&gt;  <span class="c"># 创建并切换</span>
+git switch <span class="nt">-c</span> &lt;branch-name&gt;    <span class="c"># 创建并切换（新命令）</span>
+
+<span class="c"># 切换分支</span>
+git checkout &lt;branch-name&gt;
+git switch &lt;branch-name&gt;       <span class="c"># 新命令</span>
+
+<span class="c"># 删除分支</span>
+git branch <span class="nt">-d</span> &lt;branch-name&gt;    <span class="c"># 删除已合并的分支</span>
+git branch <span class="nt">-D</span> &lt;branch-name&gt;    <span class="c"># 强制删除分支</span>
+
+<span class="c"># 重命名分支</span>
+git branch <span class="nt">-m</span> &lt;old-name&gt; &lt;new-name&gt;
+git branch <span class="nt">-m</span> &lt;new-name&gt;       <span class="c"># 重命名当前分支</span>
+</code></pre></div></div>
+
+<h3 id="42-合并分支">4.2 合并分支</h3>
+
+<h4 id="merge-合并可视化">Merge 合并可视化</h4>
+
+<p><strong>快进合并（Fast-forward）</strong>：</p>
+
+<pre><code class="language-mermaid">%%{init: {'theme':'dark'}}%%
+gitGraph
+    commit id: "A"
+    commit id: "B"
+    commit id: "C" tag: "main"
+    branch feature
+    checkout feature
+    commit id: "D"
+    commit id: "E" tag: "feature"
+    checkout main
+    merge feature tag: "main,feature"
+</code></pre>
+
+<p><strong>三方合并（3-way merge）</strong>：</p>
+
+<pre><code class="language-mermaid">%%{init: {'theme':'dark'}}%%
+gitGraph
+    commit id: "A"
+    commit id: "B"
+    commit id: "C"
+    branch feature
+    checkout feature
+    commit id: "D"
+    commit id: "E"
+    checkout main
+    commit id: "F"
+    merge feature tag: "main"
+</code></pre>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 合并分支</span>
+git merge &lt;branch-name&gt;        <span class="c"># 合并指定分支到当前分支</span>
+git merge <span class="nt">--no-ff</span> &lt;branch-name&gt;  <span class="c"># 禁用快进合并</span>
+git merge <span class="nt">--squash</span> &lt;branch-name&gt;  <span class="c"># 压缩合并</span>
+
+<span class="c"># 解决冲突</span>
+<span class="c"># 1. 手动编辑冲突文件</span>
+<span class="c"># 2. git add &lt;file&gt;</span>
+<span class="c"># 3. git commit</span>
+
+<span class="c"># 中止合并</span>
+git merge <span class="nt">--abort</span>
+</code></pre></div></div>
+
+<h3 id="43-变基rebase">4.3 变基（Rebase）</h3>
+
+<h4 id="rebase-vs-merge-对比">Rebase vs Merge 对比</h4>
+
+<p><strong>Merge 方式（保留完整历史，产生合并提交）</strong>：</p>
+
+<pre><code class="language-mermaid">%%{init: {'theme':'dark'}}%%
+gitGraph
+    commit id: "A"
+    commit id: "B"
+    commit id: "C"
+    branch feature
+    checkout feature
+    commit id: "D"
+    commit id: "E"
+    checkout main
+    commit id: "F"
+    merge feature tag: "M(merge)"
+</code></pre>
+
+<p><strong>Rebase 方式（提交历史呈线性）</strong>：</p>
+
+<pre><code class="language-mermaid">%%{init: {'theme':'dark'}}%%
+gitGraph
+    commit id: "A"
+    commit id: "B"
+    commit id: "C"
+    commit id: "F" tag: "main"
+    commit id: "D'" type: HIGHLIGHT
+    commit id: "E'" type: HIGHLIGHT tag: "feature"
+</code></pre>
+
+<p><strong>Rebase 原理</strong>：</p>
+<ol>
+  <li>找到共同祖先 C</li>
+  <li>提取 feature 分支的修改（D, E）</li>
+  <li>将这些修改应用到 main 分支的最新提交 F 之后</li>
+  <li>生成新的提交 D’, E’（哈希值改变）</li>
+</ol>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 变基操作</span>
+git rebase &lt;branch-name&gt;       <span class="c"># 将当前分支变基到指定分支</span>
+git rebase <span class="nt">--continue</span>          <span class="c"># 解决冲突后继续</span>
+git rebase <span class="nt">--abort</span>             <span class="c"># 中止变基</span>
+git rebase <span class="nt">--skip</span>              <span class="c"># 跳过当前提交</span>
+
+<span class="c"># 交互式变基</span>
+git rebase <span class="nt">-i</span> HEAD~3           <span class="c"># 修改最近 3 次提交</span>
+<span class="c"># 可以进行：</span>
+<span class="c"># - pick: 保留提交</span>
+<span class="c"># - reword: 修改提交信息</span>
+<span class="c"># - edit: 修改提交内容</span>
+<span class="c"># - squash: 合并到前一个提交</span>
+<span class="c"># - fixup: 合并到前一个提交但丢弃提交信息</span>
+<span class="c"># - drop: 删除提交</span>
+</code></pre></div></div>
+
+<h2 id="5-远程仓库操作">5. 远程仓库操作</h2>
+
+<h3 id="51-远程仓库管理">5.1 远程仓库管理</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 查看远程仓库</span>
+git remote                     <span class="c"># 查看远程仓库名称</span>
+git remote <span class="nt">-v</span>                  <span class="c"># 查看远程仓库 URL</span>
+git remote show &lt;remote-name&gt;  <span class="c"># 查看远程仓库详细信息</span>
+
+<span class="c"># 添加远程仓库</span>
+git remote add &lt;name&gt; &lt;url&gt;
+
+<span class="c"># 修改远程仓库</span>
+git remote rename &lt;old-name&gt; &lt;new-name&gt;
+git remote set-url &lt;name&gt; &lt;new-url&gt;
+
+<span class="c"># 删除远程仓库</span>
+git remote remove &lt;name&gt;
+</code></pre></div></div>
+
+<h3 id="52-推送和拉取">5.2 推送和拉取</h3>
+
+<p><strong>远程仓库交互可视化：</strong></p>
+
+<pre><code class="language-mermaid">sequenceDiagram
+    participant L as 本地仓库
+    participant R as 远程仓库(origin)
+
+    Note over L: A ← B ← C
+    L-&gt;&gt;R: git push
+    Note over R: A ← B ← C
+
+    Note over R: A ← B ← C ← D
+    R-&gt;&gt;L: git fetch
+    Note over L: origin/main: A ← B ← C ← D
+
+    Note over L: git merge origin/main
+    Note over L: A ← B ← C ← D
+</code></pre>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 推送到远程仓库</span>
+git push &lt;remote&gt; &lt;branch&gt;
+git push origin main
+git push <span class="nt">-u</span> origin main        <span class="c"># 设置上游分支</span>
+git push <span class="nt">--all</span>                 <span class="c"># 推送所有分支</span>
+git push <span class="nt">--tags</span>                <span class="c"># 推送所有标签</span>
+git push <span class="nt">--force</span>               <span class="c"># 强制推送（危险操作）</span>
+git push <span class="nt">--force-with-lease</span>    <span class="c"># 更安全的强制推送</span>
+
+<span class="c"># 拉取远程更新</span>
+git fetch &lt;remote&gt;             <span class="c"># 获取远程更新但不合并</span>
+git fetch <span class="nt">--all</span>                <span class="c"># 获取所有远程仓库的更新</span>
+git pull &lt;remote&gt; &lt;branch&gt;     <span class="c"># 获取并合并</span>
+git pull <span class="nt">--rebase</span>              <span class="c"># 使用变基方式拉取</span>
+
+<span class="c"># 删除远程分支</span>
+git push &lt;remote&gt; <span class="nt">--delete</span> &lt;branch-name&gt;
+git push &lt;remote&gt; :&lt;branch-name&gt;  <span class="c"># 旧语法</span>
+</code></pre></div></div>
+
+<h2 id="6-标签管理">6. 标签管理</h2>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 查看标签</span>
+git tag                        <span class="c"># 列出所有标签</span>
+git tag <span class="nt">-l</span> <span class="s2">"v1.8.*"</span>           <span class="c"># 搜索标签</span>
+
+<span class="c"># 创建标签</span>
+git tag &lt;tag-name&gt;             <span class="c"># 轻量标签</span>
+git tag <span class="nt">-a</span> &lt;tag-name&gt; <span class="nt">-m</span> <span class="s2">"标签信息"</span>  <span class="c"># 附注标签</span>
+git tag <span class="nt">-a</span> &lt;tag-name&gt; &lt;commit-hash&gt;  <span class="c"># 给特定提交打标签</span>
+
+<span class="c"># 查看标签信息</span>
+git show &lt;tag-name&gt;
+
+<span class="c"># 推送标签</span>
+git push origin &lt;tag-name&gt;
+git push origin <span class="nt">--tags</span>         <span class="c"># 推送所有标签</span>
+
+<span class="c"># 删除标签</span>
+git tag <span class="nt">-d</span> &lt;tag-name&gt;          <span class="c"># 删除本地标签</span>
+git push origin <span class="nt">--delete</span> &lt;tag-name&gt;  <span class="c"># 删除远程标签</span>
+</code></pre></div></div>
+
+<h2 id="7-高阶操作">7. 高阶操作</h2>
+
+<h3 id="71-储藏stash">7.1 储藏（Stash）</h3>
+
+<p><strong>储藏工作流程：</strong></p>
+
+<pre><code class="language-mermaid">flowchart TD
+    A[工作区有未提交的修改] --&gt; B[git stash&lt;br/&gt;保存到储藏栈]
+    B --&gt; C[工作区恢复干净]
+    C --&gt; D[切换分支/处理其他工作]
+    D --&gt; E[git stash pop&lt;br/&gt;恢复修改]
+    E --&gt; F[继续之前的工作]
+
+    style A fill:#1a1a2e,stroke:#00f2ff,stroke-width:2px,color:#fff
+    style B fill:#1a1a2e,stroke:#00f2ff,stroke-width:2px,color:#fff
+    style C fill:#1a1a2e,stroke:#00f2ff,stroke-width:2px,color:#fff
+    style D fill:#1a1a2e,stroke:#00f2ff,stroke-width:2px,color:#fff
+    style E fill:#1a1a2e,stroke:#00f2ff,stroke-width:2px,color:#fff
+    style F fill:#1a1a2e,stroke:#00f2ff,stroke-width:2px,color:#fff
+</code></pre>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 储藏当前工作</span>
+git stash                      <span class="c"># 储藏修改</span>
+git stash save <span class="s2">"描述信息"</span>       <span class="c"># 带描述的储藏</span>
+git stash <span class="nt">-u</span>                   <span class="c"># 包括未跟踪的文件</span>
+git stash <span class="nt">--all</span>                <span class="c"># 包括所有文件（含忽略的）</span>
+
+<span class="c"># 查看储藏</span>
+git stash list                 <span class="c"># 查看所有储藏</span>
+git stash show                 <span class="c"># 查看最新储藏的差异</span>
+git stash show <span class="nt">-p</span> stash@<span class="o">{</span>0<span class="o">}</span>    <span class="c"># 查看指定储藏的详细差异</span>
+
+<span class="c"># 应用储藏</span>
+git stash apply                <span class="c"># 应用最新储藏</span>
+git stash apply stash@<span class="o">{</span>2<span class="o">}</span>      <span class="c"># 应用指定储藏</span>
+git stash pop                  <span class="c"># 应用并删除最新储藏</span>
+
+<span class="c"># 删除储藏</span>
+git stash drop stash@<span class="o">{</span>0<span class="o">}</span>       <span class="c"># 删除指定储藏</span>
+git stash clear                <span class="c"># 删除所有储藏</span>
+</code></pre></div></div>
+
+<h3 id="72-cherry-pick">7.2 Cherry-pick</h3>
+
+<p><strong>Cherry-pick 可视化：</strong></p>
+
+<pre><code class="language-mermaid">%%{init: {'theme':'dark'}}%%
+gitGraph
+    commit id: "A"
+    commit id: "B"
+    branch feature
+    checkout feature
+    commit id: "C"
+    commit id: "D" type: HIGHLIGHT
+    commit id: "E"
+    checkout main
+    commit id: "F"
+    commit id: "G"
+    commit id: "D'" type: HIGHLIGHT tag: "cherry-pick"
+</code></pre>
+
+<p>只挑选了 D 提交，生成新的 D’</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 挑选提交</span>
+git cherry-pick &lt;commit-hash&gt;  <span class="c"># 应用指定提交</span>
+git cherry-pick &lt;commit1&gt; &lt;commit2&gt;  <span class="c"># 应用多个提交</span>
+git cherry-pick &lt;start-commit&gt;..&lt;end-commit&gt;  <span class="c"># 应用提交范围</span>
+
+<span class="c"># 解决冲突</span>
+git cherry-pick <span class="nt">--continue</span>     <span class="c"># 继续</span>
+git cherry-pick <span class="nt">--abort</span>        <span class="c"># 中止</span>
+</code></pre></div></div>
+
+<h3 id="73-重置reset">7.3 重置（Reset）</h3>
+
+<p><strong>Reset 三种模式对比：</strong></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>模式</th>
+      <th>工作区</th>
+      <th>暂存区</th>
+      <th>版本库</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>初始状态</strong></td>
+      <td>file.txt (modified)</td>
+      <td>file.txt (staged)</td>
+      <td>A ← B ← C (HEAD)</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td><strong>–soft</strong></td>
+      <td>✓ 保留</td>
+      <td>✓ 保留</td>
+      <td>✗ 回退到 B</td>
+      <td>只移动 HEAD</td>
+    </tr>
+    <tr>
+      <td><strong>–mixed</strong> (默认)</td>
+      <td>✓ 保留</td>
+      <td>✗ 清空</td>
+      <td>✗ 回退到 B</td>
+      <td>移动 HEAD + 重置暂存区</td>
+    </tr>
+    <tr>
+      <td><strong>–hard</strong></td>
+      <td>✗ 清空</td>
+      <td>✗ 清空</td>
+      <td>✗ 回退到 B</td>
+      <td>完全重置（危险）</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 软重置（保留修改在暂存区）</span>
+git reset <span class="nt">--soft</span> HEAD~1
+
+<span class="c"># 混合重置（保留修改在工作区，默认）</span>
+git reset HEAD~1
+git reset <span class="nt">--mixed</span> HEAD~1
+
+<span class="c"># 硬重置（丢弃所有修改，危险）</span>
+git reset <span class="nt">--hard</span> HEAD~1
+git reset <span class="nt">--hard</span> &lt;commit-hash&gt;
+
+<span class="c"># 重置到远程分支状态</span>
+git reset <span class="nt">--hard</span> origin/main
+</code></pre></div></div>
+
+<h3 id="74-reflog引用日志">7.4 Reflog（引用日志）</h3>
+
+<p><strong>Reflog 救援示例：</strong></p>
+
+<pre><code class="language-mermaid">%%{init: {'theme':'dark'}}%%
+gitGraph
+    commit id: "A"
+    commit id: "B"
+    commit id: "C"
+    commit id: "D" tag: "main(HEAD)"
+</code></pre>
+
+<p><strong>误操作后（git reset –hard B）：</strong></p>
+<pre><code class="language-mermaid">%%{init: {'theme':'dark'}}%%
+gitGraph
+    commit id: "A"
+    commit id: "B" tag: "main(HEAD)"
+</code></pre>
+
+<p>提交 C 和 D 看似丢失了！</p>
+
+<p><strong>使用 git reflog 查看：</strong></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>b3a8f2 HEAD@{0}: reset: moving to B
+d4c9e1 HEAD@{1}: commit: D
+c7f3a2 HEAD@{2}: commit: C
+</code></pre></div></div>
+
+<p><strong>恢复（git reset –hard d4c9e1）：</strong></p>
+<pre><code class="language-mermaid">%%{init: {'theme':'dark'}}%%
+gitGraph
+    commit id: "A"
+    commit id: "B"
+    commit id: "C"
+    commit id: "D" tag: "main(HEAD)恢复"
+</code></pre>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 查看引用日志</span>
+git reflog                     <span class="c"># 查看所有操作历史</span>
+git reflog show &lt;branch-name&gt;  <span class="c"># 查看指定分支的历史</span>
+
+<span class="c"># 恢复丢失的提交</span>
+git reset <span class="nt">--hard</span> &lt;commit-hash&gt;  <span class="c"># 使用 reflog 中的哈希值恢复</span>
+</code></pre></div></div>
+
+<h3 id="75-子模块submodule">7.5 子模块（Submodule）</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 添加子模块</span>
+git submodule add &lt;repository-url&gt; &lt;path&gt;
+
+<span class="c"># 克隆包含子模块的仓库</span>
+git clone <span class="nt">--recursive</span> &lt;repository-url&gt;
+
+<span class="c"># 初始化和更新子模块</span>
+git submodule init
+git submodule update
+git submodule update <span class="nt">--remote</span>  <span class="c"># 更新到最新版本</span>
+
+<span class="c"># 查看子模块状态</span>
+git submodule status
+
+<span class="c"># 删除子模块</span>
+git submodule deinit &lt;path&gt;
+git <span class="nb">rm</span> &lt;path&gt;
+</code></pre></div></div>
+
+<h3 id="76-工作树worktree">7.6 工作树（Worktree）</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 创建工作树</span>
+git worktree add &lt;path&gt; &lt;branch-name&gt;
+
+<span class="c"># 查看工作树</span>
+git worktree list
+
+<span class="c"># 删除工作树</span>
+git worktree remove &lt;path&gt;
+git worktree prune             <span class="c"># 清理无效的工作树</span>
+</code></pre></div></div>
+
+<h2 id="8-实用技巧">8. 实用技巧</h2>
+
+<h3 id="81-搜索和查找">8.1 搜索和查找</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 在提交历史中搜索</span>
+git log <span class="nt">-S</span> <span class="s2">"关键词"</span>            <span class="c"># 搜索添加或删除了关键词的提交</span>
+git log <span class="nt">-G</span> <span class="s2">"正则表达式"</span>         <span class="c"># 使用正则表达式搜索</span>
+
+<span class="c"># 在工作区搜索</span>
+git <span class="nb">grep</span> <span class="s2">"关键词"</span>              <span class="c"># 在工作区搜索</span>
+git <span class="nb">grep</span> <span class="nt">-n</span> <span class="s2">"关键词"</span>           <span class="c"># 显示行号</span>
+git <span class="nb">grep</span> <span class="nt">--count</span> <span class="s2">"关键词"</span>      <span class="c"># 显示匹配次数</span>
+
+<span class="c"># 查找引入 bug 的提交</span>
+git bisect start
+git bisect bad                 <span class="c"># 标记当前版本有问题</span>
+git bisect good &lt;commit&gt;       <span class="c"># 标记某个版本正常</span>
+<span class="c"># Git 会自动二分查找，测试后标记 good 或 bad</span>
+git bisect reset               <span class="c"># 结束查找</span>
+</code></pre></div></div>
+
+<h3 id="82-别名和快捷方式">8.2 别名和快捷方式</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 实用别名配置</span>
+git config <span class="nt">--global</span> alias.lg <span class="s2">"log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)&lt;%an&gt;%Creset' --abbrev-commit"</span>
+git config <span class="nt">--global</span> alias.unstage <span class="s2">"reset HEAD --"</span>
+git config <span class="nt">--global</span> alias.last <span class="s2">"log -1 HEAD"</span>
+git config <span class="nt">--global</span> alias.visual <span class="s2">"log --graph --all --oneline --decorate"</span>
+</code></pre></div></div>
+
+<h3 id="83-忽略文件">8.3 忽略文件</h3>
+
+<p>创建 <code class="language-plaintext highlighter-rouge">.gitignore</code> 文件：</p>
+
+<pre><code class="language-gitignore"># 忽略所有 .log 文件
+*.log
+
+# 忽略 node_modules 目录
+node_modules/
+
+# 忽略所有 .env 文件
+.env
+.env.local
+
+# 但不忽略 .env.example
+!.env.example
+
+# 忽略 build 目录
+/build
+
+# 忽略所有 .pdf 文件，除了 doc/ 目录下的
+*.pdf
+!doc/*.pdf
+</code></pre>
+
+<p>全局忽略文件：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git config <span class="nt">--global</span> core.excludesfile ~/.gitignore_global
+</code></pre></div></div>
+
+<h3 id="84-清理和维护">8.4 清理和维护</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 清理未跟踪的文件</span>
+git clean <span class="nt">-n</span>                   <span class="c"># 预览将要删除的文件</span>
+git clean <span class="nt">-f</span>                   <span class="c"># 删除未跟踪的文件</span>
+git clean <span class="nt">-fd</span>                  <span class="c"># 删除未跟踪的文件和目录</span>
+git clean <span class="nt">-fX</span>                  <span class="c"># 只删除被忽略的文件</span>
+
+<span class="c"># 垃圾回收和优化</span>
+git gc                         <span class="c"># 垃圾回收</span>
+git gc <span class="nt">--aggressive</span>            <span class="c"># 更彻底的优化</span>
+
+<span class="c"># 检查仓库完整性</span>
+git fsck                       <span class="c"># 检查对象完整性</span>
+
+<span class="c"># 查看仓库大小</span>
+git count-objects <span class="nt">-vH</span>
+</code></pre></div></div>
+
+<h2 id="9-最佳实践">9. 最佳实践</h2>
+
+<h3 id="91-提交信息规范">9.1 提交信息规范</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;type&gt;(&lt;scope&gt;): &lt;subject&gt;
+
+&lt;body&gt;
+
+&lt;footer&gt;
+</code></pre></div></div>
+
+<p>常用类型：</p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">feat</code>: 新功能</li>
+  <li><code class="language-plaintext highlighter-rouge">fix</code>: 修复 bug</li>
+  <li><code class="language-plaintext highlighter-rouge">docs</code>: 文档更新</li>
+  <li><code class="language-plaintext highlighter-rouge">style</code>: 代码格式调整</li>
+  <li><code class="language-plaintext highlighter-rouge">refactor</code>: 重构</li>
+  <li><code class="language-plaintext highlighter-rouge">test</code>: 测试相关</li>
+  <li><code class="language-plaintext highlighter-rouge">chore</code>: 构建/工具相关</li>
+</ul>
+
+<p>示例：</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>feat(user): 添加用户登录功能
+
+- 实现用户名密码登录
+- 添加记住密码功能
+- 集成第三方登录
+
+Closes #123
+</code></pre></div></div>
+
+<h3 id="92-分支策略">9.2 分支策略</h3>
+
+<p><strong>Git Flow 可视化</strong>：</p>
+
+<pre><code class="language-mermaid">%%{init: {'theme':'dark'}}%%
+gitGraph
+    commit id: "init"
+    branch develop
+    checkout develop
+    commit id: "dev1"
+    branch feature/login
+    checkout feature/login
+    commit id: "login1"
+    commit id: "login2"
+    checkout develop
+    merge feature/login
+    branch feature/payment
+    checkout feature/payment
+    commit id: "pay1"
+    checkout develop
+    commit id: "dev2"
+    checkout main
+    branch hotfix/bug-fix
+    commit id: "hotfix"
+    checkout main
+    merge hotfix/bug-fix tag: "v1.0.1"
+    checkout develop
+    branch release/1.0
+    checkout release/1.0
+    commit id: "rc1"
+    checkout main
+    merge release/1.0 tag: "v1.0"
+</code></pre>
+
+<p><strong>GitHub Flow 可视化</strong>：</p>
+
+<pre><code class="language-mermaid">%%{init: {'theme':'dark'}}%%
+gitGraph
+    commit id: "A"
+    commit id: "B"
+    branch feature/new-ui
+    checkout feature/new-ui
+    commit id: "UI-1"
+    commit id: "UI-2"
+    checkout main
+    merge feature/new-ui tag: "PR merged"
+    commit id: "C"
+    branch bugfix/issue-123
+    checkout bugfix/issue-123
+    commit id: "fix"
+    checkout main
+    merge bugfix/issue-123 tag: "PR merged"
+</code></pre>
+
+<p><strong>Git Flow</strong>：</p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">main</code>: 生产环境分支</li>
+  <li><code class="language-plaintext highlighter-rouge">develop</code>: 开发分支</li>
+  <li><code class="language-plaintext highlighter-rouge">feature/*</code>: 功能分支</li>
+  <li><code class="language-plaintext highlighter-rouge">release/*</code>: 发布分支</li>
+  <li><code class="language-plaintext highlighter-rouge">hotfix/*</code>: 热修复分支</li>
+</ul>
+
+<p><strong>GitHub Flow</strong>（简化版）：</p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">main</code>: 主分支</li>
+  <li><code class="language-plaintext highlighter-rouge">feature/*</code>: 功能分支</li>
+  <li>通过 Pull Request 合并</li>
+</ul>
+
+<h3 id="93-常见问题解决">9.3 常见问题解决</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 撤销已推送的提交</span>
+git revert &lt;commit-hash&gt;       <span class="c"># 创建新提交来撤销</span>
+
+<span class="c"># 修改已推送的提交信息（危险）</span>
+git commit <span class="nt">--amend</span>
+git push <span class="nt">--force-with-lease</span>
+
+<span class="c"># 合并多个提交</span>
+git rebase <span class="nt">-i</span> HEAD~n
+
+<span class="c"># 恢复误删的分支</span>
+git reflog
+git checkout <span class="nt">-b</span> &lt;branch-name&gt; &lt;commit-hash&gt;
+
+<span class="c"># 解决"detached HEAD"状态</span>
+git checkout <span class="nt">-b</span> &lt;new-branch-name&gt;  <span class="c"># 创建新分支保存工作</span>
+git checkout &lt;branch-name&gt;         <span class="c"># 或切换回原分支</span>
+
+<span class="c"># 更改远程仓库 URL</span>
+git remote set-url origin &lt;new-url&gt;
+
+<span class="c"># 清除本地已删除的远程分支引用</span>
+git fetch <span class="nt">--prune</span>
+git remote prune origin
+</code></pre></div></div>
+
+<h2 id="10-总结">10. 总结</h2>
+
+<p>Git 是一个功能强大的版本控制系统，掌握它需要时间和实践。建议：</p>
+
+<ol>
+  <li><strong>从基础开始</strong>：先掌握 add、commit、push、pull 等基本操作</li>
+  <li><strong>理解原理</strong>：了解 Git 的三个区域和文件状态</li>
+  <li><strong>多练习</strong>：在实际项目中使用，遇到问题及时查阅文档</li>
+  <li><strong>学习高级功能</strong>：逐步掌握 rebase、cherry-pick、stash 等高级操作</li>
+  <li><strong>遵循规范</strong>：养成良好的提交习惯和分支管理习惯</li>
+</ol>
+
+<h3 id="推荐资源">推荐资源</h3>
+
+<ul>
+  <li><a href="https://git-scm.com/book/zh/v2">Pro Git 中文版</a></li>
+  <li><a href="https://learngitbranching.js.org/?locale=zh_CN">Learn Git Branching</a></li>
+  <li><a href="https://git-scm.com/docs">Git 官方文档</a></li>
+  <li><a href="https://training.github.com/downloads/zh_CN/github-git-cheat-sheet/">GitHub Git 备忘单</a></li>
+</ul>
+
+<p>掌握 Git 不仅能提高工作效率，更能让你在团队协作中游刃有余！</p>
+
+
+        <!-- Giscus 评论区 -->
+        <div style="margin-top: 50px; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 30px;">
+            <script src="https://giscus.app/client.js" data-repo="The-time-forever/The-time-forever.github.io"
+                data-repo-id="R_kgDOQXvq9w" data-category="General" data-category-id="DIC_kwDOQXvq984CzpQ2"
+                data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0"
+                data-input-position="top" data-theme="transparent_dark" data-lang="zh-CN" data-loading="lazy"
+                crossorigin="anonymous" async>
+                </script>
+        </div>
+
+        <p
+            style="font-size:0.9rem;color:#bbb;margin-top:3rem;border-top:1px solid rgba(255,255,255,0.1);padding-top:20px;">
+            提示：鼠标移动会产生拖尾并影响周围粒子；按住 <strong>Alt</strong> 可切换吸引（Alt）/排斥（默认）效果。
+        </p>
+    </div>
+
+    <script src="/assets/js/space-particles.js" defer></script>
+
+    <!-- Mermaid 代码块转换脚本 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 查找所有 language-mermaid 的代码块
+            document.querySelectorAll('pre code.language-mermaid').forEach(function(block) {
+                // 获取 Mermaid 代码
+                const code = block.textContent;
+
+                // 创建一个新的 div 元素来替换 pre 标签
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = code;
+
+                // 替换原来的 pre 元素
+                block.parentElement.replaceWith(mermaidDiv);
+            });
+
+            // 重新初始化 Mermaid
+            if (typeof mermaid !== 'undefined') {
+                mermaid.init(undefined, document.querySelectorAll('.mermaid'));
+            }
+        });
+    </script>
+</body>
+
+</html>

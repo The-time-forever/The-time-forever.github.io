@@ -1,0 +1,318 @@
+{
+  "image": "intro-animation/calendar202602.png",
+  "generatedAt": "2026-02-11T08:19:32",
+  "imageNaturalSize": {
+    "width": 2560,
+    "height": 1440
+  },
+  "inferredDaysFromName": 28,
+  "daysUsed": 28,
+  "layout": {
+    "calendarBand": {
+      "x0": 0,
+      "x1": 2560,
+      "y0": 1191,
+      "y1": 1425,
+      "width": 2560,
+      "height": 234
+    },
+    "detectedRowCentersY": [
+      1199,
+      1344
+    ]
+  },
+  "numbers": [
+    {
+      "value": 1,
+      "text": "1",
+      "confidence": 82.0,
+      "source": "ocr",
+      "leftPercent": 25.1563,
+      "topPercent": 88.9583
+    },
+    {
+      "value": 2,
+      "text": "2",
+      "confidence": 92.0,
+      "source": "ocr",
+      "leftPercent": 28.2813,
+      "topPercent": 88.9583
+    },
+    {
+      "value": 3,
+      "text": "3",
+      "confidence": 96.0,
+      "source": "ocr",
+      "leftPercent": 31.3672,
+      "topPercent": 88.9583
+    },
+    {
+      "value": 4,
+      "text": "4",
+      "confidence": 95.0,
+      "source": "ocr",
+      "leftPercent": 34.4141,
+      "topPercent": 88.9583
+    },
+    {
+      "value": 5,
+      "text": "5",
+      "confidence": 94.0,
+      "source": "ocr",
+      "leftPercent": 37.4805,
+      "topPercent": 88.9583
+    },
+    {
+      "value": 6,
+      "text": "6",
+      "confidence": 94.0,
+      "source": "ocr",
+      "leftPercent": 40.5273,
+      "topPercent": 88.9583
+    },
+    {
+      "value": 7,
+      "text": "7",
+      "confidence": 94.0,
+      "source": "ocr",
+      "leftPercent": 43.5156,
+      "topPercent": 88.9583
+    },
+    {
+      "value": 8,
+      "text": "8",
+      "confidence": 94.0,
+      "source": "ocr",
+      "leftPercent": 46.6211,
+      "topPercent": 88.9583
+    },
+    {
+      "value": 9,
+      "text": "9",
+      "confidence": 95.0,
+      "source": "ocr",
+      "leftPercent": 49.707,
+      "topPercent": 88.9583
+    },
+    {
+      "value": 10,
+      "text": "10",
+      "confidence": 96.0,
+      "source": "ocr",
+      "leftPercent": 52.6563,
+      "topPercent": 88.9583
+    },
+    {
+      "value": 11,
+      "text": "11",
+      "confidence": 47.0,
+      "source": "ocr",
+      "leftPercent": 55.6836,
+      "topPercent": 88.9583
+    },
+    {
+      "value": 12,
+      "text": "12",
+      "confidence": 91.0,
+      "source": "ocr",
+      "leftPercent": 58.8281,
+      "topPercent": 88.9583
+    },
+    {
+      "value": 13,
+      "text": "13",
+      "confidence": 91.0,
+      "source": "ocr",
+      "leftPercent": 61.8945,
+      "topPercent": 88.9583
+    },
+    {
+      "value": 14,
+      "text": "14",
+      "confidence": 94.0,
+      "source": "ocr",
+      "leftPercent": 64.8633,
+      "topPercent": 88.9583
+    },
+    {
+      "value": 15,
+      "text": "15",
+      "confidence": 91.0,
+      "source": "ocr",
+      "leftPercent": 67.6172,
+      "topPercent": 88.125
+    },
+    {
+      "value": 16,
+      "text": "16",
+      "confidence": 95.0,
+      "source": "ocr",
+      "leftPercent": 31.4258,
+      "topPercent": 94.2361
+    },
+    {
+      "value": 17,
+      "text": "17",
+      "confidence": 94.0,
+      "source": "ocr",
+      "leftPercent": 34.3555,
+      "topPercent": 94.3056
+    },
+    {
+      "value": 18,
+      "text": "18",
+      "confidence": 95.0,
+      "source": "ocr",
+      "leftPercent": 37.4414,
+      "topPercent": 94.3056
+    },
+    {
+      "value": 19,
+      "text": "19",
+      "confidence": 90.0,
+      "source": "ocr",
+      "leftPercent": 40.5078,
+      "topPercent": 94.3056
+    },
+    {
+      "value": 20,
+      "text": "20",
+      "confidence": 96.0,
+      "source": "ocr",
+      "leftPercent": 43.5156,
+      "topPercent": 94.3056
+    },
+    {
+      "value": 21,
+      "text": "21",
+      "confidence": 95.0,
+      "source": "ocr",
+      "leftPercent": 46.4844,
+      "topPercent": 94.3056
+    },
+    {
+      "value": 22,
+      "text": "22",
+      "confidence": 96.0,
+      "source": "ocr",
+      "leftPercent": 49.6289,
+      "topPercent": 94.3056
+    },
+    {
+      "value": 23,
+      "text": "23",
+      "confidence": 96.0,
+      "source": "ocr",
+      "leftPercent": 52.6758,
+      "topPercent": 94.3056
+    },
+    {
+      "value": 24,
+      "text": "24",
+      "confidence": 96.0,
+      "source": "ocr",
+      "leftPercent": 55.7422,
+      "topPercent": 94.3056
+    },
+    {
+      "value": 25,
+      "text": "25",
+      "confidence": 96.0,
+      "source": "ocr",
+      "leftPercent": 58.8281,
+      "topPercent": 94.3056
+    },
+    {
+      "value": 26,
+      "text": "26",
+      "confidence": 94.0,
+      "source": "ocr",
+      "leftPercent": 61.9141,
+      "topPercent": 94.3056
+    },
+    {
+      "value": 27,
+      "text": "27",
+      "confidence": 96.0,
+      "source": "ocr",
+      "leftPercent": 64.8438,
+      "topPercent": 94.3056
+    },
+    {
+      "value": 28,
+      "text": "28",
+      "confidence": 93.0,
+      "source": "ocr",
+      "leftPercent": 67.5781,
+      "topPercent": 93.4375
+    }
+  ],
+  "weekdays": [
+    {
+      "text": "SUN",
+      "confidence": 96.0,
+      "leftPercent": 25.2344,
+      "topPercent": 86.875
+    },
+    {
+      "text": "MON",
+      "confidence": 96.0,
+      "leftPercent": 28.2813,
+      "topPercent": 86.875
+    },
+    {
+      "text": "TUE",
+      "confidence": 96.0,
+      "leftPercent": 31.3281,
+      "topPercent": 86.875
+    },
+    {
+      "text": "WED",
+      "confidence": 96.0,
+      "leftPercent": 37.4219,
+      "topPercent": 92.2222
+    },
+    {
+      "text": "THU",
+      "confidence": 96.0,
+      "leftPercent": 37.4414,
+      "topPercent": 86.875
+    },
+    {
+      "text": "FRI",
+      "confidence": 96.0,
+      "leftPercent": 40.4883,
+      "topPercent": 86.875
+    },
+    {
+      "text": "SAT",
+      "confidence": 96.0,
+      "leftPercent": 43.5156,
+      "topPercent": 86.875
+    }
+  ],
+  "ocr": {
+    "enabled": true,
+    "error": null,
+    "engine": "pytesseract",
+    "tesseractCmd": "D:\\SoftWare\\Tesseract-OCR\\tesseract.exe"
+  },
+  "manualCalibrationGuide": [
+    {
+      "point": "01_center",
+      "order": 1
+    },
+    {
+      "point": "15_center",
+      "order": 2
+    },
+    {
+      "point": "16_center",
+      "order": 3
+    },
+    {
+      "point": "last_day_center",
+      "order": 4
+    }
+  ]
+}
