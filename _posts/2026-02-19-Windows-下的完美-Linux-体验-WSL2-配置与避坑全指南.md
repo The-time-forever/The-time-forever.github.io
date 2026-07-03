@@ -4,6 +4,7 @@ title: Windows 下的完美 Linux 体验：WSL2 配置与避坑全指南
 date: 2026-02-19 19:00:00
 tags: [WSL, Linux, Windows, 开发环境, 教程]
 categories: 技术折腾
+permalink: /posts/2026/02/19/wsl2-setup-guide/
 ---
 
 作为一名开发者，我们常常面临两难的选择：Windows 拥有最广泛的软件生态和游戏支持（尤其对于拥有 RTX 显卡的同学），而 Linux 则是编程、服务器部署和 AI 训练的原生乐土。

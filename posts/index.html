@@ -98,6 +98,15 @@ layout: null
       opacity: 0.85;
     }
 
+    /* 访问统计图标：跟随文字颜色，不用彩色 emoji 避免突兀 */
+    .stat-icon {
+      width: 12px;
+      height: 12px;
+      vertical-align: -1px;
+      margin: 0 1px;
+      color: #00f2ff;
+    }
+
     /* 列表样式 */
     .glass-container ul {
       list-style: none;
@@ -185,7 +194,19 @@ layout: null
   <div class="glass-container">
     <h1>文章列表</h1>
     <p class="site-stats" id="busuanzi_container_site_pv" style="display:none">
-      👁 全站访问 <span id="busuanzi_value_site_pv"></span> 次 · 👤 访客 <span id="busuanzi_value_site_uv"></span> 人
+      <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+        <circle cx="12" cy="12" r="3"></circle>
+      </svg>
+      全站访问 <span id="busuanzi_value_site_pv"></span> 次
+      ·
+      <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+        <circle cx="12" cy="7" r="4"></circle>
+      </svg>
+      访客 <span id="busuanzi_value_site_uv"></span> 人
     </p>
 
     <ul>

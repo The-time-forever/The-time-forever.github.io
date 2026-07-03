@@ -177,6 +177,14 @@
             margin-left: 4px;
         }
 
+        /* 访问统计图标：跟随文字颜色，不用彩色 emoji 避免突兀 */
+        .stat-icon {
+            width: 12px;
+            height: 12px;
+            vertical-align: -1px;
+            margin: 0 1px;
+        }
+
         /* Table Styles */
         .glass-container table {
             width: 100%;
@@ -450,7 +458,13 @@
         <p class="post-meta">
             发布于 {{ page.date | date: "%Y-%m-%d" }}
             <span class="view-count" id="busuanzi_container_page_pv" style="display:none">
-                · 👁 <span id="busuanzi_value_page_pv"></span> 次阅读
+                ·
+                <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                <span id="busuanzi_value_page_pv"></span> 次阅读
             </span>
         </p>
 
