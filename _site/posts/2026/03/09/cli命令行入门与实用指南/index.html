@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CLI 命令行入门与实用指南 | The Time Forever</title>
+    <link rel="icon" href="/images/favicon.png" type="image/png">
+    <style>
+        /* 全局重置与字体颜色 */
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: #ffffff;
+            /* 全局白色字体 */
+            overflow-x: hidden;
+            background-color: #000000;
+            /* 确保背景黑 */
+        }
+
+        /* Canvas 放到页面最底层 */
+        #bg-canvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            display: block;
+            background: #000000;
+            pointer-events: none;
+        }
+
+        /* 返回首页按钮 */
+        .home-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 8px 16px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            backdrop-filter: blur(4px);
+            transition: all 0.3s ease;
+            z-index: 100;
+            font-size: 0.9rem;
+        }
+
+        .home-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border-color: #fff;
+        }
+
+        /* 毛玻璃容器 (Glassmorphism) */
+        .glass-container {
+            max-width: 900px;
+            margin: 80px auto 40px;
+            /* 上边距留给返回按钮 */
+            padding: 40px;
+            background: rgba(20, 20, 30, 0.4);
+            /* 更通透的深色背景 */
+            backdrop-filter: blur(20px);
+            /* 高强度背景模糊 */
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            /* 极细的亮色边框 */
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            /* 深度感阴影 */
+        }
+
+        /* 标题样式 */
+        .glass-container h1 {
+            margin-top: 0;
+            font-weight: 300;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 16px;
+            margin-bottom: 10px;
+            text-align: center;
+            color: #00f2ff;
+            text-shadow: 0 0 5px rgba(0, 242, 255, 0.7), 0 0 15px rgba(0, 242, 255, 0.5);
+            letter-spacing: 2px;
+        }
+
+        /* Markdown Content Styles */
+        .glass-container h2 {
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+            color: #00f2ff;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 5px;
+        }
+
+        .glass-container h3 {
+            margin-top: 1.2em;
+            margin-bottom: 0.5em;
+            color: #e0e0e0;
+        }
+
+        .glass-container h4 {
+            margin-top: 1em;
+            margin-bottom: 0.5em;
+            color: #ccc;
+        }
+
+        .glass-container p {
+            line-height: 1.8;
+            margin-bottom: 1em;
+            color: #ddd;
+            font-size: 1.05rem;
+        }
+
+        .glass-container ul,
+        .glass-container ol {
+            margin-left: 20px;
+            margin-bottom: 1em;
+            color: #ddd;
+        }
+
+        .glass-container li {
+            margin-bottom: 5px;
+        }
+
+        .glass-container blockquote {
+            border-left: 4px solid #00f2ff;
+            padding-left: 15px;
+            color: #aaa;
+            margin: 1em 0;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px 15px;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .glass-container pre {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1em 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-container code {
+            font-family: Consolas, Monaco, 'Andale Mono', monospace;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 5px;
+            border-radius: 3px;
+            color: #ff79c6;
+        }
+
+        .glass-container pre code {
+            background: transparent;
+            color: #f8f8f2;
+            padding: 0;
+        }
+
+        .glass-container img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin: 1em 0;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .post-meta {
+            text-align: center;
+            color: #888;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+
+        /* Table Styles */
+        .glass-container table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1em 0;
+            color: #ddd;
+        }
+
+        .glass-container th,
+        .glass-container td {
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        .glass-container th {
+            background: rgba(255, 255, 255, 0.1);
+            color: #00f2ff;
+        }
+
+        /* MathJax Overflow Handling */
+        mjx-container[display="true"] {
+            overflow-x: auto;
+            overflow-y: hidden;
+            max-width: 100%;
+            padding: 10px 0;
+        }
+
+        /* 链接样式 */
+        .glass-container a {
+            color: #00ffff;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .glass-container a:hover {
+            color: #fff;
+            text-decoration: underline;
+            text-shadow: 0 0 8px rgba(0, 255, 255, 0.6);
+        }
+
+        /* Mermaid 图表样式 */
+        .glass-container .mermaid {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 1.5em auto;
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            overflow-x: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Mermaid SVG 居中 */
+        .glass-container .mermaid svg {
+            display: block;
+            margin: 0 auto;
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 600px) {
+            .glass-container {
+                margin: 72px 12px 20px;
+                padding: 20px;
+            }
+
+            .home-btn {
+                top: 16px;
+                left: 16px;
+                padding: 8px 14px;
+            }
+
+            .glass-container h1 {
+                font-size: 1.8rem;
+                letter-spacing: 1px;
+            }
+
+            .glass-container h2 {
+                font-size: 1.35rem;
+            }
+
+            .glass-container h3 {
+                font-size: 1.15rem;
+            }
+
+            .glass-container p,
+            .glass-container li {
+                font-size: 1rem;
+                line-height: 1.75;
+            }
+
+            .post-meta {
+                margin-bottom: 22px;
+            }
+
+            .glass-container pre {
+                padding: 12px;
+                font-size: 0.9rem;
+            }
+
+            .glass-container table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .glass-container th,
+            .glass-container td {
+                padding: 8px 10px;
+            }
+
+            .glass-container .mermaid {
+                padding: 12px;
+            }
+        }
+    </style>
+
+    <!-- MathJax Configuration -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async src="/assets/js/mathjax.js">
+    </script>
+
+    <!-- Mermaid Configuration -->
+    <script src="/assets/js/mermaid.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            mermaid.initialize({
+                startOnLoad: true,
+                theme: 'dark',
+                themeVariables: {
+                    // 主要颜色 - 使用亮青色
+                    primaryColor: '#00d4ff',
+                    primaryTextColor: '#ffffff',
+                    primaryBorderColor: '#00f2ff',
+
+                    // 次要颜色 - 使用深色但不太暗
+                    secondaryColor: '#2a3f5f',
+                    secondaryTextColor: '#ffffff',
+                    secondaryBorderColor: '#00d4ff',
+
+                    // 第三颜色
+                    tertiaryColor: '#1e3a5f',
+                    tertiaryTextColor: '#ffffff',
+                    tertiaryBorderColor: '#00d4ff',
+
+                    // 线条颜色
+                    lineColor: '#00f2ff',
+
+                    // 文字颜色 - 确保所有文字都是白色
+                    textColor: '#ffffff',
+                    mainBkg: '#1a2332',
+
+                    // Git 图表特定颜色
+                    git0: '#00d4ff',
+                    git1: '#7c4dff',
+                    git2: '#ff6b6b',
+                    git3: '#4ecdc4',
+                    git4: '#ffd93d',
+                    git5: '#95e1d3',
+                    git6: '#f38181',
+                    git7: '#aa96da',
+
+                    // Git 分支名称文字颜色（gitInv 控制分支名称标签的文字颜色）
+                    gitInv0: '#000000',
+                    gitInv1: '#000000',
+                    gitInv2: '#000000',
+                    gitInv3: '#000000',
+                    gitInv4: '#000000',
+                    gitInv5: '#000000',
+                    gitInv6: '#000000',
+                    gitInv7: '#000000',
+
+                    // 提交点颜色 - 使用黑色文字以便在亮色背景上显示
+                    commitLabelColor: '#000000',
+                    commitLabelBackground: '#00d4ff',
+                    commitLabelFontSize: '14px',
+
+                    // 标签颜色 - 使用黑色文字
+                    tagLabelColor: '#000000',
+                    tagLabelBackground: '#00d4ff',
+                    tagLabelBorder: '#00f2ff',
+                    tagLabelFontSize: '12px',
+
+                    // Git 标签文字颜色（确保所有标签都是黑色）
+                    gitTagLabelColor: '#000000',
+                    gitTagLabelBackground: '#00d4ff',
+                    gitTagLabelBorder: '#00f2ff',
+
+                    // 分支标签颜色
+                    gitBranchLabel0: '#000000',
+                    gitBranchLabel1: '#000000',
+                    gitBranchLabel2: '#000000',
+                    gitBranchLabel3: '#000000',
+                    gitBranchLabel4: '#000000',
+                    gitBranchLabel5: '#000000',
+                    gitBranchLabel6: '#000000',
+                    gitBranchLabel7: '#000000',
+
+                    // 节点颜色
+                    nodeBorder: '#00f2ff',
+                    nodeTextColor: '#ffffff',
+
+                    // 边框和背景
+                    clusterBkg: '#1a2332',
+                    clusterBorder: '#00d4ff',
+
+                    // 标题颜色
+                    titleColor: '#ffffff',
+
+                    // 边缘标签
+                    edgeLabelBackground: '#1a2332',
+
+                    // 活动状态
+                    activeTaskBkgColor: '#00d4ff',
+                    activeTaskBorderColor: '#00f2ff',
+
+                    // 网格颜色
+                    gridColor: '#333333',
+
+                    // 序列图颜色
+                    actorBorder: '#00f2ff',
+                    actorBkg: '#1a2332',
+                    actorTextColor: '#ffffff',
+                    actorLineColor: '#00d4ff',
+                    signalColor: '#ffffff',
+                    signalTextColor: '#ffffff',
+                    labelBoxBkgColor: '#1a2332',
+                    labelBoxBorderColor: '#00f2ff',
+                    labelTextColor: '#ffffff',
+                    loopTextColor: '#ffffff',
+                    noteBorderColor: '#00f2ff',
+                    noteBkgColor: '#1a2332',
+                    noteTextColor: '#ffffff',
+                    activationBorderColor: '#00f2ff',
+                    activationBkgColor: '#2a3f5f',
+                    sequenceNumberColor: '#ffffff'
+                }
+            });
+        });
+    </script>
+</head>
+
+<body>
+
+    <!-- Canvas 背景：不影响可访问性 -->
+    <canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+    <!-- 返回首页按钮 -->
+    <a href="/posts" class="home-btn">← 返回文章列表</a>
+
+    <div class="glass-container">
+        <h1>CLI 命令行入门与实用指南</h1>
+        <p class="post-meta">发布于 2026-03-09</p>
+
+        <p>CLI（Command Line Interface，命令行界面）是通过输入文本命令与计算机交互的方式。虽然它看起来没有图形界面直观，但在效率、自动化和可重复操作上非常强大。</p>
+
+<p>这篇文章会带你快速认识 CLI：它是什么、为什么值得学、常见命令有哪些，以及如何从新手过渡到日常高效使用。</p>
+
+<h2 id="1-什么是-cli">1. 什么是 CLI</h2>
+
+<p>CLI 是一种“通过键盘输入命令来控制系统和程序”的交互方式。与 GUI（图形界面）相比，CLI 的特点是：</p>
+
+<ol>
+  <li><strong>操作快</strong>：熟练后很多操作比鼠标点击更快。</li>
+  <li><strong>可批量处理</strong>：一个命令可同时处理大量文件。</li>
+  <li><strong>易自动化</strong>：命令可写成脚本，重复执行。</li>
+  <li><strong>可追溯</strong>：命令历史便于复盘与共享。</li>
+</ol>
+
+<p>常见 CLI 环境：</p>
+
+<ol>
+  <li>macOS/Linux 的 <code class="language-plaintext highlighter-rouge">Terminal</code></li>
+  <li>Windows 的 <code class="language-plaintext highlighter-rouge">PowerShell</code>、<code class="language-plaintext highlighter-rouge">cmd</code>、<code class="language-plaintext highlighter-rouge">Windows Terminal</code></li>
+  <li>开发工具中的内置终端（如 VS Code Terminal）</li>
+</ol>
+
+<h2 id="2-为什么学习-cli">2. 为什么学习 CLI</h2>
+
+<p>如果你经常做这些事情，CLI 会明显提升效率：</p>
+
+<ol>
+  <li>管理项目文件、重命名、查找、压缩</li>
+  <li>使用 Git 进行版本控制</li>
+  <li>安装依赖、运行脚本、构建项目</li>
+  <li>登录服务器、查看日志、排查问题</li>
+  <li>自动化重复工作（备份、批量处理、定时任务）</li>
+</ol>
+
+<p>一句话理解：GUI 适合“偶尔做”，CLI 适合“经常做”。</p>
+
+<h2 id="3-常见基础命令通用思路">3. 常见基础命令（通用思路）</h2>
+
+<p>下面以类 Unix 终端（macOS/Linux）为例，Windows PowerShell 也有对应命令。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>目标</th>
+      <th>常见命令</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>查看当前位置</td>
+      <td><code class="language-plaintext highlighter-rouge">pwd</code></td>
+      <td>显示当前目录</td>
+    </tr>
+    <tr>
+      <td>列出文件</td>
+      <td><code class="language-plaintext highlighter-rouge">ls</code></td>
+      <td>可加 <code class="language-plaintext highlighter-rouge">-la</code> 查看详细信息</td>
+    </tr>
+    <tr>
+      <td>切换目录</td>
+      <td><code class="language-plaintext highlighter-rouge">cd &lt;路径&gt;</code></td>
+      <td><code class="language-plaintext highlighter-rouge">cd ..</code> 返回上一级</td>
+    </tr>
+    <tr>
+      <td>新建目录</td>
+      <td><code class="language-plaintext highlighter-rouge">mkdir &lt;目录名&gt;</code></td>
+      <td>创建文件夹</td>
+    </tr>
+    <tr>
+      <td>新建文件</td>
+      <td><code class="language-plaintext highlighter-rouge">touch &lt;文件名&gt;</code></td>
+      <td>创建空文件</td>
+    </tr>
+    <tr>
+      <td>复制文件</td>
+      <td><code class="language-plaintext highlighter-rouge">cp &lt;源&gt; &lt;目标&gt;</code></td>
+      <td>复制文件或目录</td>
+    </tr>
+    <tr>
+      <td>移动/重命名</td>
+      <td><code class="language-plaintext highlighter-rouge">mv &lt;源&gt; &lt;目标&gt;</code></td>
+      <td>也可用于改名</td>
+    </tr>
+    <tr>
+      <td>删除文件</td>
+      <td><code class="language-plaintext highlighter-rouge">rm &lt;文件名&gt;</code></td>
+      <td>删除前要确认</td>
+    </tr>
+    <tr>
+      <td>查看文件内容</td>
+      <td><code class="language-plaintext highlighter-rouge">cat &lt;文件&gt;</code></td>
+      <td>快速查看文本</td>
+    </tr>
+    <tr>
+      <td>搜索文本</td>
+      <td><code class="language-plaintext highlighter-rouge">grep "关键字" 文件</code></td>
+      <td>在内容中检索</td>
+    </tr>
+    <tr>
+      <td>查找文件</td>
+      <td><code class="language-plaintext highlighter-rouge">find . -name "*.md"</code></td>
+      <td>按条件搜索文件</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>建议：先熟练 <code class="language-plaintext highlighter-rouge">cd</code>、<code class="language-plaintext highlighter-rouge">ls</code>、<code class="language-plaintext highlighter-rouge">mkdir</code>、<code class="language-plaintext highlighter-rouge">cp</code>、<code class="language-plaintext highlighter-rouge">mv</code>、<code class="language-plaintext highlighter-rouge">rm</code>，这六个命令覆盖了大部分日常文件操作。</p>
+
+<h2 id="4-三个高频-cli-使用场景">4. 三个高频 CLI 使用场景</h2>
+
+<h3 id="41-项目开发">4.1 项目开发</h3>
+
+<ol>
+  <li><code class="language-plaintext highlighter-rouge">git clone</code> 拉取项目</li>
+  <li><code class="language-plaintext highlighter-rouge">npm install</code> 或 <code class="language-plaintext highlighter-rouge">pip install -r requirements.txt</code> 安装依赖</li>
+  <li><code class="language-plaintext highlighter-rouge">npm run dev</code> 或 <code class="language-plaintext highlighter-rouge">python main.py</code> 启动项目</li>
+</ol>
+
+<p>优势是整个流程可复用、可记录、可发给同事直接执行。</p>
+
+<h3 id="42-运维与排障">4.2 运维与排障</h3>
+
+<ol>
+  <li>用 <code class="language-plaintext highlighter-rouge">ssh</code> 登录远程服务器</li>
+  <li>用 <code class="language-plaintext highlighter-rouge">tail -f</code> 追踪日志</li>
+  <li>用 <code class="language-plaintext highlighter-rouge">ps</code>、<code class="language-plaintext highlighter-rouge">top</code>、<code class="language-plaintext highlighter-rouge">lsof</code> 查看进程和端口占用</li>
+</ol>
+
+<p>CLI 在“快速定位问题”上通常比图形化面板更直接。</p>
+
+<h3 id="43-批量处理">4.3 批量处理</h3>
+
+<ol>
+  <li>批量重命名文件</li>
+  <li>批量转码与压缩</li>
+  <li>组合命令完成流水线处理（例如 <code class="language-plaintext highlighter-rouge">cat</code> + <code class="language-plaintext highlighter-rouge">grep</code> + <code class="language-plaintext highlighter-rouge">sort</code>）</li>
+</ol>
+
+<p>这类工作如果用 GUI 手动点，耗时且容易出错。</p>
+
+<h2 id="5-初学者常见误区">5. 初学者常见误区</h2>
+
+<ol>
+  <li><strong>害怕输错命令</strong>：先在测试目录练习，逐步建立信心。</li>
+  <li><strong>不看帮助文档</strong>：先学会 <code class="language-plaintext highlighter-rouge">--help</code>，再学会 <code class="language-plaintext highlighter-rouge">man</code>。</li>
+  <li><strong>上来就背很多命令</strong>：先掌握 10 个高频命令，再扩展。</li>
+  <li><strong>忽略路径概念</strong>：相对路径与绝对路径是核心基础。</li>
+  <li><strong>直接执行来源不明命令</strong>：尤其是带 <code class="language-plaintext highlighter-rouge">sudo</code> 或删除类命令，先理解再执行。</li>
+</ol>
+
+<h2 id="6-现在主流的-ai-cli-工具">6. 现在主流的 AI CLI 工具</h2>
+
+<p>随着大模型能力增强，AI CLI 已经成为很多开发者的日常工具。它们通常支持代码解释、命令建议、文件修改、自动化任务拆解等能力。</p>
+
+<p>下面是目前讨论度较高、使用较广的几类工具（按生态分类）：</p>
+
+<ol>
+  <li>
+    <p><strong>OpenAI Codex CLI</strong>
+ 面向终端场景的 AI 编码助手，适合在本地项目中进行代码生成、修改和任务执行。
+ 链接：<a href="https://github.com/openai/codex">https://github.com/openai/codex</a></p>
+  </li>
+  <li>
+    <p><strong>Claude Code（Anthropic）</strong>
+ 强调代码库理解与多步任务处理，常用于复杂重构、排查和大规模代码解释。
+ 链接：<a href="https://docs.anthropic.com/">https://docs.anthropic.com/</a></p>
+  </li>
+  <li>
+    <p><strong>Gemini CLI（Google）</strong>
+ Google 生态下的命令行 AI 工具，适合与其模型与云服务工作流结合。
+ 链接：<a href="https://ai.google.dev/">https://ai.google.dev/</a></p>
+  </li>
+  <li>
+    <p><strong>Aider</strong>
+ 开源、上手快，支持在终端里让 AI 直接参与 Git 工作流（改代码、提交建议等）。
+ 链接：<a href="https://github.com/Aider-AI/aider">https://github.com/Aider-AI/aider</a></p>
+  </li>
+  <li>
+    <p><strong>Warp（AI Terminal）</strong>
+ 不是传统“纯命令行工具”，更像带 AI 能力的现代终端，适合希望兼顾 GUI 体验和 CLI 效率的用户。
+ 链接：<a href="https://www.warp.dev/">https://www.warp.dev/</a></p>
+  </li>
+</ol>
+
+<h2 id="7-一句话总结">7. 一句话总结</h2>
+
+<p>CLI 不是“更难的 GUI”，而是“更高效的工作方式”。当你的任务开始重复、规模变大、需要协作和自动化时，命令行会成为非常稳定的生产力工具。</p>
+
+
+        <!-- Giscus 评论区 -->
+        <div style="margin-top: 50px; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 30px;">
+            <script src="https://giscus.app/client.js" data-repo="The-time-forever/The-time-forever.github.io"
+                data-repo-id="R_kgDOQXvq9w" data-category="General" data-category-id="DIC_kwDOQXvq984CzpQ2"
+                data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0"
+                data-input-position="top" data-theme="transparent_dark" data-lang="zh-CN" data-loading="lazy"
+                crossorigin="anonymous" async>
+                </script>
+        </div>
+
+        <p
+            style="font-size:0.9rem;color:#bbb;margin-top:3rem;border-top:1px solid rgba(255,255,255,0.1);padding-top:20px;">
+            提示：鼠标移动会产生拖尾并影响周围粒子；按住 <strong>Alt</strong> 可切换吸引（Alt）/排斥（默认）效果。
+        </p>
+    </div>
+
+    <script src="/assets/js/space-particles.js" defer></script>
+
+    <!-- Mermaid 代码块转换脚本 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 查找所有 language-mermaid 的代码块
+            document.querySelectorAll('pre code.language-mermaid').forEach(function(block) {
+                // 获取 Mermaid 代码
+                const code = block.textContent;
+
+                // 创建一个新的 div 元素来替换 pre 标签
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = code;
+
+                // 替换原来的 pre 元素
+                block.parentElement.replaceWith(mermaidDiv);
+            });
+
+            // 重新初始化 Mermaid
+            if (typeof mermaid !== 'undefined') {
+                mermaid.init(undefined, document.querySelectorAll('.mermaid'));
+            }
+        });
+    </script>
+</body>
+
+</html>

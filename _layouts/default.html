@@ -29,6 +29,7 @@
         body {
             height: 100%;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            overflow-x: hidden;
         }
 
         /* 背景轮播容器 */
@@ -78,6 +79,7 @@
             justify-content: center;
             text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
             outline: none;
+            touch-action: manipulation;
         }
 
         .prev-slide:hover,
@@ -106,6 +108,7 @@
             justify-content: center;
             text-align: center;
             color: #fff;
+            touch-action: pan-y;
         }
 
         /* 整体内容块，用于整体居中和避让箭头 */
@@ -161,9 +164,11 @@
             flex-wrap: wrap;
             gap: 12px;
             justify-content: center;
+            max-width: 520px;
         }
 
         .nav-buttons a {
+            min-height: 44px;
             padding: 10px 18px;
             border-radius: 999px;
             border: 1px solid rgba(255, 255, 255, 0.7);
@@ -172,6 +177,9 @@
             font-size: 14px;
             backdrop-filter: blur(8px);
             background: rgba(0, 0, 0, 0.25);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             transition:
                 transform 0.15s ease,
                 background 0.15s ease,
@@ -261,6 +269,11 @@
             box-sizing: border-box;
         }
 
+        .post-list li>*:first-child {
+            flex: 1;
+            min-width: 0;
+        }
+
         .content-inner h2 {
             font-size: 22px;
             margin-bottom: 24px;
@@ -339,6 +352,20 @@
             box-shadow: 0 6px 16px rgba(252, 85, 49, 0.4);
         }
 
+        @media (hover: hover) and (pointer: fine) {
+            .prev-slide,
+            .next-slide,
+            .scroll-down {
+                opacity: 0;
+            }
+
+            .prev-slide:hover,
+            .next-slide:hover,
+            .scroll-down:hover {
+                opacity: 1;
+            }
+        }
+
         /* 底部版权 */
         .footer {
             padding: 12px 0 16px;
@@ -349,9 +376,157 @@
             background: rgba(0, 0, 0, 0.4);
         }
 
+        @media (max-width: 900px) {
+            .hero-content {
+                width: min(100%, 560px);
+                margin-top: -24px;
+            }
+
+            .content-inner {
+                padding: 48px 0;
+            }
+
+            .content-inner>* {
+                padding: 0 20px;
+            }
+
+            #guestbook-panel {
+                width: min(420px, 100%);
+            }
+        }
+
         @media (max-width: 600px) {
+            .prev-slide,
+            .next-slide {
+                top: auto;
+                bottom: 18px;
+                transform: none;
+                width: 44px;
+                height: 44px;
+                min-height: 44px;
+                padding: 0;
+                border-radius: 999px;
+                background: rgba(0, 0, 0, 0.3);
+                backdrop-filter: blur(6px);
+                -webkit-backdrop-filter: blur(6px);
+                font-size: 28px;
+                opacity: 0.72;
+            }
+
+            .prev-slide {
+                left: 16px;
+            }
+
+            .next-slide {
+                right: 16px;
+            }
+
+            .overlay {
+                padding: 20px 16px 72px;
+                align-items: stretch;
+            }
+
+            .hero-content {
+                width: 100%;
+                margin-top: 0;
+                gap: 18px;
+            }
+
+            .avatar {
+                width: 88px;
+                height: 88px;
+            }
+
             .header h1 {
                 font-size: 24px;
+                line-height: 1.2;
+            }
+
+            .header p {
+                font-size: 14px;
+                line-height: 1.6;
+            }
+
+            .nav-buttons {
+                width: 100%;
+                gap: 10px;
+            }
+
+            .nav-buttons a {
+                flex: 1 1 calc(50% - 10px);
+                padding: 12px 14px;
+                font-size: 13px;
+            }
+
+            .scroll-down {
+                bottom: 8px;
+                padding: 14px 28px;
+                font-size: 24px;
+                opacity: 0.72;
+            }
+
+            .content-inner {
+                padding: 40px 0;
+            }
+
+            .content-inner>* {
+                padding: 0 16px;
+            }
+
+            .content-inner h2 {
+                font-size: 20px;
+                margin-bottom: 18px;
+            }
+
+            .post-list {
+                margin-bottom: 36px;
+            }
+
+            .post-list li {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 6px;
+                padding: 14px 0;
+            }
+
+            .post-list span {
+                font-size: 0.82em;
+                opacity: 0.85;
+            }
+
+            .csdn-btn {
+                width: 100%;
+                padding: 12px 20px;
+            }
+
+            .footer {
+                padding: 12px 16px 20px;
+                line-height: 1.6;
+            }
+
+            #guestbook-btn {
+                right: 12px;
+                bottom: 24px;
+                width: 44px;
+                height: 44px;
+                background: rgba(255, 255, 255, 0.2);
+            }
+
+            #guestbook-btn:hover {
+                right: 12px;
+            }
+
+            #guestbook-panel {
+                width: 100%;
+                max-width: 100%;
+                border-left: none;
+                box-shadow: none;
+            }
+
+            .guestbook-header,
+            .guestbook-content {
+                padding-left: 16px;
+                padding-right: 16px;
             }
         }
 
@@ -503,18 +678,18 @@
 
     <!-- 背景轮播图片：images/bg1.jpg/bg2.jpg/bg3.jpg 需与你仓库中的图片文件名一致 -->
     <div class="bg-slideshow">
-        <img src="images/bgz1.jpg" class="active" alt="background 1" />
-        <img src="images/bgz2.jpg" alt="background 2" />
-        <img src="images/bgz3.jpg" alt="background 3" />
-        <img src="images/bgz4.jpg" alt="background 4" />
-        <img src="images/bgz5.jpg" alt="background 5" />
-        <img src="images/bgz6.jpg" alt="background 6" />
-        <img src="images/bgz7.jpg" alt="background 7" />
-        <img src="images/bgz8.jpg" alt="background 8" />
-        <img src="images/bgz9.jpg" alt="background 9" />
-        <img src="images/bgz10.jpg" alt="background 10" />
-        <img src="images/bgz11.jpg" alt="background 11" />
-        <img src="images/bgz12.jpg" alt="background 12" />
+        <img src="/images/bgz1.jpg" class="active" alt="background 1" />
+        <img src="/images/bgz2.jpg" alt="background 2" />
+        <img src="/images/bgz3.jpg" alt="background 3" />
+        <img src="/images/bgz4.jpg" alt="background 4" />
+        <img src="/images/bgz5.jpg" alt="background 5" />
+        <img src="/images/bgz6.jpg" alt="background 6" />
+        <img src="/images/bgz7.jpg" alt="background 7" />
+        <img src="/images/bgz8.jpg" alt="background 8" />
+        <img src="/images/bgz9.jpg" alt="background 9" />
+        <img src="/images/bgz10.jpg" alt="background 10" />
+        <img src="/images/bgz11.jpg" alt="background 11" />
+        <img src="/images/bgz12.jpg" alt="background 12" />
     </div>
 
     <!-- 轮播手动切换按钮 -->
@@ -576,6 +751,9 @@
 
     <div class="footer">
         © 2025 The Time Forever · Hosted on GitHub Pages
+        <span id="busuanzi_container_site_pv" style="display:none">
+            · 👁 全站访问 <span id="busuanzi_value_site_pv"></span> 次 · 👤 访客 <span id="busuanzi_value_site_uv"></span> 人
+        </span>
     </div>
 
     <!-- 悬浮留言板按钮 -->
@@ -600,9 +778,34 @@
 
     <!-- 简单的 JS，用来轮播背景图片 -->
     <script>
-        const slides = document.querySelectorAll(".bg-slideshow img");
+        const slides = Array.from(document.querySelectorAll(".bg-slideshow img"));
+        const mobileSlidesQuery = window.matchMedia("(max-width: 768px)");
+        const swipeSurface = document.querySelector(".overlay");
         let index = 0;
         let slideInterval;
+        let usingMobileSlides = null;
+        let touchStartX = 0;
+        let touchStartY = 0;
+
+        function updateSlideSources(forceUpdate = false) {
+            const useMobileSlides = mobileSlidesQuery.matches;
+            if (!forceUpdate && useMobileSlides === usingMobileSlides) {
+                return;
+            }
+
+            usingMobileSlides = useMobileSlides;
+            const directory = useMobileSlides ? "/mobile-images" : "/images";
+            const prefix = useMobileSlides ? "bgzm" : "bgz";
+
+            slides.forEach((slide, slideIndex) => {
+                const nextSrc = `${directory}/${prefix}${slideIndex + 1}.jpg`;
+                if (slide.getAttribute("src") !== nextSrc) {
+                    slide.setAttribute("src", nextSrc);
+                }
+                slide.loading = slideIndex === index ? "eager" : "lazy";
+                slide.decoding = "async";
+            });
+        }
 
         // 显示第 n 张图片
         function showSlide(n) {
@@ -614,6 +817,7 @@
 
             // 添加新激活状态
             slides[index].classList.add("active");
+            slides[index].loading = "eager";
         }
 
         // 下一张
@@ -647,6 +851,47 @@
             nextSlide();
             resetTimer();
         });
+
+        function handleSwipeStart(event) {
+            if (event.touches.length !== 1) {
+                return;
+            }
+
+            touchStartX = event.touches[0].clientX;
+            touchStartY = event.touches[0].clientY;
+        }
+
+        function handleSwipeEnd(event) {
+            if (event.changedTouches.length !== 1) {
+                return;
+            }
+
+            const deltaX = event.changedTouches[0].clientX - touchStartX;
+            const deltaY = event.changedTouches[0].clientY - touchStartY;
+            if (Math.abs(deltaX) < 50 || Math.abs(deltaX) <= Math.abs(deltaY) * 1.2) {
+                return;
+            }
+
+            if (deltaX > 0) {
+                prevSlide();
+            } else {
+                nextSlide();
+            }
+            resetTimer();
+        }
+
+        updateSlideSources(true);
+
+        if (typeof mobileSlidesQuery.addEventListener === 'function') {
+            mobileSlidesQuery.addEventListener('change', () => updateSlideSources());
+        } else if (typeof mobileSlidesQuery.addListener === 'function') {
+            mobileSlidesQuery.addListener(() => updateSlideSources());
+        }
+
+        if (swipeSurface) {
+            swipeSurface.addEventListener('touchstart', handleSwipeStart, { passive: true });
+            swipeSurface.addEventListener('touchend', handleSwipeEnd, { passive: true });
+        }
 
         // 初始化自动播放
         startAutoPlay();
@@ -695,6 +940,9 @@
         guestbookClose.addEventListener('click', closeGuestbook);
         guestbookOverlay.addEventListener('click', closeGuestbook);
     </script>
+
+    <!-- 不蒜子访问量统计 -->
+    <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 </body>
 
 </html>

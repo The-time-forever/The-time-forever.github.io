@@ -171,6 +171,12 @@
             font-size: 0.9em;
         }
 
+        .post-meta .view-count {
+            color: #00f2ff;
+            opacity: 0.85;
+            margin-left: 4px;
+        }
+
         /* Table Styles */
         .glass-container table {
             width: 100%;
@@ -236,13 +242,58 @@
         /* 响应式调整 */
         @media (max-width: 600px) {
             .glass-container {
-                margin: 70px 16px 20px;
-                padding: 24px;
+                margin: 72px 12px 20px;
+                padding: 20px;
             }
 
             .home-btn {
                 top: 16px;
                 left: 16px;
+                padding: 8px 14px;
+            }
+
+            .glass-container h1 {
+                font-size: 1.8rem;
+                letter-spacing: 1px;
+            }
+
+            .glass-container h2 {
+                font-size: 1.35rem;
+            }
+
+            .glass-container h3 {
+                font-size: 1.15rem;
+            }
+
+            .glass-container p,
+            .glass-container li {
+                font-size: 1rem;
+                line-height: 1.75;
+            }
+
+            .post-meta {
+                margin-bottom: 22px;
+            }
+
+            .glass-container pre {
+                padding: 12px;
+                font-size: 0.9rem;
+            }
+
+            .glass-container table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .glass-container th,
+            .glass-container td {
+                padding: 8px 10px;
+            }
+
+            .glass-container .mermaid {
+                padding: 12px;
             }
         }
     </style>
@@ -262,6 +313,9 @@
     </script>
     <script type="text/javascript" id="MathJax-script" async src="/assets/js/mathjax.js">
     </script>
+
+    <!-- 不蒜子访问量统计 -->
+    <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
     <!-- Mermaid Configuration -->
     <script src="/assets/js/mermaid.min.js"></script>
@@ -393,7 +447,12 @@
 
     <div class="glass-container">
         <h1>{{ page.title }}</h1>
-        <p class="post-meta">发布于 {{ page.date | date: "%Y-%m-%d" }}</p>
+        <p class="post-meta">
+            发布于 {{ page.date | date: "%Y-%m-%d" }}
+            <span class="view-count" id="busuanzi_container_page_pv" style="display:none">
+                · 👁 <span id="busuanzi_value_page_pv"></span> 次阅读
+            </span>
+        </p>
 
         {{ content }}
 

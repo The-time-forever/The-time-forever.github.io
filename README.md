@@ -1,39 +1,24 @@
-# The-time-forever.github.io
+# The Time Forever 🕒
 
-欢迎来到我的个人博客仓库！这是一个基于 GitHub Pages 和 Jekyll 构建的静态博客，主要用于记录技术学习、工具指南和日常笔记。
+一个记录学习和生活的个人博客，写点技术笔记、工具指南，也写点日常。
 
-## 目录结构
+👉 **访问博客：[the-time-forever.github.io](https://the-time-forever.github.io/)**
 
-- `_posts/`：存放所有的博客文章（Markdown 格式，文件名遵循 `YYYY-MM-DD-title.md`）。
-- `_layouts/`：存放页面布局模板。
-- `assets/`：存放 CSS、JS 等静态资源文件。
-- `images/`：存放文章配图。
-- `_config.yml`：Jekyll 的全局配置文件。
+## 都写些什么
 
-## 如何本地预览
+内容比较杂，想到什么记什么：
 
-如果你想克隆并在本地运行此博客：
+- 折腾电脑时踩过的坑（Git、CLI、WSL2、Python 虚拟环境……）
+- 好用的工具和软件推荐（压缩软件、妙控板手势……）
+- 一些数学笔记（复变函数、离散数学……）
+- 别的随手记的东西
 
-1. 确保已安装 [Ruby](https://ruby-lang.org/) 和 [Bundler](https://bundler.io/)。
-2. 安装 Jekyll（如果不使用 Bundler）：`gem install jekyll bundler`
-3. 安装依赖并在本地运行：
-   ```bash
-   bundle install
-   bundle exec jekyll serve
-   ```
-4. 浏览器访问 `http://localhost:4000` 即可预览效果。
+## 关于这个仓库
 
-## 最近添加的文章
+博客基于 GitHub Pages + Jekyll 搭建，文章都在 `_posts/` 文件夹里，纯 Markdown 写作。
 
-- 苹果妙控板使用与快捷手势指南
-- CLI 命令行入门与实用指南
-- Git 完全指南：从入门到精通
-- Markdown 使用指南
-
-## 关于主题与构建
-
-本项目使用原生 GitHub Pages 构建，采用自定义布局处理。数学公式支持由 MathJax 驱动。
+如果你也想搭一个类似的博客，或者对某篇文章的内容有疑问、建议，欢迎提 Issue～
 
 ---
 
-*如对内容有建议，欢迎提 Issue 或 PR。*
+*欢迎路过的朋友留言交流。*

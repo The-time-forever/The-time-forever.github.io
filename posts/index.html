@@ -85,6 +85,19 @@ layout: null
       letter-spacing: 2px;
     }
 
+    /* 全站访问统计 */
+    .site-stats {
+      text-align: center;
+      color: #888;
+      font-size: 0.85em;
+      margin: -12px 0 24px;
+    }
+
+    .site-stats span {
+      color: #00f2ff;
+      opacity: 0.85;
+    }
+
     /* 列表样式 */
     .glass-container ul {
       list-style: none;
@@ -97,7 +110,14 @@ layout: null
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      gap: 12px;
       padding-bottom: 8px;
+    }
+
+    .glass-container li a {
+      flex: 1;
+      min-width: 0;
+      line-height: 1.6;
     }
 
     .glass-container .post-date {
@@ -125,13 +145,30 @@ layout: null
     /* 响应式调整 */
     @media (max-width: 600px) {
       .glass-container {
-        margin: 70px 16px 20px;
-        padding: 24px;
+        margin: 72px 12px 20px;
+        padding: 20px;
       }
 
       .home-btn {
         top: 16px;
         left: 16px;
+        padding: 8px 14px;
+      }
+
+      .glass-container h1 {
+        font-size: 1.8rem;
+        letter-spacing: 1px;
+      }
+
+      .glass-container li {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 4px;
+        padding-bottom: 12px;
+      }
+
+      .glass-container .post-date {
+        margin-left: 0;
       }
     }
   </style>
@@ -147,6 +184,9 @@ layout: null
 
   <div class="glass-container">
     <h1>文章列表</h1>
+    <p class="site-stats" id="busuanzi_container_site_pv" style="display:none">
+      👁 全站访问 <span id="busuanzi_value_site_pv"></span> 次 · 👤 访客 <span id="busuanzi_value_site_uv"></span> 人
+    </p>
 
     <ul>
       {% for post in site.posts %}
@@ -166,6 +206,7 @@ layout: null
   </div>
 
   <script src="/assets/js/space-particles.js" defer></script>
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 </body>
 
 </html>

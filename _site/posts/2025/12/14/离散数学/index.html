@@ -1,0 +1,1972 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>离散数学 | The Time Forever</title>
+    <link rel="icon" href="/images/favicon.png" type="image/png">
+    <style>
+        /* 全局重置与字体颜色 */
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: #ffffff;
+            /* 全局白色字体 */
+            overflow-x: hidden;
+            background-color: #000000;
+            /* 确保背景黑 */
+        }
+
+        /* Canvas 放到页面最底层 */
+        #bg-canvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            display: block;
+            background: #000000;
+            pointer-events: none;
+        }
+
+        /* 返回首页按钮 */
+        .home-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 8px 16px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            backdrop-filter: blur(4px);
+            transition: all 0.3s ease;
+            z-index: 100;
+            font-size: 0.9rem;
+        }
+
+        .home-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border-color: #fff;
+        }
+
+        /* 毛玻璃容器 (Glassmorphism) */
+        .glass-container {
+            max-width: 900px;
+            margin: 80px auto 40px;
+            /* 上边距留给返回按钮 */
+            padding: 40px;
+            background: rgba(20, 20, 30, 0.4);
+            /* 更通透的深色背景 */
+            backdrop-filter: blur(20px);
+            /* 高强度背景模糊 */
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            /* 极细的亮色边框 */
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            /* 深度感阴影 */
+        }
+
+        /* 标题样式 */
+        .glass-container h1 {
+            margin-top: 0;
+            font-weight: 300;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 16px;
+            margin-bottom: 10px;
+            text-align: center;
+            color: #00f2ff;
+            text-shadow: 0 0 5px rgba(0, 242, 255, 0.7), 0 0 15px rgba(0, 242, 255, 0.5);
+            letter-spacing: 2px;
+        }
+
+        /* Markdown Content Styles */
+        .glass-container h2 {
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+            color: #00f2ff;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 5px;
+        }
+
+        .glass-container h3 {
+            margin-top: 1.2em;
+            margin-bottom: 0.5em;
+            color: #e0e0e0;
+        }
+
+        .glass-container h4 {
+            margin-top: 1em;
+            margin-bottom: 0.5em;
+            color: #ccc;
+        }
+
+        .glass-container p {
+            line-height: 1.8;
+            margin-bottom: 1em;
+            color: #ddd;
+            font-size: 1.05rem;
+        }
+
+        .glass-container ul,
+        .glass-container ol {
+            margin-left: 20px;
+            margin-bottom: 1em;
+            color: #ddd;
+        }
+
+        .glass-container li {
+            margin-bottom: 5px;
+        }
+
+        .glass-container blockquote {
+            border-left: 4px solid #00f2ff;
+            padding-left: 15px;
+            color: #aaa;
+            margin: 1em 0;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px 15px;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .glass-container pre {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1em 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-container code {
+            font-family: Consolas, Monaco, 'Andale Mono', monospace;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 5px;
+            border-radius: 3px;
+            color: #ff79c6;
+        }
+
+        .glass-container pre code {
+            background: transparent;
+            color: #f8f8f2;
+            padding: 0;
+        }
+
+        .glass-container img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin: 1em 0;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .post-meta {
+            text-align: center;
+            color: #888;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+
+        /* Table Styles */
+        .glass-container table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1em 0;
+            color: #ddd;
+        }
+
+        .glass-container th,
+        .glass-container td {
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        .glass-container th {
+            background: rgba(255, 255, 255, 0.1);
+            color: #00f2ff;
+        }
+
+        /* MathJax Overflow Handling */
+        mjx-container[display="true"] {
+            overflow-x: auto;
+            overflow-y: hidden;
+            max-width: 100%;
+            padding: 10px 0;
+        }
+
+        /* 链接样式 */
+        .glass-container a {
+            color: #00ffff;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .glass-container a:hover {
+            color: #fff;
+            text-decoration: underline;
+            text-shadow: 0 0 8px rgba(0, 255, 255, 0.6);
+        }
+
+        /* Mermaid 图表样式 */
+        .glass-container .mermaid {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 1.5em auto;
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            overflow-x: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Mermaid SVG 居中 */
+        .glass-container .mermaid svg {
+            display: block;
+            margin: 0 auto;
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 600px) {
+            .glass-container {
+                margin: 72px 12px 20px;
+                padding: 20px;
+            }
+
+            .home-btn {
+                top: 16px;
+                left: 16px;
+                padding: 8px 14px;
+            }
+
+            .glass-container h1 {
+                font-size: 1.8rem;
+                letter-spacing: 1px;
+            }
+
+            .glass-container h2 {
+                font-size: 1.35rem;
+            }
+
+            .glass-container h3 {
+                font-size: 1.15rem;
+            }
+
+            .glass-container p,
+            .glass-container li {
+                font-size: 1rem;
+                line-height: 1.75;
+            }
+
+            .post-meta {
+                margin-bottom: 22px;
+            }
+
+            .glass-container pre {
+                padding: 12px;
+                font-size: 0.9rem;
+            }
+
+            .glass-container table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .glass-container th,
+            .glass-container td {
+                padding: 8px 10px;
+            }
+
+            .glass-container .mermaid {
+                padding: 12px;
+            }
+        }
+    </style>
+
+    <!-- MathJax Configuration -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async src="/assets/js/mathjax.js">
+    </script>
+
+    <!-- Mermaid Configuration -->
+    <script src="/assets/js/mermaid.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            mermaid.initialize({
+                startOnLoad: true,
+                theme: 'dark',
+                themeVariables: {
+                    // 主要颜色 - 使用亮青色
+                    primaryColor: '#00d4ff',
+                    primaryTextColor: '#ffffff',
+                    primaryBorderColor: '#00f2ff',
+
+                    // 次要颜色 - 使用深色但不太暗
+                    secondaryColor: '#2a3f5f',
+                    secondaryTextColor: '#ffffff',
+                    secondaryBorderColor: '#00d4ff',
+
+                    // 第三颜色
+                    tertiaryColor: '#1e3a5f',
+                    tertiaryTextColor: '#ffffff',
+                    tertiaryBorderColor: '#00d4ff',
+
+                    // 线条颜色
+                    lineColor: '#00f2ff',
+
+                    // 文字颜色 - 确保所有文字都是白色
+                    textColor: '#ffffff',
+                    mainBkg: '#1a2332',
+
+                    // Git 图表特定颜色
+                    git0: '#00d4ff',
+                    git1: '#7c4dff',
+                    git2: '#ff6b6b',
+                    git3: '#4ecdc4',
+                    git4: '#ffd93d',
+                    git5: '#95e1d3',
+                    git6: '#f38181',
+                    git7: '#aa96da',
+
+                    // Git 分支名称文字颜色（gitInv 控制分支名称标签的文字颜色）
+                    gitInv0: '#000000',
+                    gitInv1: '#000000',
+                    gitInv2: '#000000',
+                    gitInv3: '#000000',
+                    gitInv4: '#000000',
+                    gitInv5: '#000000',
+                    gitInv6: '#000000',
+                    gitInv7: '#000000',
+
+                    // 提交点颜色 - 使用黑色文字以便在亮色背景上显示
+                    commitLabelColor: '#000000',
+                    commitLabelBackground: '#00d4ff',
+                    commitLabelFontSize: '14px',
+
+                    // 标签颜色 - 使用黑色文字
+                    tagLabelColor: '#000000',
+                    tagLabelBackground: '#00d4ff',
+                    tagLabelBorder: '#00f2ff',
+                    tagLabelFontSize: '12px',
+
+                    // Git 标签文字颜色（确保所有标签都是黑色）
+                    gitTagLabelColor: '#000000',
+                    gitTagLabelBackground: '#00d4ff',
+                    gitTagLabelBorder: '#00f2ff',
+
+                    // 分支标签颜色
+                    gitBranchLabel0: '#000000',
+                    gitBranchLabel1: '#000000',
+                    gitBranchLabel2: '#000000',
+                    gitBranchLabel3: '#000000',
+                    gitBranchLabel4: '#000000',
+                    gitBranchLabel5: '#000000',
+                    gitBranchLabel6: '#000000',
+                    gitBranchLabel7: '#000000',
+
+                    // 节点颜色
+                    nodeBorder: '#00f2ff',
+                    nodeTextColor: '#ffffff',
+
+                    // 边框和背景
+                    clusterBkg: '#1a2332',
+                    clusterBorder: '#00d4ff',
+
+                    // 标题颜色
+                    titleColor: '#ffffff',
+
+                    // 边缘标签
+                    edgeLabelBackground: '#1a2332',
+
+                    // 活动状态
+                    activeTaskBkgColor: '#00d4ff',
+                    activeTaskBorderColor: '#00f2ff',
+
+                    // 网格颜色
+                    gridColor: '#333333',
+
+                    // 序列图颜色
+                    actorBorder: '#00f2ff',
+                    actorBkg: '#1a2332',
+                    actorTextColor: '#ffffff',
+                    actorLineColor: '#00d4ff',
+                    signalColor: '#ffffff',
+                    signalTextColor: '#ffffff',
+                    labelBoxBkgColor: '#1a2332',
+                    labelBoxBorderColor: '#00f2ff',
+                    labelTextColor: '#ffffff',
+                    loopTextColor: '#ffffff',
+                    noteBorderColor: '#00f2ff',
+                    noteBkgColor: '#1a2332',
+                    noteTextColor: '#ffffff',
+                    activationBorderColor: '#00f2ff',
+                    activationBkgColor: '#2a3f5f',
+                    sequenceNumberColor: '#ffffff'
+                }
+            });
+        });
+    </script>
+</head>
+
+<body>
+
+    <!-- Canvas 背景：不影响可访问性 -->
+    <canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+    <!-- 返回首页按钮 -->
+    <a href="/posts" class="home-btn">← 返回文章列表</a>
+
+    <div class="glass-container">
+        <h1>离散数学</h1>
+        <p class="post-meta">发布于 2025-12-14</p>
+
+        <h1 id="离散数学复习全书-完整版">离散数学复习全书 (完整版)</h1>
+
+<blockquote>
+  <p><strong>教材版本</strong>：离散数学 (第3版) - 西安交通大学出版社 (陈建明 曾明 刘国荣 编)<br />
+<strong>适用范围</strong>：期末复习 / 考研备考<br />
+<strong>内容涵盖</strong>：集合论、关系、函数、代数系统、图论</p>
+</blockquote>
+
+<h2 id="目录">目录</h2>
+<ul id="markdown-toc">
+  <li><a href="#离散数学复习全书-完整版" id="markdown-toc-离散数学复习全书-完整版">离散数学复习全书 (完整版)</a>    <ul>
+      <li><a href="#目录" id="markdown-toc-目录">目录</a></li>
+    </ul>
+  </li>
+  <li><a href="#第3章-集合" id="markdown-toc-第3章-集合">第3章 集合</a>    <ul>
+      <li><a href="#31-集合的基本概念" id="markdown-toc-31-集合的基本概念">3.1 集合的基本概念</a>        <ul>
+          <li><a href="#1-集合的定义与特性" id="markdown-toc-1-集合的定义与特性">1. 集合的定义与特性</a></li>
+          <li><a href="#2-集合的表示法" id="markdown-toc-2-集合的表示法">2. 集合的表示法</a></li>
+          <li><a href="#3-特殊集合" id="markdown-toc-3-特殊集合">3. 特殊集合</a></li>
+          <li><a href="#4-集合间的关系" id="markdown-toc-4-集合间的关系">4. 集合间的关系</a></li>
+          <li><a href="#5-幂集-power-set" id="markdown-toc-5-幂集-power-set">5. 幂集 (Power Set)</a></li>
+        </ul>
+      </li>
+      <li><a href="#32-集合的基本运算" id="markdown-toc-32-集合的基本运算">3.2 集合的基本运算</a>        <ul>
+          <li><a href="#1-补运算-complement" id="markdown-toc-1-补运算-complement">1. 补运算 (Complement)</a></li>
+          <li><a href="#2-并运算与交运算" id="markdown-toc-2-并运算与交运算">2. 并运算与交运算</a></li>
+          <li><a href="#3-运算定律-重要" id="markdown-toc-3-运算定律-重要">3. 运算定律 (重要)</a></li>
+          <li><a href="#4-包含关系的等价形式-定理-37" id="markdown-toc-4-包含关系的等价形式-定理-37">4. 包含关系的等价形式 (定理 3.7)</a></li>
+        </ul>
+      </li>
+      <li><a href="#33-集合的宏运算" id="markdown-toc-33-集合的宏运算">3.3 集合的宏运算</a>        <ul>
+          <li><a href="#1-差运算-difference" id="markdown-toc-1-差运算-difference">1. 差运算 (Difference)</a></li>
+          <li><a href="#2-环和运算--对称差-symmetric-difference" id="markdown-toc-2-环和运算--对称差-symmetric-difference">2. 环和运算 / 对称差 (Symmetric Difference)</a></li>
+          <li><a href="#3-环积运算-ring-product" id="markdown-toc-3-环积运算-ring-product">3. 环积运算 (Ring Product)</a></li>
+          <li><a href="#4-大并与大交" id="markdown-toc-4-大并与大交">4. 大并与大交</a></li>
+        </ul>
+      </li>
+      <li><a href="#34-集合运算的其他表示法" id="markdown-toc-34-集合运算的其他表示法">3.4 集合运算的其他表示法</a>        <ul>
+          <li><a href="#1-文氏图-venn-diagram" id="markdown-toc-1-文氏图-venn-diagram">1. 文氏图 (Venn Diagram)</a></li>
+          <li><a href="#2-成员表法-membership-table" id="markdown-toc-2-成员表法-membership-table">2. 成员表法 (Membership Table)</a></li>
+        </ul>
+      </li>
+      <li><a href="#35-习题与考点提示" id="markdown-toc-35-习题与考点提示">3.5 习题与考点提示</a></li>
+    </ul>
+  </li>
+  <li><a href="#第4章-关系" id="markdown-toc-第4章-关系">第4章 关系</a>    <ul>
+      <li><a href="#41-集合的叉积-cartesian-product" id="markdown-toc-41-集合的叉积-cartesian-product">4.1 集合的叉积 (Cartesian Product)</a>        <ul>
+          <li><a href="#1-基本定义" id="markdown-toc-1-基本定义">1. 基本定义</a></li>
+          <li><a href="#2-运算性质-常考点" id="markdown-toc-2-运算性质-常考点">2. 运算性质 (常考点)</a></li>
+        </ul>
+      </li>
+      <li><a href="#42-关系的基本概念" id="markdown-toc-42-关系的基本概念">4.2 关系的基本概念</a>        <ul>
+          <li><a href="#1-定义与术语" id="markdown-toc-1-定义与术语">1. 定义与术语</a></li>
+          <li><a href="#2-关系的表示" id="markdown-toc-2-关系的表示">2. 关系的表示</a></li>
+        </ul>
+      </li>
+      <li><a href="#43-关系的运算" id="markdown-toc-43-关系的运算">4.3 关系的运算</a>        <ul>
+          <li><a href="#1-逆运算-r-1" id="markdown-toc-1-逆运算-r-1">1. 逆运算 ($R^{-1}$)</a></li>
+          <li><a href="#2-复合运算-r-circ-s" id="markdown-toc-2-复合运算-r-circ-s">2. 复合运算 ($R \circ S$)</a></li>
+          <li><a href="#3-幂运算-rn" id="markdown-toc-3-幂运算-rn">3. 幂运算 ($R^n$)</a></li>
+        </ul>
+      </li>
+      <li><a href="#44-关系的性质-核心考点" id="markdown-toc-44-关系的性质-核心考点">4.4 关系的性质 (核心考点)</a>        <ul>
+          <li><a href="#-习题中的重要推论-性质的保持" id="markdown-toc--习题中的重要推论-性质的保持">★ 习题中的重要推论 (性质的保持)</a></li>
+        </ul>
+      </li>
+      <li><a href="#45-闭包运算-closure" id="markdown-toc-45-闭包运算-closure">4.5 闭包运算 (Closure)</a></li>
+      <li><a href="#46-等价关系与划分" id="markdown-toc-46-等价关系与划分">4.6 等价关系与划分</a>        <ul>
+          <li><a href="#1-核心概念" id="markdown-toc-1-核心概念">1. 核心概念</a></li>
+          <li><a href="#2-划分定理" id="markdown-toc-2-划分定理">2. 划分定理</a></li>
+        </ul>
+      </li>
+      <li><a href="#47-半序关系-partial-order" id="markdown-toc-47-半序关系-partial-order">4.7 半序关系 (Partial Order)</a>        <ul>
+          <li><a href="#1-核心概念-1" id="markdown-toc-1-核心概念-1">1. 核心概念</a></li>
+          <li><a href="#2-特殊元素-极值与界" id="markdown-toc-2-特殊元素-极值与界">2. 特殊元素 (极值与界)</a></li>
+          <li><a href="#3-格-lattice" id="markdown-toc-3-格-lattice">3. 格 (Lattice)</a></li>
+          <li><a href="#-习题中的重要结论" id="markdown-toc--习题中的重要结论">★ 习题中的重要结论</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#第5章-函数" id="markdown-toc-第5章-函数">第5章 函数</a>    <ul>
+      <li><a href="#51-函数的基本概念" id="markdown-toc-51-函数的基本概念">5.1 函数的基本概念</a>        <ul>
+          <li><a href="#1-函数的定义" id="markdown-toc-1-函数的定义">1. 函数的定义</a></li>
+          <li><a href="#2-函数集合-yx" id="markdown-toc-2-函数集合-yx">2. 函数集合 $Y^X$</a></li>
+          <li><a href="#3-特殊函数" id="markdown-toc-3-特殊函数">3. 特殊函数</a></li>
+        </ul>
+      </li>
+      <li><a href="#52-函数的性质-核心考点" id="markdown-toc-52-函数的性质-核心考点">5.2 函数的性质 (核心考点)</a>        <ul>
+          <li><a href="#1-三类重要函数" id="markdown-toc-1-三类重要函数">1. 三类重要函数</a></li>
+          <li><a href="#2-复合函数" id="markdown-toc-2-复合函数">2. 复合函数</a></li>
+          <li><a href="#3-逆函数" id="markdown-toc-3-逆函数">3. 逆函数</a></li>
+        </ul>
+      </li>
+      <li><a href="#53-集合的基数-cardinality" id="markdown-toc-53-集合的基数-cardinality">5.3 集合的基数 (Cardinality)</a>        <ul>
+          <li><a href="#1-等势与基数" id="markdown-toc-1-等势与基数">1. 等势与基数</a></li>
+          <li><a href="#2-可数集-countable-set" id="markdown-toc-2-可数集-countable-set">2. 可数集 (Countable Set)</a></li>
+          <li><a href="#3-不可数集" id="markdown-toc-3-不可数集">3. 不可数集</a></li>
+          <li><a href="#4-基数的比较" id="markdown-toc-4-基数的比较">4. 基数的比较</a></li>
+        </ul>
+      </li>
+      <li><a href="#54--55-原始递归函数与可计算函数-了解" id="markdown-toc-54--55-原始递归函数与可计算函数-了解">5.4 &amp; 5.5 原始递归函数与可计算函数 (了解)</a></li>
+      <li><a href="#6--习题中的重要结论-解题技巧" id="markdown-toc-6--习题中的重要结论-解题技巧">6. 🎯 习题中的重要结论 (解题技巧)</a>        <ul>
+          <li><a href="#1-象的集合运算性质-习题-5-7" id="markdown-toc-1-象的集合运算性质-习题-5-7">1. 象的集合运算性质 [习题 5-7]</a></li>
+          <li><a href="#2-复合函数的性质推导-习题-5-9" id="markdown-toc-2-复合函数的性质推导-习题-5-9">2. 复合函数的性质推导 [习题 5-9]</a></li>
+          <li><a href="#3-单射满射的充要条件-右逆与左逆-习题-5-4-5-6" id="markdown-toc-3-单射满射的充要条件-右逆与左逆-习题-5-4-5-6">3. 单射/满射的充要条件 (右逆与左逆) [习题 5-4, 5-6]</a></li>
+          <li><a href="#4-鸽巢原理-pigeonhole-principle" id="markdown-toc-4-鸽巢原理-pigeonhole-principle">4. 鸽巢原理 (Pigeonhole Principle)</a></li>
+          <li><a href="#5-关于基数的判断-习题-5-15-17" id="markdown-toc-5-关于基数的判断-习题-5-15-17">5. 关于基数的判断 [习题 5-15, 17]</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#第6章-代数系统" id="markdown-toc-第6章-代数系统">第6章 代数系统</a>    <ul>
+      <li><a href="#61-代数系统的基本概念" id="markdown-toc-61-代数系统的基本概念">6.1 代数系统的基本概念</a>        <ul>
+          <li><a href="#1-运算-operation" id="markdown-toc-1-运算-operation">1. 运算 (Operation)</a></li>
+          <li><a href="#2-运算的性质" id="markdown-toc-2-运算的性质">2. 运算的性质</a></li>
+          <li><a href="#3-特殊元素-重要" id="markdown-toc-3-特殊元素-重要">3. 特殊元素 (重要)</a></li>
+        </ul>
+      </li>
+      <li><a href="#62-代数系统的同构与同态" id="markdown-toc-62-代数系统的同构与同态">6.2 代数系统的同构与同态</a>        <ul>
+          <li><a href="#1-定义" id="markdown-toc-1-定义">1. 定义</a></li>
+          <li><a href="#2-性质" id="markdown-toc-2-性质">2. 性质</a></li>
+        </ul>
+      </li>
+      <li><a href="#63-半群-semigroup与独异点-monoid" id="markdown-toc-63-半群-semigroup与独异点-monoid">6.3 半群 (Semigroup)与独异点 (Monoid)</a>        <ul>
+          <li><a href="#1-半群" id="markdown-toc-1-半群">1. 半群</a></li>
+          <li><a href="#2-独异点-幺半群" id="markdown-toc-2-独异点-幺半群">2. 独异点 (幺半群)</a></li>
+        </ul>
+      </li>
+      <li><a href="#64-群-group--核心章节" id="markdown-toc-64-群-group--核心章节">6.4 群 (Group) —— <strong>核心章节</strong></a>        <ul>
+          <li><a href="#1-群的定义" id="markdown-toc-1-群的定义">1. 群的定义</a></li>
+          <li><a href="#2-群的性质" id="markdown-toc-2-群的性质">2. 群的性质</a></li>
+          <li><a href="#3-子群-subgroup" id="markdown-toc-3-子群-subgroup">3. 子群 (Subgroup)</a></li>
+          <li><a href="#4-循环群-cyclic-group" id="markdown-toc-4-循环群-cyclic-group">4. 循环群 (Cyclic Group)</a></li>
+          <li><a href="#5-陪集与拉格朗日定理-lagranges-theorem" id="markdown-toc-5-陪集与拉格朗日定理-lagranges-theorem">5. 陪集与拉格朗日定理 (Lagrange’s Theorem)</a></li>
+          <li><a href="#6-正规子群与商群" id="markdown-toc-6-正规子群与商群">6. 正规子群与商群</a></li>
+        </ul>
+      </li>
+      <li><a href="#65--66-环-ring-与-域-field" id="markdown-toc-65--66-环-ring-与-域-field">6.5 &amp; 6.6 环 (Ring) 与 域 (Field)</a>        <ul>
+          <li><a href="#1-环的定义" id="markdown-toc-1-环的定义">1. 环的定义</a></li>
+          <li><a href="#2-特殊的环" id="markdown-toc-2-特殊的环">2. 特殊的环</a></li>
+          <li><a href="#3-域" id="markdown-toc-3-域">3. 域</a></li>
+        </ul>
+      </li>
+      <li><a href="#-习题中的重要结论-补充考点" id="markdown-toc--习题中的重要结论-补充考点">🎯 习题中的重要结论 (补充考点)</a>        <ul>
+          <li><a href="#1-半群与群的判定" id="markdown-toc-1-半群与群的判定">1. 半群与群的判定</a></li>
+          <li><a href="#2-元素的阶与运算" id="markdown-toc-2-元素的阶与运算">2. 元素的阶与运算</a></li>
+          <li><a href="#3-子群的相关性质" id="markdown-toc-3-子群的相关性质">3. 子群的相关性质</a></li>
+          <li><a href="#4-正规子群与中心" id="markdown-toc-4-正规子群与中心">4. 正规子群与中心</a></li>
+          <li><a href="#5-环的性质" id="markdown-toc-5-环的性质">5. 环的性质</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#第8章-图论" id="markdown-toc-第8章-图论">第8章 图论</a>    <ul>
+      <li><a href="#81--82-图的基本概念" id="markdown-toc-81--82-图的基本概念">8.1 &amp; 8.2 图的基本概念</a>        <ul>
+          <li><a href="#1-图的定义" id="markdown-toc-1-图的定义">1. 图的定义</a></li>
+          <li><a href="#2-顶点的度-degree" id="markdown-toc-2-顶点的度-degree">2. 顶点的度 (Degree)</a></li>
+          <li><a href="#3-握手定理-核心考点" id="markdown-toc-3-握手定理-核心考点">3. 握手定理 (核心考点)</a></li>
+          <li><a href="#4-特殊图类" id="markdown-toc-4-特殊图类">4. 特殊图类</a></li>
+          <li><a href="#5-子图与同构" id="markdown-toc-5-子图与同构">5. 子图与同构</a></li>
+        </ul>
+      </li>
+      <li><a href="#83-路与圈-连通性" id="markdown-toc-83-路与圈-连通性">8.3 路与圈 (连通性)</a>        <ul>
+          <li><a href="#1-通路与回路" id="markdown-toc-1-通路与回路">1. 通路与回路</a></li>
+          <li><a href="#2-连通性" id="markdown-toc-2-连通性">2. 连通性</a></li>
+          <li><a href="#3-图的距离与直径" id="markdown-toc-3-图的距离与直径">3. 图的距离与直径</a></li>
+          <li><a href="#4-割点与桥" id="markdown-toc-4-割点与桥">4. 割点与桥</a></li>
+        </ul>
+      </li>
+      <li><a href="#84-图的矩阵表示" id="markdown-toc-84-图的矩阵表示">8.4 图的矩阵表示</a>        <ul>
+          <li><a href="#1-邻接矩阵-ag" id="markdown-toc-1-邻接矩阵-ag">1. 邻接矩阵 $A(G)$</a></li>
+          <li><a href="#2-关联矩阵-mg" id="markdown-toc-2-关联矩阵-mg">2. 关联矩阵 $M(G)$</a></li>
+          <li><a href="#3-可达性矩阵-p" id="markdown-toc-3-可达性矩阵-p">3. 可达性矩阵 $P$</a></li>
+        </ul>
+      </li>
+      <li><a href="#85-带权图的最短路径" id="markdown-toc-85-带权图的最短路径">8.5 带权图的最短路径</a></li>
+      <li><a href="#86--87-欧拉图与哈密顿图" id="markdown-toc-86--87-欧拉图与哈密顿图">8.6 &amp; 8.7 欧拉图与哈密顿图</a>        <ul>
+          <li><a href="#1-欧拉图-euler-graph--边的问题" id="markdown-toc-1-欧拉图-euler-graph--边的问题">1. 欧拉图 (Euler Graph) —— 边的问题</a></li>
+          <li><a href="#2-哈密顿图-hamilton-graph--点的问题" id="markdown-toc-2-哈密顿图-hamilton-graph--点的问题">2. 哈密顿图 (Hamilton Graph) —— 点的问题</a></li>
+        </ul>
+      </li>
+      <li><a href="#88-二分图-bipartite-graph" id="markdown-toc-88-二分图-bipartite-graph">8.8 二分图 (Bipartite Graph)</a>        <ul>
+          <li><a href="#1-定义与判定" id="markdown-toc-1-定义与判定">1. 定义与判定</a></li>
+          <li><a href="#2-匹配" id="markdown-toc-2-匹配">2. 匹配</a></li>
+        </ul>
+      </li>
+      <li><a href="#89-平面图-planar-graph" id="markdown-toc-89-平面图-planar-graph">8.9 平面图 (Planar Graph)</a>        <ul>
+          <li><a href="#1-定义-1" id="markdown-toc-1-定义-1">1. 定义</a></li>
+          <li><a href="#2-欧拉公式-核心" id="markdown-toc-2-欧拉公式-核心">2. 欧拉公式 (核心)</a></li>
+          <li><a href="#3-库拉图斯基定理-充要条件" id="markdown-toc-3-库拉图斯基定理-充要条件">3. 库拉图斯基定理 (充要条件)</a></li>
+        </ul>
+      </li>
+      <li><a href="#810-树-tree" id="markdown-toc-810-树-tree">8.10 树 (Tree)</a>        <ul>
+          <li><a href="#1-定义与性质" id="markdown-toc-1-定义与性质">1. 定义与性质</a></li>
+          <li><a href="#2-生成树" id="markdown-toc-2-生成树">2. 生成树</a></li>
+        </ul>
+      </li>
+      <li><a href="#-习题中的重要结论-补充考点-1" id="markdown-toc--习题中的重要结论-补充考点-1">🎯 习题中的重要结论 (补充考点)</a></li>
+    </ul>
+  </li>
+</ul>
+
+<hr />
+
+<h1 id="第3章-集合">第3章 集合</h1>
+
+<blockquote>
+  <p><strong>复习重点</strong>：集合的定义与表示、幂集、基本运算定律、<strong>宏运算（对称差与环积）</strong>、集合恒等式的证明方法（特别是成员表法）。</p>
+</blockquote>
+
+<h2 id="31-集合的基本概念">3.1 集合的基本概念</h2>
+
+<h3 id="1-集合的定义与特性">1. 集合的定义与特性</h3>
+<ul>
+  <li><strong>概念</strong>：集合是由总括某些个体成一个整体而产生的，其中的个体称为<strong>元素</strong>（成员）。</li>
+  <li><strong>关系</strong>：
+    <ul>
+      <li><strong>属于 ($a \in A$)</strong>：个体 $a$ 是集合 $A$ 的成员。</li>
+      <li><strong>不属于 ($a \notin A$)</strong>：个体 $a$ 不是集合 $A$ 的成员。</li>
+      <li><strong>特性</strong>：集合中的元素必须是<strong>可辨认的</strong>（互异性），且属于关系是无二义性的。</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="2-集合的表示法">2. 集合的表示法</h3>
+<ol>
+  <li><strong>文字表示法</strong>：用自然语言描述，如 <code class="language-plaintext highlighter-rouge">{教室里在座的同学}</code>。</li>
+  <li><strong>列举法</strong>：列出所有元素，如 <code class="language-plaintext highlighter-rouge">{1, 2, 3}</code>。</li>
+  <li><strong>谓词表示法</strong>：${x \mid P(x)}$，其中 $P(x)$ 是元素 $x$ 具有的属性，如 ${x \mid x^2 - 4x + 3 = 0}$。</li>
+</ol>
+
+<h3 id="3-特殊集合">3. 特殊集合</h3>
+<ul>
+  <li><strong>空集 ($\emptyset$)</strong>：不含任何元素的集合。</li>
+  <li><strong>全集 ($X$ 或 $E$)</strong>：研究范围内全部个体组成的集合。</li>
+</ul>
+
+<h3 id="4-集合间的关系">4. 集合间的关系</h3>
+<ul>
+  <li><strong>子集 ($\subseteq$)</strong>：若 $\forall x (x \in A \rightarrow x \in B)$，则 $A \subseteq B$。
+    <ul>
+      <li>性质：$\emptyset \subseteq A$，$A \subseteq A$。</li>
+    </ul>
+  </li>
+  <li><strong>相等 ($=$)</strong>：$A = B$ 当且仅当 $A \subseteq B$ 且 $B \subseteq A$。</li>
+</ul>
+
+<h3 id="5-幂集-power-set">5. 幂集 (Power Set)</h3>
+<ul>
+  <li><strong>定义</strong>：集合 $A$ 的所有子集组成的集合，记为 $2^A$。
+    <ul>
+      <li>公式：$2^A = {x \mid x \subseteq A}$。</li>
+    </ul>
+  </li>
+  <li><strong>性质</strong>：
+    <ul>
+      <li>若 $\vert A\vert = n$，则 $\vert2^A\vert = 2^n$。</li>
+      <li>$2^\emptyset = {\emptyset}$。</li>
+      <li>$A = B \iff 2^A = 2^B$。</li>
+    </ul>
+  </li>
+</ul>
+
+<hr />
+
+<h2 id="32-集合的基本运算">3.2 集合的基本运算</h2>
+
+<h3 id="1-补运算-complement">1. 补运算 (Complement)</h3>
+<ul>
+  <li><strong>定义</strong>：$A’ = {x \mid x \in X \land x \notin A}$ （相对于全集 $X$）。</li>
+  <li><strong>性质</strong>：
+    <ul>
+      <li>$(A’)’ = A$ （双重否定）。</li>
+      <li>$X’ = \emptyset, \emptyset’ = X$。</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="2-并运算与交运算">2. 并运算与交运算</h3>
+<ul>
+  <li><strong>并集 ($\cup$)</strong>：$A \cup B = {x \mid x \in A \lor x \in B}$。</li>
+  <li><strong>交集 ($\cap$)</strong>：$A \cap B = {x \mid x \in A \land x \in B}$。</li>
+</ul>
+
+<h3 id="3-运算定律-重要">3. 运算定律 (重要)</h3>
+<p>常用的集合恒等式包括：</p>
+<ul>
+  <li><strong>幂等律</strong>：$A \cup A = A, A \cap A = A$。</li>
+  <li><strong>交换律</strong>：$A \cup B = B \cup A, A \cap B = B \cap A$。</li>
+  <li><strong>结合律</strong>：$(A \cup B) \cup C = A \cup (B \cup C)$。</li>
+  <li><strong>分配律</strong>：
+    <ul>
+      <li>$A \cup (B \cap C) = (A \cup B) \cap (A \cup C)$。</li>
+      <li>$A \cap (B \cup C) = (A \cap B) \cup (A \cap C)$。</li>
+    </ul>
+  </li>
+  <li><strong>De Morgan 律 (德摩根律)</strong>：
+    <ul>
+      <li>$(A \cup B)’ = A’ \cap B’$。</li>
+      <li>$(A \cap B)’ = A’ \cup B’$。</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="4-包含关系的等价形式-定理-37">4. 包含关系的等价形式 (定理 3.7)</h3>
+<p>以下三个命题等价：</p>
+<ol>
+  <li>$A \subseteq B$</li>
+  <li>$A \cup B = B$</li>
+  <li>$A \cap B = A$</li>
+</ol>
+
+<hr />
+
+<h2 id="33-集合的宏运算">3.3 集合的宏运算</h2>
+
+<p>这些运算是由基本运算（并、交、补）组合而成的。</p>
+
+<h3 id="1-差运算-difference">1. 差运算 (Difference)</h3>
+<ul>
+  <li><strong>定义</strong>：$A \setminus B = {x \mid x \in A \land x \notin B}$。</li>
+  <li><strong>等价形式</strong>：$A \setminus B = A \cap B’$。</li>
+  <li><strong>性质</strong>：$A \setminus B \subseteq A$；$A \setminus A = \emptyset$；$A \setminus \emptyset = A$。</li>
+</ul>
+
+<h3 id="2-环和运算--对称差-symmetric-difference">2. 环和运算 / 对称差 (Symmetric Difference)</h3>
+<ul>
+  <li><strong>定义</strong>：$A \oplus B = {x \mid (x \in A \land x \notin B) \lor (x \in B \land x \notin A)}$。</li>
+  <li><strong>等价形式</strong>：
+    <ul>
+      <li>$A \oplus B = (A \setminus B) \cup (B \setminus A)$</li>
+      <li>$A \oplus B = (A \cup B) \setminus (A \cap B)$</li>
+    </ul>
+  </li>
+  <li><strong>性质</strong>：满足交换律和结合律；$A \oplus A = \emptyset$；$A \oplus \emptyset = A$。</li>
+</ul>
+
+<h3 id="3-环积运算-ring-product">3. 环积运算 (Ring Product)</h3>
+<ul>
+  <li><strong>定义</strong>：$A \otimes B = {x \mid (x \in A \lor x \notin B) \land (x \in B \lor x \notin A)}$。</li>
+  <li><strong>等价形式</strong>：$A \otimes B = (A \cup B’) \cap (B \cup A’)$。</li>
+  <li><strong>关系</strong>：$A \otimes B = (A \oplus B)’$，即环积是环和的补集。</li>
+</ul>
+
+<h3 id="4-大并与大交">4. 大并与大交</h3>
+<ul>
+  <li>用于处理集族（集合的集合）的运算。</li>
+  <li><strong>大并 ($\bigcup$)</strong>：$\bigcup_{y \in \Gamma} A_y = {x \mid \exists \gamma \in \Gamma (x \in A_\gamma)}$。</li>
+  <li><strong>大交 ($\bigcap$)</strong>：$\bigcap_{y \in \Gamma} A_y = {x \mid \forall \gamma \in \Gamma (x \in A_\gamma)}$。</li>
+  <li><strong>广义 De Morgan 律</strong>：$(\bigcup A_y)’ = \bigcap (A_y’)$；$(\bigcap A_y)’ = \bigcup (A_y’)$。</li>
+</ul>
+
+<hr />
+
+<h2 id="34-集合运算的其他表示法">3.4 集合运算的其他表示法</h2>
+
+<h3 id="1-文氏图-venn-diagram">1. 文氏图 (Venn Diagram)</h3>
+<ul>
+  <li>用平面上的封闭曲线（如圆）表示集合，用矩形表示全集。适合直观展示集合关系，但不适合作为严格证明工具。</li>
+</ul>
+
+<h3 id="2-成员表法-membership-table">2. 成员表法 (Membership Table)</h3>
+<ul>
+  <li><strong>原理</strong>：将全集中的个体分为两类（属于集合记为1，不属于记为0）。列出所有可能的所属状态组合，类似于真值表。</li>
+  <li><strong>用途</strong>：<strong>证明集合恒等式</strong>。如果两个集合表达式的成员表结果列完全相同，则这两个集合相等。</li>
+  <li><strong>示例</strong>：证明 $(A \cup B)’ = A’ \cap B’$</li>
+</ul>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">A</th>
+      <th style="text-align: center">B</th>
+      <th style="text-align: center">A $\cup$ B</th>
+      <th style="text-align: center">(A $\cup$ B)’</th>
+      <th style="text-align: center">A’</th>
+      <th style="text-align: center">B’</th>
+      <th style="text-align: center">A’ $\cap$ B’</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center"><strong>1</strong></td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center"><strong>1</strong></td>
+    </tr>
+    <tr>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center"><strong>0</strong></td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center"><strong>0</strong></td>
+    </tr>
+    <tr>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center"><strong>0</strong></td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center"><strong>0</strong></td>
+    </tr>
+    <tr>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center"><strong>0</strong></td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center"><strong>0</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<p><em>(注：两列粗体部分相同，故等式成立)</em></p>
+
+<hr />
+
+<h2 id="35-习题与考点提示">3.5 习题与考点提示</h2>
+<ul>
+  <li><strong>区分 $\in$ 和 $\subseteq$</strong>：$\emptyset \in {\emptyset}$ 是真的，但 $\emptyset \subseteq {\emptyset}$ 也是真的。要特别注意空集和幂集的元素关系。</li>
+  <li><strong>幂集元素个数</strong>：若 $A={1, 2}$，则 $2^A = {\emptyset, {1}, {2}, {1, 2}}$，共 $2^2=4$ 个元素。</li>
+  <li><strong>证明题技巧</strong>：
+    <ul>
+      <li>证明 $A = B$：分别证明 $A \subseteq B$ 和 $B \subseteq A$。</li>
+      <li>证明 $A \subseteq B$：任取 $x \in A$，推导出 $x \in B$。</li>
+      <li>使用成员表法或集合演算法（利用已知定律变换）来证明复杂的集合恒等式。</li>
+    </ul>
+  </li>
+</ul>
+
+<hr />
+<hr />
+
+<h1 id="第4章-关系">第4章 关系</h1>
+
+<blockquote>
+  <p><strong>复习重点</strong>：关系的本质（集合）、五大基本性质的判定（矩阵/图法）、闭包运算、等价关系与划分的对应、偏序集中的特殊元素判定。</p>
+</blockquote>
+
+<h2 id="41-集合的叉积-cartesian-product">4.1 集合的叉积 (Cartesian Product)</h2>
+
+<h3 id="1-基本定义">1. 基本定义</h3>
+<ul>
+  <li><strong>有序对</strong>：由两个元素 $a, b$ 按特定顺序组成的序列 $(a, b)$。特点是当 $a \neq b$ 时，$(a, b) \neq (b, a)$。</li>
+  <li><strong>叉积 (笛卡儿积)</strong>：
+  \(A \times B = \{(a, b) \mid a \in A \land b \in B\}\)
+    <ul>
+      <li><strong>基数</strong>：$\vert A \times B\vert = \vert A\vert \times \vert B\vert$。</li>
+      <li><strong>推广</strong>：$A_1 \times A_2 \times \dots \times A_n$ 是 $n$ 元组的集合。</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="2-运算性质-常考点">2. 运算性质 (常考点)</h3>
+<ol>
+  <li><strong>不满足交换律</strong>：$A \times B \neq B \times A$ (除非 $A=B$ 或其中之一为空)。</li>
+  <li><strong>不满足结合律</strong>：$(A \times B) \times C \neq A \times (B \times C)$。</li>
+  <li><strong>对集合运算的分配律</strong> [习题 4-1]：
+    <ul>
+      <li>$A \times (B \cup C) = (A \times B) \cup (A \times C)$</li>
+      <li>$A \times (B \cap C) = (A \times B) \cap (A \times C)$</li>
+      <li>$A \times (B \setminus C) = (A \times B) \setminus (A \times C)$</li>
+      <li><strong>(注意)</strong>：$(A \cup B) \times (C \cup D) \neq (A \times C) \cup (B \times D)$，通常前者包含后者。</li>
+    </ul>
+  </li>
+</ol>
+
+<hr />
+
+<h2 id="42-关系的基本概念">4.2 关系的基本概念</h2>
+
+<h3 id="1-定义与术语">1. 定义与术语</h3>
+<ul>
+  <li><strong>二元关系</strong>：$A$ 到 $B$ 的二元关系 $R$ 是 $A \times B$ 的子集。</li>
+  <li><strong>A上的关系</strong>：$R \subseteq A \times A$。</li>
+  <li><strong>三大域</strong>：
+    <ul>
+      <li><strong>定义域 (Domain)</strong>：$\mathcal{D}(R) = {x \mid \exists y, xRy}$ (出发点集合)</li>
+      <li><strong>值域 (Range)</strong>：$\mathcal{R}(R) = {y \mid \exists x, xRy}$ (终点集合)</li>
+      <li><strong>域 (Field)</strong>：$\mathcal{F}(R) = \mathcal{D}(R) \cup \mathcal{R}(R)$</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="2-关系的表示">2. 关系的表示</h3>
+<ol>
+  <li><strong>关系矩阵</strong> $M_R$：
+    <ul>
+      <li>元素 $m_{ij}=1 \iff (a_i, a_j) \in R$。</li>
+    </ul>
+  </li>
+  <li><strong>关系图</strong> $G_R$：
+    <ul>
+      <li>有向图，节点为集合元素，有向边表示关系存在。</li>
+    </ul>
+  </li>
+</ol>
+
+<hr />
+
+<h2 id="43-关系的运算">4.3 关系的运算</h2>
+
+<h3 id="1-逆运算-r-1">1. 逆运算 ($R^{-1}$)</h3>
+<ul>
+  <li><strong>定义</strong>：$R^{-1} = {(y, x) \mid (x, y) \in R}$。</li>
+  <li><strong>性质</strong>：
+    <ul>
+      <li>$(R^{-1})^{-1} = R$</li>
+      <li>$\mathcal{D}(R^{-1}) = \mathcal{R}(R), \mathcal{R}(R^{-1}) = \mathcal{D}(R)$</li>
+      <li>$(R \cup S)^{-1} = R^{-1} \cup S^{-1}$ [习题 4-13]</li>
+      <li>$(R \cap S)^{-1} = R^{-1} \cap S^{-1}$</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="2-复合运算-r-circ-s">2. 复合运算 ($R \circ S$)</h3>
+<ul>
+  <li><strong>定义</strong>：设 $R \subseteq A \times B, S \subseteq B \times C$。
+  \(R \circ S = \{(x, z) \mid \exists y \in B, (x, y) \in R \land (y, z) \in S\}\)
+  <em>(注意：本教材符号顺序为先R后S，有些教材写作 S $\circ$ R，需区分)</em></li>
+  <li><strong>性质</strong>：
+    <ul>
+      <li><strong>结合律</strong>：$(R \circ S) \circ T = R \circ (S \circ T)$</li>
+      <li><strong>逆序律</strong>：$(R \circ S)^{-1} = S^{-1} \circ R^{-1}$ [习题 4-13]</li>
+      <li><strong>对并运算分配</strong>：$R \circ (S \cup T) = (R \circ S) \cup (R \circ T)$</li>
+    </ul>
+  </li>
+  <li><strong>矩阵运算</strong>：$M_{R \circ S} = M_R \cdot M_S$ (布尔乘法)。</li>
+</ul>
+
+<h3 id="3-幂运算-rn">3. 幂运算 ($R^n$)</h3>
+<ul>
+  <li>$R^0 = I_A$ (恒等关系)</li>
+  <li>$R^{n+1} = R^n \circ R$</li>
+  <li><strong>定理</strong>：若 $A$ 为有限集，则存在 $k, s$ 使得 $R^k = R^{k+s}$ (幂序列最终会出现循环)。</li>
+</ul>
+
+<hr />
+
+<h2 id="44-关系的性质-核心考点">4.4 关系的性质 (核心考点)</h2>
+
+<p>设 $R$ 是集合 $A$ 上的关系：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">性质</th>
+      <th style="text-align: center">定义 ($\forall x, y, z \in A$)</th>
+      <th style="text-align: center">矩阵特征 $M_R$</th>
+      <th style="text-align: center">图特征 $G_R$</th>
+      <th style="text-align: center">集合特征</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><strong>自反性</strong></td>
+      <td style="text-align: center">$xRx$</td>
+      <td style="text-align: center">主对角线全1</td>
+      <td style="text-align: center">每个点有自环</td>
+      <td style="text-align: center">$I_A \subseteq R$</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>反自反性</strong></td>
+      <td style="text-align: center">$\neg(xRx)$</td>
+      <td style="text-align: center">主对角线全0</td>
+      <td style="text-align: center">无自环</td>
+      <td style="text-align: center">$R \cap I_A = \emptyset$</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>对称性</strong></td>
+      <td style="text-align: center">$xRy \to yRx$</td>
+      <td style="text-align: center">对称矩阵 ($M=M^T$)</td>
+      <td style="text-align: center">边成对出现或无向</td>
+      <td style="text-align: center">$R = R^{-1}$</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>反对称性</strong></td>
+      <td style="text-align: center">$xRy \land yRx \to x=y$</td>
+      <td style="text-align: center">$m_{ij}=1 \land i \neq j \Rightarrow m_{ji}=0$</td>
+      <td style="text-align: center">无双向边</td>
+      <td style="text-align: center">$R \cap R^{-1} \subseteq I_A$</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>传递性</strong></td>
+      <td style="text-align: center">$xRy \land yRz \to xRz$</td>
+      <td style="text-align: center">$M^2 \le M$ (布尔)</td>
+      <td style="text-align: center">若有路必有直达边</td>
+      <td style="text-align: center">$R \circ R \subseteq R$</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="-习题中的重要推论-性质的保持">★ 习题中的重要推论 (性质的保持)</h3>
+<ol>
+  <li><strong>运算后的性质保持</strong> [习题 4-17]：
+    <ul>
+      <li>若 $R_1, R_2$ <strong>自反</strong>，则 $R_1 \cup R_2, R_1 \cap R_2, R_1 \circ R_2, R_1^{-1}$ 均自反。</li>
+      <li>若 $R_1, R_2$ <strong>对称</strong>，则 $R_1 \cup R_2, R_1 \cap R_2, R_1^{-1}$ 对称；但 $R_1 \circ R_2$ <strong>不一定</strong>对称 (除非 $R_1 \circ R_2 = R_2 \circ R_1$)。</li>
+      <li>若 $R_1, R_2$ <strong>传递</strong>，则 $R_1 \cap R_2, R_1^{-1}$ 传递；但 $R_1 \cup R_2$ <strong>不一定</strong>传递。</li>
+    </ul>
+  </li>
+  <li><strong>特殊判定</strong>：
+    <ul>
+      <li>若 $R$ 对称且反对称，则 $R$ 只能包含对角线元素 (即 $R \subseteq I_A$)。</li>
+      <li>全关系 $E_A$ 是自反、对称、传递的。</li>
+      <li>空关系 $\emptyset$ 是反自反、对称、反对称、传递的。</li>
+    </ul>
+  </li>
+</ol>
+
+<hr />
+
+<h2 id="45-闭包运算-closure">4.5 闭包运算 (Closure)</h2>
+
+<ul>
+  <li><strong>定义</strong>：包含 $R$ 且具有性质 $P$ 的最小关系。</li>
+  <li><strong>计算公式</strong>：
+    <ol>
+      <li><strong>自反闭包</strong> $r(R) = R \cup I_A$</li>
+      <li><strong>对称闭包</strong> $s(R) = R \cup R^{-1}$</li>
+      <li><strong>传递闭包</strong> $t(R)$ (或 $R^+$) $= \bigcup_{i=1}^{\vert A\vert} R^i$</li>
+    </ol>
+  </li>
+  <li><strong>性质</strong> [习题 4-18]：
+    <ul>
+      <li>若 $R$ 自反，则 $s(R)$ 和 $t(R)$ 也自反。</li>
+      <li>若 $R$ 对称，则 $r(R)$ 和 $t(R)$ 也对称。</li>
+      <li>$(R^+)^+ = R^+$ (闭包的闭包等于自身)。</li>
+    </ul>
+  </li>
+</ul>
+
+<hr />
+
+<h2 id="46-等价关系与划分">4.6 等价关系与划分</h2>
+
+<h3 id="1-核心概念">1. 核心概念</h3>
+<ul>
+  <li><strong>等价关系</strong>：自反 + 对称 + 传递。 (记为 $\sim$)</li>
+  <li><strong>等价类</strong>：$[x]_R = {y \mid y \in A \land xRy}$。</li>
+  <li><strong>商集</strong>：$A/R = {[x]_R \mid x \in A}$。</li>
+</ul>
+
+<h3 id="2-划分定理">2. 划分定理</h3>
+<ul>
+  <li><strong>定理</strong>：集合 $A$ 上的<strong>等价关系</strong>与 $A$ 的<strong>划分</strong>一一对应。
+    <ul>
+      <li><strong>由关系求划分</strong>：商集即为划分。</li>
+      <li><strong>由划分求关系</strong>：$R = {(x, y) \mid x, y \text{ 在划分的同一个块中}}$。</li>
+      <li><strong>关系图特征</strong>：等价关系的关系图由若干个互不相连的<strong>完全图</strong>（团）组成（每个团对应一个等价类）。</li>
+    </ul>
+  </li>
+</ul>
+
+<hr />
+
+<h2 id="47-半序关系-partial-order">4.7 半序关系 (Partial Order)</h2>
+
+<h3 id="1-核心概念-1">1. 核心概念</h3>
+<ul>
+  <li><strong>偏序关系</strong>：自反 + 反对称 + 传递。 (记为 $\preceq$)
+    <ul>
+      <li><em>例：$\le$ (小于等于)，$\subseteq$ (包含)，$\vert$ (整除)</em></li>
+    </ul>
+  </li>
+  <li><strong>覆盖 (Covering)</strong>：若 $x \prec y$ 且中间没有其他元素，称 $y$ 覆盖 $x$。</li>
+  <li><strong>哈斯图 (Hasse Diagram)</strong>：简化图，仅画覆盖关系，方向向上。</li>
+</ul>
+
+<h3 id="2-特殊元素-极值与界">2. 特殊元素 (极值与界)</h3>
+<p>设 $B$ 是偏序集 $A$ 的子集：</p>
+<ul>
+  <li><strong>极大元</strong>：$B$ 中没有比它大的。 (可以有多个，可以没有)</li>
+  <li><strong>最大元</strong>：$B$ 中所有元素都 $\preceq$ 它。 (唯一，若存在必是极大元)</li>
+  <li><strong>上界</strong>：$A$ 中比 $B$ 所有元素都大的元素。</li>
+  <li><strong>上确界 (LUB)</strong>：最小的上界。 (唯一)</li>
+  <li><em>(极小元、最小元、下界、下确界同理)</em></li>
+</ul>
+
+<h3 id="3-格-lattice">3. 格 (Lattice)</h3>
+<ul>
+  <li><strong>定义</strong>：偏序集中任意两个元素 $x, y$ 都有上确界 ($x \lor y$) 和下确界 ($x \land y$)。</li>
+  <li><strong>全序集 (线序)</strong>：任意两元素都可比的偏序集。全序集一定是格。</li>
+</ul>
+
+<h3 id="-习题中的重要结论">★ 习题中的重要结论</h3>
+<ol>
+  <li><strong>有限偏序集</strong>必有极大元和极小元 [习题 4-36]。</li>
+  <li><strong>整除关系</strong>：在正整数集上的整除关系 $D_n$ 构成格。
+    <ul>
+      <li>$x \land y = \text{gcd}(x, y)$ (最大公约数)</li>
+      <li>$x \lor y = \text{lcm}(x, y)$ (最小公倍数)</li>
+    </ul>
+  </li>
+</ol>
+
+<hr />
+<hr />
+
+<h1 id="第5章-函数">第5章 函数</h1>
+
+<blockquote>
+  <p><strong>复习重点</strong>：函数的定义与分类（单/满/双射）、复合函数与逆函数的性质、集合基数的比较与计算、可数集与不可数集的判定。</p>
+</blockquote>
+
+<h2 id="51-函数的基本概念">5.1 函数的基本概念</h2>
+
+<h3 id="1-函数的定义">1. 函数的定义</h3>
+<ul>
+  <li><strong>定义</strong>：设 $X, Y$ 是非空集合，$f$ 是从 $X$ 到 $Y$ 的二元关系。若 $\forall x \in X$，存在<strong>唯一</strong>的 $y \in Y$ 使得 $(x, y) \in f$，则称 $f$ 为从 $X$ 到 $Y$ 的<strong>函数</strong> (或映射)，记为 $f: X \to Y$。
+    <ul>
+      <li><strong>定义域 (Domain)</strong>：$\mathcal{D}(f) = X$ (必须全域定义)。</li>
+      <li><strong>值域 (Range)</strong>：$\mathcal{R}(f) = {y \mid \exists x \in X, f(x) = y} \subseteq Y$。</li>
+    </ul>
+  </li>
+  <li><strong>函数相等</strong>：$f = g \iff \mathcal{D}(f) = \mathcal{D}(g) \land \forall x \in \mathcal{D}(f), f(x) = g(x)$ (即作为关系集合相等)。</li>
+</ul>
+
+<h3 id="2-函数集合-yx">2. 函数集合 $Y^X$</h3>
+<ul>
+  <li><strong>定义</strong>：$Y^X = {f \mid f: X \to Y}$，即所有从 $X$ 到 $Y$ 的函数组成的集合。</li>
+  <li><strong>基数</strong>：若 $\vert X\vert = m, \vert Y\vert = n$，则 $\vert Y^X\vert = n^m$。</li>
+</ul>
+
+<h3 id="3-特殊函数">3. 特殊函数</h3>
+<ul>
+  <li><strong>特征函数</strong> $\chi_A$：设 $A \subseteq X$，$\chi_A: X \to {0, 1}$，
+  \(\chi_A(x) = \begin{cases} 1, &amp; x \in A \\ 0, &amp; x \notin A \end{cases}\)
+    <ul>
+      <li><strong>性质</strong>：$\chi_{A \cap B} = \chi_A \cdot \chi_B$；$\chi_{A \cup B} = \chi_A + \chi_B - \chi_A \cdot \chi_B$；$\chi_{A’} = 1 - \chi_A$。</li>
+    </ul>
+  </li>
+</ul>
+
+<hr />
+
+<h2 id="52-函数的性质-核心考点">5.2 函数的性质 (核心考点)</h2>
+
+<h3 id="1-三类重要函数">1. 三类重要函数</h3>
+<p>设 $f: X \to Y$：</p>
+<ol>
+  <li><strong>满射 (Surjection)</strong>：$\mathcal{R}(f) = Y$。
+    <ul>
+      <li>即 $\forall y \in Y, \exists x \in X, f(x) = y$。</li>
+    </ul>
+  </li>
+  <li><strong>单射 (Injection)</strong>：$\forall x_1, x_2 \in X, x_1 \neq x_2 \Rightarrow f(x_1) \neq f(x_2)$。
+    <ul>
+      <li>等价命题：$f(x_1) = f(x_2) \Rightarrow x_1 = x_2$。</li>
+    </ul>
+  </li>
+  <li><strong>双射 (Bijection)</strong>：既是单射又是满射。
+    <ul>
+      <li>只有双射才存在逆函数。</li>
+    </ul>
+  </li>
+</ol>
+
+<h3 id="2-复合函数">2. 复合函数</h3>
+<ul>
+  <li><strong>定义</strong>：设 $f: X \to Y, g: Y \to Z$，则 $g \circ f: X \to Z$ 定义为 $(g \circ f)(x) = g(f(x))$。
+    <ul>
+      <li><em>(注意：本书记号 $g \circ f$ 表示先 $f$ 后 $g$，有些教材顺序相反，需留意)</em>。</li>
+    </ul>
+  </li>
+  <li><strong>性质</strong>：
+    <ul>
+      <li><strong>结合律</strong>：$(h \circ g) \circ f = h \circ (g \circ f)$。</li>
+      <li><strong>不满足交换律</strong>。</li>
+    </ul>
+  </li>
+  <li><strong>复合后的性质保持</strong> [定理 5.4]：
+    <ul>
+      <li>两个满射的复合是满射。</li>
+      <li>两个单射的复合是单射。</li>
+      <li>两个双射的复合是双射。</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="3-逆函数">3. 逆函数</h3>
+<ul>
+  <li><strong>定义</strong>：若 $f: X \to Y$ 是双射，则 $f^{-1}: Y \to X$ 存在且也是双射，满足 $f^{-1}(y) = x \iff f(x) = y$。</li>
+  <li><strong>性质</strong>：
+    <ul>
+      <li>$(f^{-1})^{-1} = f$。</li>
+      <li>$(g \circ f)^{-1} = f^{-1} \circ g^{-1}$ (穿脱原理)。</li>
+    </ul>
+  </li>
+</ul>
+
+<hr />
+
+<h2 id="53-集合的基数-cardinality">5.3 集合的基数 (Cardinality)</h2>
+
+<h3 id="1-等势与基数">1. 等势与基数</h3>
+<ul>
+  <li><strong>等势 ($A \approx B$)</strong>：若存在双射 $f: A \to B$，则称 $A$ 与 $B$ 等势（基数相等），记为 $\vert A\vert = \vert B\vert$。</li>
+  <li><strong>康托尔定理</strong> [定理 5.13]：$\vert A\vert &lt; \vert2^A\vert$。即集合的幂集的基数总是严格大于原集合的基数。</li>
+</ul>
+
+<h3 id="2-可数集-countable-set">2. 可数集 (Countable Set)</h3>
+<ul>
+  <li><strong>定义</strong>：凡是与自然数集 $\mathbb{N}$ 等势的集合称为<strong>可数集</strong> (或可列集)，基数记为 $\aleph_0$ (阿列夫零)。</li>
+  <li><strong>性质</strong>：
+    <ul>
+      <li>任何无限集必包含一个可数子集。</li>
+      <li>可数集的子集是有限集或可数集。</li>
+      <li><strong>可数集的并</strong>：两个 (或有限个、可数个) 可数集的并集仍是可数集。</li>
+      <li><strong>可数集的积</strong>：有限个可数集的笛卡儿积仍是可数集 (如 $\mathbb{Q}$ 是可数的)。</li>
+      <li><strong>例子</strong>：$\mathbb{Z}, \mathbb{Q}, \mathbb{N} \times \mathbb{N}$ 都是可数集。</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="3-不可数集">3. 不可数集</h3>
+<ul>
+  <li><strong>实数集 $\mathbb{R}$</strong>：基数记为 $\aleph$ (或 $\mathfrak{c}$，连续统势)。
+    <ul>
+      <li>证明方法：康托尔对角线法。</li>
+      <li>常见的不可数集：$(0, 1)$ 区间、$\mathbb{R}$、复数集 $\mathbb{C}$、无理数集、$\mathbb{N}$ 的幂集 $2^\mathbb{N}$。</li>
+    </ul>
+  </li>
+  <li><strong>关系</strong>：$\aleph_0 &lt; \aleph = 2^{\aleph_0}$。</li>
+</ul>
+
+<h3 id="4-基数的比较">4. 基数的比较</h3>
+<ul>
+  <li><strong>$\vert A\vert \le \vert B\vert$</strong>：存在单射 $f: A \to B$。</li>
+  <li><strong>C-S-B 定理 (康托尔-施罗德-伯恩斯坦定理)</strong>：若 $\vert A\vert \le \vert B\vert$ 且 $\vert B\vert \le \vert A\vert$，则 $\vert A\vert = \vert B\vert$。
+    <ul>
+      <li>这是一个证明两个集合等势的强大工具，无需直接构造双射，只需构造两个方向的单射。</li>
+    </ul>
+  </li>
+</ul>
+
+<hr />
+
+<h2 id="54--55-原始递归函数与可计算函数-了解">5.4 &amp; 5.5 原始递归函数与可计算函数 (了解)</h2>
+
+<ul>
+  <li><strong>原始递归函数</strong>：由初始函数（零函数、后继函数、投影函数）经过有限次复合和递归运算得到的函数。</li>
+  <li><strong>Ackermann 函数</strong>：一个著名的<strong>非原始递归</strong>但<strong>可计算</strong>的函数（增长速度极快）。</li>
+</ul>
+
+<hr />
+
+<h2 id="6--习题中的重要结论-解题技巧">6. 🎯 习题中的重要结论 (解题技巧)</h2>
+
+<p>以下结论来自课后习题 (P157-159)，在证明题和判断题中经常使用：</p>
+
+<h3 id="1-象的集合运算性质-习题-5-7">1. 象的集合运算性质 [习题 5-7]</h3>
+<p>设 $f: X \to Y$ 是函数，$A, B \subseteq X$：</p>
+<ul>
+  <li><strong>并集保持</strong>：$f(A \cup B) = f(A) \cup f(B)$。</li>
+  <li><strong>交集包含</strong>：$f(A \cap B) \subseteq f(A) \cap f(B)$。
+    <ul>
+      <li><strong>注意</strong>：等号成立的充要条件是 $f$ 为<strong>单射</strong>。</li>
+    </ul>
+  </li>
+  <li><strong>差集包含</strong>：$f(A) \setminus f(B) \subseteq f(A \setminus B)$。
+    <ul>
+      <li><strong>注意</strong>：等号不一定成立。</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="2-复合函数的性质推导-习题-5-9">2. 复合函数的性质推导 [习题 5-9]</h3>
+<p>设 $f: A \to B, g: B \to C$，对于复合函数 $g \circ f$：</p>
+<ul>
+  <li>若 $g \circ f$ 是<strong>满射</strong> $\Rightarrow$ <strong>$g$ 必须是满射</strong> (外层满)。</li>
+  <li>若 $g \circ f$ 是<strong>单射</strong> $\Rightarrow$ <strong>$f$ 必须是单射</strong> (内层单)。</li>
+  <li>若 $g \circ f$ 是<strong>双射</strong> $\Rightarrow$ $f$ 单且 $g$ 满。</li>
+</ul>
+
+<h3 id="3-单射满射的充要条件-右逆与左逆-习题-5-4-5-6">3. 单射/满射的充要条件 (右逆与左逆) [习题 5-4, 5-6]</h3>
+<ul>
+  <li>$f: A \to B$ 是<strong>单射</strong> $\iff$ 存在 $g: B \to A$ 使得 $g \circ f = I_A$ (存在左逆)。</li>
+  <li>$f: A \to B$ 是<strong>满射</strong> $\iff$ 存在 $g: B \to A$ 使得 $f \circ g = I_B$ (存在右逆)。</li>
+</ul>
+
+<h3 id="4-鸽巢原理-pigeonhole-principle">4. 鸽巢原理 (Pigeonhole Principle)</h3>
+<p>虽然本章习题未大量展开，但它是函数部分常考点：</p>
+<ul>
+  <li>若 $\vert X\vert &gt; \vert Y\vert$，则不存在从 $X$ 到 $Y$ 的单射 (必有冲突)。</li>
+  <li>若 $\vert X\vert &lt; \vert Y\vert$，则不存在从 $X$ 到 $Y$ 的满射。</li>
+</ul>
+
+<h3 id="5-关于基数的判断-习题-5-15-17">5. 关于基数的判断 [习题 5-15, 17]</h3>
+<ul>
+  <li><strong>代数数</strong>是可数的。</li>
+  <li><strong>超越数</strong>是不可数的。</li>
+  <li>所有从 $\mathbb{N}$ 到 $\mathbb{N}$ 的函数构成的集合 ($\mathbb{N}^\mathbb{N}$) 是不可数的 (基数为 $2^{\aleph_0}$)。</li>
+  <li>所有从 $\mathbb{N}$ 到 ${0, 1}$ 的函数构成的集合 (${0, 1}^\mathbb{N}$) 与 $2^\mathbb{N}$ 等势，是不可数的。</li>
+</ul>
+
+<hr />
+<hr />
+
+<h1 id="第6章-代数系统">第6章 代数系统</h1>
+
+<blockquote>
+  <p><strong>复习重点</strong>：二元运算及其性质（结合/交换/分配）、特殊元素（幺元/零元/逆元）、半群与独异点、<strong>群的定义与性质</strong>、<strong>子群判定</strong>、<strong>拉格朗日定理</strong>、正规子群与商群、环与域的包含关系。</p>
+</blockquote>
+
+<h2 id="61-代数系统的基本概念">6.1 代数系统的基本概念</h2>
+
+<h3 id="1-运算-operation">1. 运算 (Operation)</h3>
+<ul>
+  <li><strong>$n$ 元运算</strong>：设 $A$ 是非空集合，从 $A^n$ 到 $A$ 的函数 $f: A^n \to A$ 称为 $A$ 上的 $n$ 元运算。
+    <ul>
+      <li><strong>封闭性</strong>：运算的结果必须仍在集合 $A$ 中。</li>
+      <li><strong>二元运算</strong>：$f: A \times A \to A$，通常记为 $a * b$。</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="2-运算的性质">2. 运算的性质</h3>
+<p>设 $*$ 是集合 $A$ 上的二元运算：</p>
+<ul>
+  <li><strong>交换律</strong>：$\forall x, y \in A, x * y = y * x$。</li>
+  <li><strong>结合律</strong>：$\forall x, y, z \in A, (x * y) * z = x * (y * z)$。</li>
+  <li><strong>分配律</strong>：设 $\circ$ 是另一个运算，
+    <ul>
+      <li>$*$ 对 $\circ$ 满足左分配律：$x * (y \circ z) = (x * y) \circ (x * z)$。</li>
+      <li>$*$ 对 $\circ$ 满足右分配律：$(y \circ z) * x = (y * x) \circ (z * x)$。</li>
+    </ul>
+  </li>
+  <li><strong>幂等律</strong>：$\forall x \in A, x * x = x$。</li>
+  <li><strong>消去律</strong>：
+    <ul>
+      <li>左消去：若 $x * y = x * z$，则 $y = z$。</li>
+      <li>右消去：若 $y * x = z * x$，则 $y = z$。</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="3-特殊元素-重要">3. 特殊元素 (重要)</h3>
+<ul>
+  <li><strong>幺元 (单位元) $e$</strong>：$\forall x \in A, e * x = x * e = x$。
+    <ul>
+      <li><strong>性质</strong>：若存在，必<strong>唯一</strong>。</li>
+    </ul>
+  </li>
+  <li><strong>零元 $ \theta $</strong>：$\forall x \in A, \theta * x = x * \theta = \theta$。
+    <ul>
+      <li><strong>性质</strong>：若存在，必<strong>唯一</strong>。</li>
+    </ul>
+  </li>
+  <li><strong>逆元 $x^{-1}$</strong>：对于 $x \in A$，若存在 $y \in A$ 使得 $x * y = y * x = e$，则称 $y$ 为 $x$ 的逆元。
+    <ul>
+      <li><strong>性质</strong>：若运算满足<strong>结合律</strong>，则元素的逆元若存在，必<strong>唯一</strong>。</li>
+      <li>$(x^{-1})^{-1} = x$；$(x * y)^{-1} = y^{-1} * x^{-1}$ (注意顺序颠倒)。</li>
+    </ul>
+  </li>
+</ul>
+
+<hr />
+
+<h2 id="62-代数系统的同构与同态">6.2 代数系统的同构与同态</h2>
+
+<h3 id="1-定义">1. 定义</h3>
+<p>设 $V_1 = \langle A, * \rangle, V_2 = \langle B, \circ \rangle$ 是同类型的代数系统。$f: A \to B$ 是函数。</p>
+<ul>
+  <li><strong>同态 (Homomorphism)</strong>：若 $\forall x, y \in A$，有 $f(x * y) = f(x) \circ f(y)$，则称 $f$ 是同态映射。
+    <ul>
+      <li><strong>单同态</strong>：$f$ 是单射。</li>
+      <li><strong>满同态</strong>：$f$ 是满射。</li>
+    </ul>
+  </li>
+  <li><strong>同构 (Isomorphism)</strong>：若 $f$ 是<strong>双射</strong>且是<strong>同态</strong>，则称 $V_1$ 与 $V_2$ 同构，记为 $V_1 \cong V_2$。</li>
+</ul>
+
+<h3 id="2-性质">2. 性质</h3>
+<ul>
+  <li>同态映射保持运算性质（如结合律、交换律、幺元、逆元等）不变。
+    <ul>
+      <li>若 $e_A$ 是 $A$ 的幺元，则 $f(e_A)$ 是 $f(A)$ 的幺元。</li>
+      <li>$f(x^{-1}) = (f(x))^{-1}$。</li>
+    </ul>
+  </li>
+</ul>
+
+<hr />
+
+<h2 id="63-半群-semigroup与独异点-monoid">6.3 半群 (Semigroup)与独异点 (Monoid)</h2>
+
+<h3 id="1-半群">1. 半群</h3>
+<ul>
+  <li><strong>定义</strong>：代数系统 $\langle S, * \rangle$，若 $*$ 满足<strong>结合律</strong>，则称 $S$ 为半群。</li>
+  <li><strong>性质</strong>：半群中做运算不需要加括号（$a_1 * a_2 * \dots * a_n$ 唯一确定）。</li>
+  <li><strong>子半群</strong>：$T \subseteq S$，且 $T$ 对 $*$ 封闭。</li>
+</ul>
+
+<h3 id="2-独异点-幺半群">2. 独异点 (幺半群)</h3>
+<ul>
+  <li><strong>定义</strong>：含有<strong>幺元</strong>的半群 $\langle M, *, e \rangle$。</li>
+  <li><strong>子独异点</strong>：$T \subseteq M$，T封闭，且 <strong>$e \in T$</strong> (幺元必须在子集中)。</li>
+</ul>
+
+<hr />
+
+<h2 id="64-群-group--核心章节">6.4 群 (Group) —— <strong>核心章节</strong></h2>
+
+<h3 id="1-群的定义">1. 群的定义</h3>
+<p>代数系统 $\langle G, * \rangle$ 是群，需满足三个条件：</p>
+<ol>
+  <li><strong>结合律</strong>：运算满足结合律。</li>
+  <li><strong>有幺元</strong>：存在 $e \in G$。</li>
+  <li><strong>有逆元</strong>：$\forall a \in G$，存在 $a^{-1} \in G$。
+<em>(注：群 = 独异点 + 每个元素可逆)</em></li>
+</ol>
+
+<ul>
+  <li><strong>阿贝尔群 (交换群)</strong>：满足交换律的群。</li>
+  <li><strong>有限群与阶</strong>：集合 $G$ 的元素个数 $\vert G\vert$ 称为群的阶。</li>
+</ul>
+
+<h3 id="2-群的性质">2. 群的性质</h3>
+<ul>
+  <li>群中无零元（除非 $\vert G\vert=1$）。</li>
+  <li>群满足<strong>消去律</strong>（左消去和右消去均成立）。</li>
+  <li>方程 $a * x = b$ 和 $y * a = b$ 在群中有唯一解。</li>
+  <li><strong>元素的阶</strong>：使 $a^k = e$ 的最小正整数 $k$，记为 $\vert a\vert$。若不存在，则阶为无限。</li>
+</ul>
+
+<h3 id="3-子群-subgroup">3. 子群 (Subgroup)</h3>
+<p>设 $H$ 是群 $G$ 的非空子集，若 $H$ 关于 $G$ 的运算也构成群，则称 $H$ 为 $G$ 的子群，记为 $H \le G$。</p>
+<ul>
+  <li><strong>平凡子群</strong>：${e}$ 和 $G$ 本身。</li>
+  <li><strong>判定定理 (重要)</strong>：
+    <ol>
+      <li><strong>两步判定法</strong>：$H \le G \iff (a, b \in H \Rightarrow ab \in H) \land (a \in H \Rightarrow a^{-1} \in H)$。</li>
+      <li><strong>一步判定法</strong>：$H \le G \iff \forall a, b \in H, a * b^{-1} \in H$。</li>
+      <li><strong>有限子群判定</strong>：若 $G$ 是群，$H \subseteq G$ 且 $H$ <strong>有限</strong>非空，只要 $H$ 对运算<strong>封闭</strong>，则 $H \le G$。</li>
+    </ol>
+  </li>
+</ul>
+
+<h3 id="4-循环群-cyclic-group">4. 循环群 (Cyclic Group)</h3>
+<ul>
+  <li><strong>定义</strong>：若群 $G$ 中存在元素 $g$，使得 $G$ 中任一元素都可表示为 $g$ 的幂 ($G = {g^n \mid n \in \mathbb{Z}}$)，则称 $G$ 为循环群，$g$ 为生成元，记为 $G = \langle g \rangle$。</li>
+  <li><strong>性质</strong>：
+    <ul>
+      <li>循环群一定是阿贝尔群。</li>
+      <li>子群也是循环群。</li>
+      <li>若 $\vert G\vert=n$，则 $G \cong \langle \mathbb{Z}_n, +_n \rangle$ (模 $n$ 剩余类加法群)。</li>
+      <li>若 $G$ 无限，则 $G \cong \langle \mathbb{Z}, + \rangle$ (整数加法群)。</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="5-陪集与拉格朗日定理-lagranges-theorem">5. 陪集与拉格朗日定理 (Lagrange’s Theorem)</h3>
+<ul>
+  <li><strong>陪集</strong>：设 $H \le G$，对于 $a \in G$：
+    <ul>
+      <li>左陪集 $aH = {ah \mid h \in H}$。</li>
+      <li>右陪集 $Ha = {ha \mid h \in H}$。</li>
+      <li><strong>性质</strong>：陪集构成了 $G$ 的一个划分；任意两个陪集要么相等，要么不相交；$\vert aH\vert = \vert H\vert$。</li>
+    </ul>
+  </li>
+  <li><strong>拉格朗日定理 (必考)</strong>：设 $G$ 是有限群，$H$ 是 $G$ 的子群，则：
+  \(\vert G\vert = \vert H\vert \cdot [G:H]\)
+    <ul>
+      <li><strong>结论</strong>：<strong>子群的阶 $\vert H\vert$ 整除群的阶 $\vert G\vert$</strong>。</li>
+      <li><strong>推论</strong>：
+        <ol>
+          <li>群中任意元素的阶整除群的阶。</li>
+          <li>素数阶的群一定是循环群。</li>
+        </ol>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="6-正规子群与商群">6. 正规子群与商群</h3>
+<ul>
+  <li><strong>正规子群</strong>：若 $\forall g \in G, gH = Hg$ (左陪集等于右陪集)，则称 $H$ 为正规子群，记为 $H \trianglelefteq G$。
+    <ul>
+      <li>阿贝尔群的所有子群都是正规子群。</li>
+    </ul>
+  </li>
+  <li><strong>商群</strong>：所有陪集构成的集合 $G/H = {aH \mid a \in G}$，在定义运算 $(aH)*(bH) = (ab)H$ 下构成的群。商群的阶 $\vert G/H\vert = \vert G\vert / \vert H\vert$。</li>
+</ul>
+
+<hr />
+
+<h2 id="65--66-环-ring-与-域-field">6.5 &amp; 6.6 环 (Ring) 与 域 (Field)</h2>
+
+<h3 id="1-环的定义">1. 环的定义</h3>
+<p>代数系统 $\langle R, +, \cdot \rangle$ 满足：</p>
+<ol>
+  <li>$\langle R, + \rangle$ 是<strong>阿贝尔群</strong>。</li>
+  <li>$\langle R, \cdot \rangle$ 是<strong>半群</strong>。</li>
+  <li>$\cdot$ 对 $+$ 满足<strong>分配律</strong>。</li>
+</ol>
+
+<h3 id="2-特殊的环">2. 特殊的环</h3>
+<ul>
+  <li><strong>交换环</strong>：乘法满足交换律。</li>
+  <li><strong>含幺环</strong>：乘法有单位元。</li>
+  <li><strong>无零因子环</strong>：若 $a \cdot b = 0 \Rightarrow a=0 \lor b=0$。</li>
+  <li><strong>整环 (Integral Domain)</strong>：交换、含幺、无零因子的环。(例如：整数环 $\mathbb{Z}$)</li>
+</ul>
+
+<h3 id="3-域">3. 域</h3>
+<ul>
+  <li><strong>定义</strong>：$\langle F, +, \cdot \rangle$ 是域，若：
+    <ol>
+      <li>$\langle F, +, \cdot \rangle$ 是含幺交换环。</li>
+      <li>$\langle F^<em>, \cdot \rangle$ 是阿贝尔群 ($F^</em> = F \setminus {0}$，即非零元素对乘法构成群)。</li>
+    </ol>
+  </li>
+  <li><strong>关系链</strong>：
+  \(域 \subset 除环 \subset 整环 \subset 交换环 \subset 环\)
+  <em>(注：有限整环一定是域)</em></li>
+</ul>
+
+<hr />
+
+<h2 id="-习题中的重要结论-补充考点">🎯 习题中的重要结论 (补充考点)</h2>
+
+<p>以下结论整理自第6章课后习题 (P212-219)，常用于证明题或填空题：</p>
+
+<h3 id="1-半群与群的判定">1. 半群与群的判定</h3>
+<ul>
+  <li><strong>有限半群判定群</strong> [习题 6-12]：若有限半群 $\langle S, * \rangle$ 满足<strong>消去律</strong>，则它是一个群。</li>
+  <li><strong>方程解判定</strong> [习题 6-13]：若半群 $S$ 中，方程 $ax=b$ 和 $ya=b$ 对任意 $a,b$ 都有解，则 $S$ 是群。</li>
+</ul>
+
+<h3 id="2-元素的阶与运算">2. 元素的阶与运算</h3>
+<ul>
+  <li><strong>逆元的阶</strong> [习题 6-17]：$\vert a\vert = \vert a^{-1}\vert$。</li>
+  <li><strong>共轭元的阶</strong> [习题 6-17]：$\vert a\vert = \vert b^{-1}ab\vert$。</li>
+  <li><strong>交换群中的阶</strong>：若 $G$ 是阿贝尔群，则 $\vert ab\vert$ 整除 $\text{lcm}(\vert a\vert, \vert b\vert)$。</li>
+  <li><strong>偶数阶群</strong> [习题 6-25]：偶数阶群中必存在阶为 2 的元素 (即 $x \neq e$ 且 $x = x^{-1}$)。</li>
+</ul>
+
+<h3 id="3-子群的相关性质">3. 子群的相关性质</h3>
+<ul>
+  <li><strong>子群的交</strong> [习题 6-22]：任意两个子群的交 $H \cap K$ 仍是子群。</li>
+  <li><strong>子群的并</strong>：$H \cup K$ 一般不是子群，除非 $H \subseteq K$ 或 $K \subseteq H$。</li>
+  <li><strong>子群的积</strong>：设 $HK = {hk \mid h \in H, k \in K}$。若 $G$ 是阿贝尔群，则 $HK$ 是子群。</li>
+</ul>
+
+<h3 id="4-正规子群与中心">4. 正规子群与中心</h3>
+<ul>
+  <li><strong>中心 (Center)</strong> [习题 6-27]：$C = {x \in G \mid \forall g \in G, xg=gx}$ (与所有元素交换的元素集合)。
+    <ul>
+      <li>结论：<strong>中心 $C$ 是 $G$ 的正规子群</strong>。</li>
+    </ul>
+  </li>
+  <li><strong>指数为2的子群</strong> [习题 6-30]：若子群 $H$ 的指数 $[G:H] = 2$ (即只有两个左陪集)，则 $H$ 必为正规子群。</li>
+</ul>
+
+<h3 id="5-环的性质">5. 环的性质</h3>
+<ul>
+  <li><strong>布尔环</strong> [习题 6-40]：若环 $R$ 满足 $\forall x \in R, x^2 = x$ (幂等律)，则 $R$ 是交换环，且 $\forall x, x+x=0$ (特征为2)。</li>
+</ul>
+
+<hr />
+<hr />
+
+<h1 id="第8章-图论">第8章 图论</h1>
+
+<blockquote>
+  <p><strong>复习重点</strong>：图的基本概念（度、握手定理）、图的连通性、矩阵表示、欧拉图与哈密顿图的判定、平面图的欧拉公式、树的性质与生成树。</p>
+</blockquote>
+
+<h2 id="81--82-图的基本概念">8.1 &amp; 8.2 图的基本概念</h2>
+
+<h3 id="1-图的定义">1. 图的定义</h3>
+<ul>
+  <li><strong>图 (Graph)</strong>：$G = \langle V, E \rangle$，其中 $V$ 是非空顶点集，$E$ 是边集。
+    <ul>
+      <li><strong>有向图</strong>：边是有序对 $\langle u, v \rangle$（弧）。</li>
+      <li><strong>无向图</strong>：边是无序对 $(u, v)$。</li>
+    </ul>
+  </li>
+  <li><strong>相关术语</strong>：
+    <ul>
+      <li><strong>阶</strong>：顶点数 $\vert V\vert$。</li>
+      <li><strong>零图</strong>：$E = \emptyset$ 的图。<strong>平凡图</strong>：1阶零图。</li>
+      <li><strong>多重图</strong>：含有平行边（多重边）的图。</li>
+      <li><strong>伪图</strong>：含有自环的图。</li>
+      <li><strong>简单图</strong>：既无自环也无平行边的图。</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="2-顶点的度-degree">2. 顶点的度 (Degree)</h3>
+<ul>
+  <li><strong>无向图</strong>：
+    <ul>
+      <li><strong>度 $d(v)$</strong>：与顶点 $v$ 关联的边的数目（自环算2度）。</li>
+      <li><strong>奇/偶点</strong>：度数为奇数/偶数的顶点。</li>
+      <li><strong>最大/最小度</strong>：$\Delta(G)$ 和 $\delta(G)$。</li>
+    </ul>
+  </li>
+  <li><strong>有向图</strong>：
+    <ul>
+      <li><strong>入度 $d^-(v)$</strong>：以 $v$ 为终点的边数。</li>
+      <li><strong>出度 $d^+(v)$</strong>：以 $v$ 为起点的边数。</li>
+      <li><strong>度</strong>：$d(v) = d^+(v) + d^-(v)$。</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="3-握手定理-核心考点">3. 握手定理 (核心考点)</h3>
+<ul>
+  <li><strong>定理</strong>：在任何图中，所有顶点的度数之和等于边数的2倍。
+  \(\sum_{v \in V} d(v) = 2\vert E\vert\)</li>
+  <li><strong>推论</strong>：任何图中，<strong>奇度顶点的个数必为偶数</strong>。</li>
+  <li><strong>有向图握手定理</strong>：
+  \(\sum d^+(v) = \sum d^-(v) = \vert E\vert\)</li>
+</ul>
+
+<h3 id="4-特殊图类">4. 特殊图类</h3>
+<ul>
+  <li><strong>完全图 $K_n$</strong>：任意两个不同顶点间都有边的简单无向图。
+    <ul>
+      <li>边数 $\vert E\vert = n(n-1)/2$，度数均为 $n-1$。</li>
+    </ul>
+  </li>
+  <li><strong>圈图 $C_n$</strong>：$n$ 个顶点的环，$d(v)=2$。</li>
+  <li><strong>轮图 $W_n$</strong>：$C_n$ 中心加一个点与周围相连 ($n \ge 3$)。</li>
+  <li><strong>正则图</strong>：所有顶点度数相同的图（$k$-正则图）。</li>
+</ul>
+
+<h3 id="5-子图与同构">5. 子图与同构</h3>
+<ul>
+  <li><strong>子图</strong>：$V’ \subseteq V, E’ \subseteq E$。</li>
+  <li><strong>生成子图</strong>：$V’ = V$（顶点全保留，边可选）。</li>
+  <li><strong>导出子图</strong>：选定顶点集 $V’$，保留 $V’$ 内部所有的边。</li>
+  <li><strong>同构 (Isomorphism)</strong>：两个图结构完全相同（仅顶点标记不同）。
+    <ul>
+      <li><strong>必要条件</strong>：顶点数、边数、度数列相同。如果不满足，则不同构。</li>
+    </ul>
+  </li>
+</ul>
+
+<hr />
+
+<h2 id="83-路与圈-连通性">8.3 路与圈 (连通性)</h2>
+
+<h3 id="1-通路与回路">1. 通路与回路</h3>
+<ul>
+  <li><strong>通路 (Walk)</strong>：顶点与边的交替序列。</li>
+  <li><strong>迹 (Trail)</strong>：边互不相同的通路。</li>
+  <li><strong>路径 (Path)</strong>：顶点互不相同的通路（简单通路）。</li>
+  <li><strong>回路 (Cycle/Circuit)</strong>：起点=终点的路径（简单回路）。</li>
+</ul>
+
+<h3 id="2-连通性">2. 连通性</h3>
+<ul>
+  <li><strong>无向图</strong>：
+    <ul>
+      <li><strong>连通</strong>：任意两点间均有路。</li>
+      <li><strong>连通分量</strong>：极大连通子图。</li>
+    </ul>
+  </li>
+  <li><strong>有向图</strong>：
+    <ul>
+      <li><strong>弱连通</strong>：略去方向后是连通的。</li>
+      <li><strong>单向连通</strong>：任意两点 $u, v$，或者 $u \to \dots \to v$，或者 $v \to \dots \to u$。</li>
+      <li><strong>强连通</strong>：任意两点间均双向可达。</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="3-图的距离与直径">3. 图的距离与直径</h3>
+<ul>
+  <li><strong>距离 $d(u, v)$</strong>：$u, v$ 间最短路径的长度。</li>
+  <li><strong>直径</strong>：图中任意两点距离的最大值。</li>
+</ul>
+
+<h3 id="4-割点与桥">4. 割点与桥</h3>
+<ul>
+  <li><strong>点连通度 $\kappa(G)$</strong>：最少删除多少个顶点使图不连通。</li>
+  <li><strong>边连通度 $\lambda(G)$</strong>：最少删除多少条边使图不连通。</li>
+  <li><strong>不等式关系</strong>：$\kappa(G) \le \lambda(G) \le \delta(G)$ (最小度)。</li>
+</ul>
+
+<hr />
+
+<h2 id="84-图的矩阵表示">8.4 图的矩阵表示</h2>
+
+<h3 id="1-邻接矩阵-ag">1. 邻接矩阵 $A(G)$</h3>
+<ul>
+  <li><strong>定义</strong>：$n \times n$ 矩阵，$a_{ij} = 1$ 若 $v_i, v_j$ 相邻，否则为0。</li>
+  <li><strong>性质</strong>：无向图的邻接矩阵是对称的。</li>
+  <li><strong>定理 (重要)</strong>：$A^k$ 中第 $i$ 行第 $j$ 列的元素 $a_{ij}^{(k)}$ 表示从 $v_i$ 到 $v_j$ 长度为 <strong>$k$</strong> 的通路的条数。</li>
+</ul>
+
+<h3 id="2-关联矩阵-mg">2. 关联矩阵 $M(G)$</h3>
+<ul>
+  <li>顶点与边的关系矩阵。无向图每列有两个1；有向图每列有一个1，一个-1（出/入）。</li>
+</ul>
+
+<h3 id="3-可达性矩阵-p">3. 可达性矩阵 $P$</h3>
+<ul>
+  <li>$p_{ij}=1$ 表示 $v_i$ 可达 $v_j$。可用 <strong>Warshall 算法</strong> 计算。</li>
+</ul>
+
+<hr />
+
+<h2 id="85-带权图的最短路径">8.5 带权图的最短路径</h2>
+
+<ul>
+  <li><strong>Dijkstra 算法</strong>：解决单源最短路径问题（边权非负）。
+    <ul>
+      <li>思想：贪心策略，按距离递增顺序求出各点最短路。</li>
+    </ul>
+  </li>
+</ul>
+
+<hr />
+
+<h2 id="86--87-欧拉图与哈密顿图">8.6 &amp; 8.7 欧拉图与哈密顿图</h2>
+
+<h3 id="1-欧拉图-euler-graph--边的问题">1. 欧拉图 (Euler Graph) —— 边的问题</h3>
+<ul>
+  <li><strong>定义</strong>：
+    <ul>
+      <li><strong>欧拉通路</strong>：经过图中每条边一次且仅一次的迹。</li>
+      <li><strong>欧拉回路</strong>：经过图中每条边一次且仅一次的闭迹。</li>
+      <li><strong>欧拉图</strong>：具有欧拉回路的图。</li>
+    </ul>
+  </li>
+  <li><strong>判定定理 (充要条件)</strong>：
+    <ul>
+      <li><strong>无向图</strong>：
+        <ul>
+          <li>欧拉图 $\iff$ 连通且<strong>所有顶点的度数为偶数</strong>。</li>
+          <li>半欧拉图 (有通路无回路) $\iff$ 连通且<strong>恰有 2 个奇度顶点</strong>。</li>
+        </ul>
+      </li>
+      <li><strong>有向图</strong>：
+        <ul>
+          <li>欧拉图 $\iff$ 基图连通且每个顶点 $d^+(v) = d^-(v)$。</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="2-哈密顿图-hamilton-graph--点的问题">2. 哈密顿图 (Hamilton Graph) —— 点的问题</h3>
+<ul>
+  <li><strong>定义</strong>：
+    <ul>
+      <li><strong>哈密顿通路</strong>：经过图中每个顶点一次且仅一次的路。</li>
+      <li><strong>哈密顿回路</strong>：经过图中每个顶点一次且仅一次的回路。</li>
+    </ul>
+  </li>
+  <li><strong>判定 (充分条件)</strong>：
+    <ul>
+      <li><strong>Ore 定理</strong>：$n \ge 3$ 的简单无向图，若对于任意不相邻顶点 $u, v$，有 $d(u) + d(v) \ge n$，则 $G$ 是哈密顿图。</li>
+      <li><strong>Dirac 定理</strong>：$n \ge 3$ 的简单无向图，若 $\delta(G) \ge n/2$，则 $G$ 是哈密顿图。</li>
+      <li><strong>必要条件</strong> (用于证明不是H图)：若 $G$ 是H图，则对于 $V$ 的任意非空真子集 $S$，有 $p(G-S) \le \vert S\vert$ （$p$ 为连通分量数）。</li>
+    </ul>
+  </li>
+</ul>
+
+<hr />
+
+<h2 id="88-二分图-bipartite-graph">8.8 二分图 (Bipartite Graph)</h2>
+
+<h3 id="1-定义与判定">1. 定义与判定</h3>
+<ul>
+  <li><strong>定义</strong>：顶点集可划分为两个互不相交的子集 $V_1, V_2$，使得每条边都连接 $V_1$ 和 $V_2$ 中的顶点。</li>
+  <li><strong>判别定理</strong>：一个图是二分图 $\iff$ 图中<strong>不含奇数长度的回路</strong> (所有圈长均为偶数)。</li>
+</ul>
+
+<h3 id="2-匹配">2. 匹配</h3>
+<ul>
+  <li><strong>Hall 定理 (完备匹配条件)</strong>：设二分图 $G=\langle V_1, V_2, E \rangle$，存在从 $V_1$ 到 $V_2$ 的完备匹配 $\iff$ 对 $V_1$ 的任意子集 $A$，都有 $\vert N(A)\vert \ge \vert A\vert$ (邻接点数 $\ge$ 自身点数)。</li>
+</ul>
+
+<hr />
+
+<h2 id="89-平面图-planar-graph">8.9 平面图 (Planar Graph)</h2>
+
+<h3 id="1-定义-1">1. 定义</h3>
+<ul>
+  <li>能画在平面上且边不相交的图。</li>
+</ul>
+
+<h3 id="2-欧拉公式-核心">2. 欧拉公式 (核心)</h3>
+<ul>
+  <li>对于连通平面图：<strong>$n - m + r = 2$</strong>
+    <ul>
+      <li>$n$：顶点数，$m$：边数，$r$：面数 (包含外部无限面)。</li>
+      <li><strong>推论</strong>：
+        <ol>
+          <li>$m \le 3n - 6$ (当 $n \ge 3$ 时)。</li>
+          <li>平面图中至少有一个度数 $\le 5$ 的顶点。</li>
+          <li>$K_5$ (5个顶点的完全图) 和 $K_{3,3}$ (3,3完全二分图) <strong>不是</strong>平面图。</li>
+        </ol>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="3-库拉图斯基定理-充要条件">3. 库拉图斯基定理 (充要条件)</h3>
+<ul>
+  <li>图 $G$ 是平面图 $\iff$ $G$ 不含同胚于 $K_5$ 或 $K_{3,3}$ 的子图（即不能通过收缩边得到 $K_5$ 或 $K_{3,3}$）。</li>
+</ul>
+
+<hr />
+
+<h2 id="810-树-tree">8.10 树 (Tree)</h2>
+
+<h3 id="1-定义与性质">1. 定义与性质</h3>
+<ul>
+  <li><strong>定义</strong>：连通且无回路的无向图。</li>
+  <li><strong>等价定义</strong> (设图有 $n$ 点 $m$ 边)：
+    <ol>
+      <li>无回路且 $m = n - 1$。</li>
+      <li>连通且 $m = n - 1$。</li>
+      <li>无回路，但增加任一条边即形成唯一的一个圈。</li>
+      <li>连通，但删除任一条边即不连通。</li>
+      <li>任意两点间有且仅有一条路径。</li>
+    </ol>
+  </li>
+</ul>
+
+<h3 id="2-生成树">2. 生成树</h3>
+<ul>
+  <li><strong>定义</strong>：包含图中所有顶点的树（是子图）。</li>
+  <li><strong>基本回路系统</strong>：对应一棵生成树，加入一条弦（非树边）形成的唯一回路。</li>
+  <li><strong>最小生成树 (MST)</strong>：
+    <ul>
+      <li><strong>Kruskal 算法</strong> (避圈法)：按边权从小到大选边。</li>
+      <li><strong>Prim 算法</strong>：从一个顶点出发，不断扩展最小边。</li>
+    </ul>
+  </li>
+</ul>
+
+<hr />
+
+<h2 id="-习题中的重要结论-补充考点-1">🎯 习题中的重要结论 (补充考点)</h2>
+
+<p>以下结论整理自课后习题，常用于证明或选择填空：</p>
+
+<ol>
+  <li><strong>补图的连通性</strong>：
+    <ul>
+      <li>若 $G$ 是不连通图，则其补图 $\overline{G}$ 必是连通图 (且直径 $\le 2$)。</li>
+    </ul>
+  </li>
+  <li><strong>树叶的数量</strong>：
+    <ul>
+      <li>任何 $n \ge 2$ 的树中，至少有 <strong>2</strong> 片树叶 (度为1的顶点)。</li>
+    </ul>
+  </li>
+  <li><strong>握手定理应用</strong>：
+    <ul>
+      <li>设树中有 $n_k$ 个度为 $k$ 的节点，则叶子数 $n_1 = 2 + \sum_{k=3}^{\Delta} (k-2)n_k$。</li>
+    </ul>
+  </li>
+  <li><strong>简单图边数限制</strong>：
+    <ul>
+      <li>$n$ 个顶点的简单图，若 $m &gt; (n-1)(n-2)/2$，则 $G$ 必连通。</li>
+    </ul>
+  </li>
+  <li><strong>二分图的边数</strong>：
+    <ul>
+      <li>$n$ 个顶点的简单二分图，边数最多为 $\lfloor n^2/4 \rfloor$。</li>
+    </ul>
+  </li>
+  <li><strong>正则图性质</strong>：
+    <ul>
+      <li>若 $G$ 是 $k$-正则二分图 ($k&gt;0$)，则 $G$ 必存在完备匹配。</li>
+    </ul>
+  </li>
+</ol>
+
+
+        <!-- Giscus 评论区 -->
+        <div style="margin-top: 50px; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 30px;">
+            <script src="https://giscus.app/client.js" data-repo="The-time-forever/The-time-forever.github.io"
+                data-repo-id="R_kgDOQXvq9w" data-category="General" data-category-id="DIC_kwDOQXvq984CzpQ2"
+                data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0"
+                data-input-position="top" data-theme="transparent_dark" data-lang="zh-CN" data-loading="lazy"
+                crossorigin="anonymous" async>
+                </script>
+        </div>
+
+        <p
+            style="font-size:0.9rem;color:#bbb;margin-top:3rem;border-top:1px solid rgba(255,255,255,0.1);padding-top:20px;">
+            提示：鼠标移动会产生拖尾并影响周围粒子；按住 <strong>Alt</strong> 可切换吸引（Alt）/排斥（默认）效果。
+        </p>
+    </div>
+
+    <script src="/assets/js/space-particles.js" defer></script>
+
+    <!-- Mermaid 代码块转换脚本 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 查找所有 language-mermaid 的代码块
+            document.querySelectorAll('pre code.language-mermaid').forEach(function(block) {
+                // 获取 Mermaid 代码
+                const code = block.textContent;
+
+                // 创建一个新的 div 元素来替换 pre 标签
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = code;
+
+                // 替换原来的 pre 元素
+                block.parentElement.replaceWith(mermaidDiv);
+            });
+
+            // 重新初始化 Mermaid
+            if (typeof mermaid !== 'undefined') {
+                mermaid.init(undefined, document.querySelectorAll('.mermaid'));
+            }
+        });
+    </script>
+</body>
+
+</html>
