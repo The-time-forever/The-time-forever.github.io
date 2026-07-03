@@ -171,6 +171,12 @@
             font-size: 0.9em;
         }
 
+        .post-meta .view-count {
+            color: #00f2ff;
+            opacity: 0.85;
+            margin-left: 4px;
+        }
+
         /* Table Styles */
         .glass-container table {
             width: 100%;
@@ -308,6 +314,9 @@
     <script type="text/javascript" id="MathJax-script" async src="/assets/js/mathjax.js">
     </script>
 
+    <!-- 不蒜子访问量统计 -->
+    <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
     <!-- Mermaid Configuration -->
     <script src="/assets/js/mermaid.min.js"></script>
     <script>
@@ -438,7 +447,12 @@
 
     <div class="glass-container">
         <h1>{{ page.title }}</h1>
-        <p class="post-meta">发布于 {{ page.date | date: "%Y-%m-%d" }}</p>
+        <p class="post-meta">
+            发布于 {{ page.date | date: "%Y-%m-%d" }}
+            <span class="view-count" id="busuanzi_container_page_pv" style="display:none">
+                · 👁 <span id="busuanzi_value_page_pv"></span> 次阅读
+            </span>
+        </p>
 
         {{ content }}
 
