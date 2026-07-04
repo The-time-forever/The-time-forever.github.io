@@ -15,7 +15,7 @@
 
 ## 关于这个仓库
 
-博客基于 GitHub Pages + Jekyll 搭建，文章都在 `_posts/` 文件夹里，纯 Markdown 写作。
+博客基于 GitHub Pages + Jekyll 搭建，纯 Markdown 写作。
 
 如果你也想搭一个类似的博客，或者对某篇文章的内容有疑问、建议，欢迎提 Issue～
 
