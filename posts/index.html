@@ -82,6 +82,45 @@ layout: null
         margin-left: 0;
       }
     }
+
+    /* 搜索框 */
+    .search-box {
+      display: block;
+      width: 100%;
+      padding: 10px 14px;
+      margin-bottom: 24px;
+      font-size: 0.95rem;
+      color: var(--text);
+      background: var(--card-bg);
+      border: 1px solid var(--hairline);
+      border-radius: 10px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .search-box::placeholder {
+      color: var(--muted);
+    }
+
+    .search-box:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
+    }
+
+    .glass-container li.search-hidden {
+      display: none;
+    }
+
+    .search-empty {
+      display: none;
+      color: var(--muted);
+      text-align: center;
+      padding: 12px 0;
+    }
+
+    .search-empty.visible {
+      display: block;
+    }
   </style>
 </head>
 
@@ -131,9 +170,11 @@ layout: null
       访客 <span id="busuanzi_value_site_uv"></span> 人
     </p>
 
-    <ul>
+    <input type="search" id="post-search" class="search-box" placeholder="搜索文章标题…" aria-label="搜索文章标题">
+
+    <ul id="post-list">
       {% for post in site.posts %}
-      <li>
+      <li data-title="{{ post.title | downcase | escape }}">
         {% if post.redirect_to %}
         <a href="{{ post.redirect_to }}" target="_blank">{{ post.title }}</a>
         {% else %}
@@ -143,10 +184,32 @@ layout: null
       </li>
       {% endfor %}
     </ul>
+    <p class="search-empty" id="search-empty">没有找到匹配的文章</p>
 
     <p style="font-size:0.9rem;color:#bbb;margin-top:2rem;">提示：鼠标移动会产生拖尾并影响周围粒子；按住 <strong>Alt</strong>
       可切换吸引（Alt）/排斥（默认）效果。</p>
   </div>
+
+  <script>
+    (function () {
+      var input = document.getElementById('post-search');
+      var items = Array.prototype.slice.call(document.querySelectorAll('#post-list li'));
+      var emptyMsg = document.getElementById('search-empty');
+
+      input.addEventListener('input', function () {
+        var query = input.value.trim().toLowerCase();
+        var visibleCount = 0;
+
+        items.forEach(function (li) {
+          var matches = !query || li.dataset.title.indexOf(query) !== -1;
+          li.classList.toggle('search-hidden', !matches);
+          if (matches) visibleCount++;
+        });
+
+        emptyMsg.classList.toggle('visible', visibleCount === 0);
+      });
+    })();
+  </script>
 
   <script src="/assets/js/space-particles.js" defer></script>
   <script src="/assets/js/theme-toggle.js" defer></script>
