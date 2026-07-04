@@ -173,12 +173,15 @@
 
     // Loop
     let lastTime = performance.now();
+    let rafId = null;
+    let running = false;
+
     function loop() {
         const now = performance.now();
         const dt = Math.min(0.1, (now - lastTime) / 1000);
         lastTime = now;
 
-        // Clear with slight fade for trails? No, user wants clean background usually, 
+        // Clear with slight fade for trails? No, user wants clean background usually,
         // but "Glow" is requested.
         ctx.clearRect(0, 0, W * DPR, H * DPR);
 
@@ -195,9 +198,33 @@
         }
 
         ctx.globalCompositeOperation = 'source-over';
-        requestAnimationFrame(loop);
+        rafId = requestAnimationFrame(loop);
     }
 
-    loop();
+    function start() {
+        if (running) return;
+        running = true;
+        lastTime = performance.now();
+        rafId = requestAnimationFrame(loop);
+    }
+
+    function stop() {
+        running = false;
+        if (rafId !== null) {
+            cancelAnimationFrame(rafId);
+            rafId = null;
+        }
+        // 停止时清空画布，避免残留最后一帧
+        ctx.clearRect(0, 0, W * DPR, H * DPR);
+    }
+
+    // 暴露控制接口给主题切换使用
+    window.spaceParticles = { start, stop };
+
+    // 仅在夜间主题启动动画（白天不跑，省 CPU）
+    const theme = document.documentElement.getAttribute('data-theme');
+    if (theme !== 'light') {
+        start();
+    }
 
 })();
