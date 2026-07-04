@@ -6,6 +6,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ page.title }} | The Time Forever</title>
     <link rel="icon" href="/images/favicon.png" type="image/png">
+    <!-- 防主题闪烁：渲染前确定 data-theme（默认夜间） -->
+    <script>
+        (function () {
+            try {
+                var t = localStorage.getItem('theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', t);
+            } catch (e) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+    </script>
+    <link rel="stylesheet" href="/assets/css/blog.css">
     {%- assign needs_math = false -%}
     {%- if page.math == true -%}
       {%- assign needs_math = true -%}
@@ -23,107 +35,44 @@
       {%- assign needs_mermaid = true -%}
     {%- endif -%}
     <style>
-        /* 全局重置与字体颜色 */
-        body {
-            margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            color: #ffffff;
-            /* 全局白色字体 */
-            overflow-x: hidden;
-            background-color: #000000;
-            /* 确保背景黑 */
-        }
-
-        /* Canvas 放到页面最底层 */
-        #bg-canvas {
-            position: fixed;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            display: block;
-            background: #000000;
-            pointer-events: none;
-        }
-
-        /* 返回首页按钮 */
-        .home-btn {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            padding: 8px 16px;
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 20px;
-            backdrop-filter: blur(4px);
-            transition: all 0.3s ease;
-            z-index: 100;
-            font-size: 0.9rem;
-        }
-
-        .home-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            border-color: #fff;
-        }
-
-        /* 毛玻璃容器 (Glassmorphism) */
-        .glass-container {
-            max-width: 900px;
-            margin: 80px auto 40px;
-            /* 上边距留给返回按钮 */
-            padding: 40px;
-            background: rgba(20, 20, 30, 0.4);
-            /* 更通透的深色背景 */
-            backdrop-filter: blur(20px);
-            /* 高强度背景模糊 */
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            /* 极细的亮色边框 */
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-            /* 深度感阴影 */
-        }
-
-        /* 标题样式 */
-        .glass-container h1 {
-            margin-top: 0;
-            font-weight: 300;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding-bottom: 16px;
-            margin-bottom: 10px;
+        /* 文章正文专属样式（骨架与主题变量见 /assets/css/blog.css） */
+        .post-meta {
             text-align: center;
-            color: #00f2ff;
-            text-shadow: 0 0 5px rgba(0, 242, 255, 0.7), 0 0 15px rgba(0, 242, 255, 0.5);
-            letter-spacing: 2px;
+            color: var(--muted);
+            margin-bottom: 30px;
+            font-size: 0.9em;
         }
 
-        /* Markdown Content Styles */
+        .post-meta .view-count {
+            color: var(--accent);
+            opacity: 0.85;
+            margin-left: 4px;
+        }
+
         .glass-container h2 {
             margin-top: 1.5em;
             margin-bottom: 0.5em;
-            color: #00f2ff;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--accent);
+            border-bottom: 1px solid var(--hairline);
             padding-bottom: 5px;
         }
 
         .glass-container h3 {
             margin-top: 1.2em;
             margin-bottom: 0.5em;
-            color: #e0e0e0;
+            color: var(--heading-3);
         }
 
         .glass-container h4 {
             margin-top: 1em;
             margin-bottom: 0.5em;
-            color: #ccc;
+            color: var(--heading-4);
         }
 
         .glass-container p {
             line-height: 1.8;
             margin-bottom: 1em;
-            color: #ddd;
+            color: var(--text);
             font-size: 1.05rem;
         }
 
@@ -131,7 +80,7 @@
         .glass-container ol {
             margin-left: 20px;
             margin-bottom: 1em;
-            color: #ddd;
+            color: var(--text);
         }
 
         .glass-container li {
@@ -139,66 +88,42 @@
         }
 
         .glass-container blockquote {
-            border-left: 4px solid #00f2ff;
-            padding-left: 15px;
-            color: #aaa;
+            border-left: 4px solid var(--accent);
+            color: var(--muted);
             margin: 1em 0;
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--quote-bg);
             padding: 10px 15px;
             border-radius: 0 4px 4px 0;
         }
 
         .glass-container pre {
-            background: rgba(0, 0, 0, 0.5);
+            background: var(--code-bg);
             padding: 15px;
             border-radius: 8px;
             overflow-x: auto;
             margin: 1em 0;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--code-border);
         }
 
         .glass-container code {
             font-family: Consolas, Monaco, 'Andale Mono', monospace;
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--inline-code-bg);
             padding: 2px 5px;
             border-radius: 3px;
-            color: #ff79c6;
+            color: var(--inline-code-text);
         }
 
         .glass-container pre code {
             background: transparent;
-            color: #f8f8f2;
+            color: var(--code-text);
             padding: 0;
         }
 
         .glass-container img {
             max-width: 100%;
             border-radius: 8px;
-            margin: 1em 0;
+            margin: 1em auto;
             display: block;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .post-meta {
-            text-align: center;
-            color: #888;
-            margin-bottom: 30px;
-            font-size: 0.9em;
-        }
-
-        .post-meta .view-count {
-            color: #00f2ff;
-            opacity: 0.85;
-            margin-left: 4px;
-        }
-
-        /* 访问统计图标：跟随文字颜色，不用彩色 emoji 避免突兀 */
-        .stat-icon {
-            width: 12px;
-            height: 12px;
-            vertical-align: -1px;
-            margin: 0 1px;
         }
 
         /* Table Styles */
@@ -206,19 +131,19 @@
             width: 100%;
             border-collapse: collapse;
             margin: 1em 0;
-            color: #ddd;
+            color: var(--text);
         }
 
         .glass-container th,
         .glass-container td {
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid var(--table-border);
             padding: 8px 12px;
             text-align: left;
         }
 
         .glass-container th {
-            background: rgba(255, 255, 255, 0.1);
-            color: #00f2ff;
+            background: var(--table-head-bg);
+            color: var(--accent);
         }
 
         /* MathJax Overflow Handling */
@@ -229,26 +154,13 @@
             padding: 10px 0;
         }
 
-        /* 链接样式 */
-        .glass-container a {
-            color: #00ffff;
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-
-        .glass-container a:hover {
-            color: #fff;
-            text-decoration: underline;
-            text-shadow: 0 0 8px rgba(0, 255, 255, 0.6);
-        }
-
         /* Mermaid 图表样式 */
         .glass-container .mermaid {
-            background: rgba(0, 0, 0, 0.3);
+            background: var(--code-bg);
             padding: 20px;
             border-radius: 8px;
             margin: 1.5em auto;
-            border: 1px solid rgba(0, 242, 255, 0.2);
+            border: 1px solid var(--card-border);
             overflow-x: auto;
             display: flex;
             justify-content: center;
@@ -263,24 +175,8 @@
             height: auto;
         }
 
-        /* 响应式调整 */
+        /* 响应式调整（正文专属；骨架断点见 blog.css） */
         @media (max-width: 600px) {
-            .glass-container {
-                margin: 72px 12px 20px;
-                padding: 20px;
-            }
-
-            .home-btn {
-                top: 16px;
-                left: 16px;
-                padding: 8px 14px;
-            }
-
-            .glass-container h1 {
-                font-size: 1.8rem;
-                letter-spacing: 1px;
-            }
-
             .glass-container h2 {
                 font-size: 1.35rem;
             }
@@ -347,9 +243,9 @@
     <!-- Mermaid Configuration -->
     <script src="/assets/js/mermaid.min.js" defer></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            mermaid.initialize({
-                startOnLoad: true,
+        // 两套主题配置：夜间沿用原霓虹青，白天用浅色纸感。
+        window.mermaidConfigs = {
+            dark: {
                 theme: 'dark',
                 themeVariables: {
                     // 主要颜色 - 使用亮青色
@@ -459,8 +355,80 @@
                     activationBkgColor: '#2a3f5f',
                     sequenceNumberColor: '#ffffff'
                 }
+            },
+            light: {
+                theme: 'default',
+                themeVariables: {
+                    primaryColor: '#e0f2f0',
+                    primaryTextColor: '#123330',
+                    primaryBorderColor: '#0b7a75',
+                    secondaryColor: '#eef1f4',
+                    secondaryTextColor: '#2b2b2b',
+                    secondaryBorderColor: '#7a99a8',
+                    tertiaryColor: '#f4f4f2',
+                    tertiaryTextColor: '#2b2b2b',
+                    tertiaryBorderColor: '#c9c9c4',
+                    lineColor: '#0b7a75',
+                    textColor: '#2b2b2b',
+                    mainBkg: '#e0f2f0',
+                    nodeBorder: '#0b7a75',
+                    nodeTextColor: '#123330',
+                    clusterBkg: '#f0efec',
+                    clusterBorder: '#0b7a75',
+                    titleColor: '#1a1a1a',
+                    edgeLabelBackground: '#faf9f7',
+                    actorBorder: '#0b7a75',
+                    actorBkg: '#e0f2f0',
+                    actorTextColor: '#123330',
+                    actorLineColor: '#0b7a75',
+                    signalColor: '#2b2b2b',
+                    signalTextColor: '#2b2b2b',
+                    labelBoxBkgColor: '#e0f2f0',
+                    labelBoxBorderColor: '#0b7a75',
+                    labelTextColor: '#2b2b2b',
+                    loopTextColor: '#2b2b2b',
+                    noteBorderColor: '#0b7a75',
+                    noteBkgColor: '#fff8e6',
+                    noteTextColor: '#2b2b2b',
+                    activationBorderColor: '#0b7a75',
+                    activationBkgColor: '#d7efec',
+                    sequenceNumberColor: '#ffffff',
+                    git0: '#0b7a75',
+                    git1: '#7c4dff',
+                    git2: '#d1495b',
+                    git3: '#2a9d8f',
+                    git4: '#e9c46a',
+                    git5: '#457b9d',
+                    git6: '#e76f51',
+                    git7: '#6d597a'
+                }
+            }
+        };
+
+        // 按当前主题渲染 / 重渲染所有 Mermaid 图（初次渲染与切换时都调用）
+        window.renderMermaidForTheme = function (theme) {
+            if (typeof mermaid === 'undefined') return;
+            var cfg = window.mermaidConfigs[theme] || window.mermaidConfigs.dark;
+            mermaid.initialize({
+                startOnLoad: false,
+                theme: cfg.theme,
+                themeVariables: cfg.themeVariables
             });
-        });
+            var nodes = document.querySelectorAll('.mermaid');
+            nodes.forEach(function (node) {
+                var src = node.getAttribute('data-src');
+                if (src === null) {
+                    // 首次：把源码存入 data-src，供后续切换重渲染
+                    src = node.textContent;
+                    node.setAttribute('data-src', src);
+                }
+                node.removeAttribute('data-processed');
+                node.innerHTML = src;
+            });
+            if (nodes.length) {
+                mermaid.init(undefined, nodes);
+            }
+        };
     </script>
     {%- endif %}
 </head>
@@ -472,6 +440,26 @@
 
     <!-- 返回首页按钮 -->
     <a href="/posts" class="home-btn">← 返回文章列表</a>
+
+    <!-- 主题切换按钮：夜间显示太阳，白天显示月亮 -->
+    <button class="theme-toggle" type="button" aria-label="切换日间/夜间模式" title="切换日间/夜间模式">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+    </button>
 
     <div class="glass-container">
         <h1>{{ page.title }}</h1>
@@ -507,6 +495,7 @@
     </div>
 
     <script src="/assets/js/space-particles.js" defer></script>
+    <script src="/assets/js/theme-toggle.js" defer></script>
 
     {%- if needs_mermaid %}
     <!-- Mermaid 代码块转换脚本 -->
@@ -520,15 +509,17 @@
                 // 创建一个新的 div 元素来替换 pre 标签
                 const mermaidDiv = document.createElement('div');
                 mermaidDiv.className = 'mermaid';
+                mermaidDiv.setAttribute('data-src', code); // 存源码供主题切换重渲染
                 mermaidDiv.textContent = code;
 
                 // 替换原来的 pre 元素
                 block.parentElement.replaceWith(mermaidDiv);
             });
 
-            // 重新初始化 Mermaid
-            if (typeof mermaid !== 'undefined') {
-                mermaid.init(undefined, document.querySelectorAll('.mermaid'));
+            // 按当前主题初次渲染
+            var theme = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+            if (typeof window.renderMermaidForTheme === 'function') {
+                window.renderMermaidForTheme(theme);
             }
         });
     </script>
