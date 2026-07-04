@@ -6,6 +6,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ page.title }} | The Time Forever</title>
     <link rel="icon" href="/images/favicon.png" type="image/png">
+    {%- assign needs_math = false -%}
+    {%- if page.math == true -%}
+      {%- assign needs_math = true -%}
+    {%- elsif page.math == false -%}
+      {%- assign needs_math = false -%}
+    {%- elsif content contains '\(' or content contains '\[' -%}
+      {%- assign needs_math = true -%}
+    {%- endif -%}
+    {%- assign needs_mermaid = false -%}
+    {%- if page.mermaid == true -%}
+      {%- assign needs_mermaid = true -%}
+    {%- elsif page.mermaid == false -%}
+      {%- assign needs_mermaid = false -%}
+    {%- elsif content contains 'language-mermaid' -%}
+      {%- assign needs_mermaid = true -%}
+    {%- endif -%}
     <style>
         /* 全局重置与字体颜色 */
         body {
@@ -306,6 +322,7 @@
         }
     </style>
 
+    {%- if needs_math %}
     <!-- MathJax Configuration -->
     <script>
         MathJax = {
@@ -321,12 +338,14 @@
     </script>
     <script type="text/javascript" id="MathJax-script" async src="/assets/js/mathjax.js">
     </script>
+    {%- endif %}
 
     <!-- 不蒜子访问量统计 -->
     <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
+    {%- if needs_mermaid %}
     <!-- Mermaid Configuration -->
-    <script src="/assets/js/mermaid.min.js"></script>
+    <script src="/assets/js/mermaid.min.js" defer></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             mermaid.initialize({
@@ -443,6 +462,7 @@
             });
         });
     </script>
+    {%- endif %}
 </head>
 
 <body>
@@ -488,6 +508,7 @@
 
     <script src="/assets/js/space-particles.js" defer></script>
 
+    {%- if needs_mermaid %}
     <!-- Mermaid 代码块转换脚本 -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -511,6 +532,7 @@
             }
         });
     </script>
+    {%- endif %}
 </body>
 
 </html>

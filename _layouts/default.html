@@ -684,21 +684,36 @@
     {% endif %}
     {% endcomment %}
 
-    <!-- 背景轮播图片：images/bg1.jpg/bg2.jpg/bg3.jpg 需与你仓库中的图片文件名一致 -->
+    <!-- 背景轮播图片：src 由下方脚本按需赋值，避免预加载扫描器一次性抓取全部12张 -->
     <div class="bg-slideshow">
-        <img src="/images/bgz1.jpg" class="active" alt="background 1" />
-        <img src="/images/bgz2.jpg" alt="background 2" />
-        <img src="/images/bgz3.jpg" alt="background 3" />
-        <img src="/images/bgz4.jpg" alt="background 4" />
-        <img src="/images/bgz5.jpg" alt="background 5" />
-        <img src="/images/bgz6.jpg" alt="background 6" />
-        <img src="/images/bgz7.jpg" alt="background 7" />
-        <img src="/images/bgz8.jpg" alt="background 8" />
-        <img src="/images/bgz9.jpg" alt="background 9" />
-        <img src="/images/bgz10.jpg" alt="background 10" />
-        <img src="/images/bgz11.jpg" alt="background 11" />
-        <img src="/images/bgz12.jpg" alt="background 12" />
+        <img class="active" alt="background 1" />
+        <img alt="background 2" />
+        <img alt="background 3" />
+        <img alt="background 4" />
+        <img alt="background 5" />
+        <img alt="background 6" />
+        <img alt="background 7" />
+        <img alt="background 8" />
+        <img alt="background 9" />
+        <img alt="background 10" />
+        <img alt="background 11" />
+        <img alt="background 12" />
     </div>
+
+    <!-- 立即为首屏图片（LCP）赋值，按视口选择正确的桌面/移动版本，避免先加载桌面图再被 JS 替换成移动图 -->
+    <script>
+        (function () {
+            var isMobile = window.matchMedia("(max-width: 768px)").matches;
+            var dir = isMobile ? "/mobile-images" : "/images";
+            var prefix = isMobile ? "bgzm" : "bgz";
+            var first = document.querySelector(".bg-slideshow img.active");
+            if (first) {
+                first.src = dir + "/" + prefix + "1.jpg";
+                first.loading = "eager";
+                first.decoding = "async";
+            }
+        })();
+    </script>
 
     <!-- 轮播手动切换按钮 -->
     <button class="prev-slide" aria-label="Previous Slide">&#10094;</button>
@@ -796,7 +811,7 @@
     </div>
     <div id="guestbook-overlay"></div>
 
-    <!-- 简单的 JS，用来轮播背景图片 -->
+    <!-- 按需加载的背景轮播：只预取"当前 + 下一张"，切换时才继续预取，不再一次性请求全部12张 -->
     <script>
         const slides = Array.from(document.querySelectorAll(".bg-slideshow img"));
         const mobileSlidesQuery = window.matchMedia("(max-width: 768px)");
@@ -806,6 +821,49 @@
         let usingMobileSlides = null;
         let touchStartX = 0;
         let touchStartY = 0;
+        let pendingTarget = 0;
+        const slidePendingLoads = new Map(); // slideIndex -> { url, promise }
+
+        function slideUrl(i) {
+            const directory = usingMobileSlides ? "/mobile-images" : "/images";
+            const prefix = usingMobileSlides ? "bgzm" : "bgz";
+            return `${directory}/${prefix}${i + 1}.jpg`;
+        }
+
+        // 确保第 i 张图片已经加载好当前视口对应的版本，返回一个 resolve 时机 = 真正加载完成的 Promise
+        function ensureSlideLoaded(i) {
+            const slide = slides[i];
+            const url = slideUrl(i);
+
+            if (slide.dataset.loadedSrc === url && !slidePendingLoads.has(i)) {
+                return Promise.resolve(slide);
+            }
+
+            const pending = slidePendingLoads.get(i);
+            if (pending && pending.url === url) {
+                return pending.promise;
+            }
+
+            slide.decoding = "async";
+            slide.loading = i === index ? "eager" : "lazy";
+
+            const promise = new Promise((resolve) => {
+                const onDone = () => {
+                    slide.removeEventListener("load", onDone);
+                    slide.removeEventListener("error", onDone);
+                    slidePendingLoads.delete(i);
+                    slide.dataset.loadedSrc = url;
+                    resolve(slide);
+                };
+                slide.addEventListener("load", onDone, { once: true });
+                slide.addEventListener("error", onDone, { once: true });
+                slide.src = url;
+                if (slide.complete) onDone();
+            });
+
+            slidePendingLoads.set(i, { url, promise });
+            return promise;
+        }
 
         function updateSlideSources(forceUpdate = false) {
             const useMobileSlides = mobileSlidesQuery.matches;
@@ -814,40 +872,39 @@
             }
 
             usingMobileSlides = useMobileSlides;
-            const directory = useMobileSlides ? "/mobile-images" : "/images";
-            const prefix = useMobileSlides ? "bgzm" : "bgz";
-
-            slides.forEach((slide, slideIndex) => {
-                const nextSrc = `${directory}/${prefix}${slideIndex + 1}.jpg`;
-                if (slide.getAttribute("src") !== nextSrc) {
-                    slide.setAttribute("src", nextSrc);
-                }
-                slide.loading = slideIndex === index ? "eager" : "lazy";
-                slide.decoding = "async";
-            });
+            slidePendingLoads.clear();
+            ensureSlideLoaded(index);
+            ensureSlideLoaded((index + 1) % slides.length);
         }
 
-        // 显示第 n 张图片
-        function showSlide(n) {
-            // 移除当前激活状态
+        // 真正切换到第 n 张（要求已加载完成），并预取下一张，给自动播放的 5 秒间隔留出下载时间
+        function activateSlide(n) {
             slides[index].classList.remove("active");
-
-            // 计算新索引（支持负数循环）
             index = (n + slides.length) % slides.length;
-
-            // 添加新激活状态
             slides[index].classList.add("active");
             slides[index].loading = "eager";
+            ensureSlideLoaded((index + 1) % slides.length);
+        }
+
+        // 请求切换到第 n 张：等图片加载完成后才切换，避免空白帧；若切换过程中又有更新的请求，则丢弃这次
+        function goToSlide(n) {
+            const target = (n + slides.length) % slides.length;
+            pendingTarget = target;
+            ensureSlideLoaded(target).then(() => {
+                if (pendingTarget === target) {
+                    activateSlide(target);
+                }
+            });
         }
 
         // 下一张
         function nextSlide() {
-            showSlide(index + 1);
+            goToSlide(index + 1);
         }
 
         // 上一张
         function prevSlide() {
-            showSlide(index - 1);
+            goToSlide(index - 1);
         }
 
         // 启动自动播放
@@ -900,7 +957,16 @@
             resetTimer();
         }
 
-        updateSlideSources(true);
+        // 初始化：第 1 张的 src 已由前面的同步脚本按视口赋值，这里记录下来避免重复加载，并预取第 2 张
+        usingMobileSlides = mobileSlidesQuery.matches;
+        slides.forEach((slide, i) => {
+            const url = slideUrl(i);
+            if (slide.getAttribute("src") === url) {
+                slide.dataset.loadedSrc = url;
+            }
+        });
+        ensureSlideLoaded(index);
+        ensureSlideLoaded((index + 1) % slides.length);
 
         if (typeof mobileSlidesQuery.addEventListener === 'function') {
             mobileSlidesQuery.addEventListener('change', () => updateSlideSources());
