@@ -63,7 +63,7 @@
 
   --heading-glow: none;
   --h1-weight: 400;
-  --measure: 680px;
+  /* 栏宽与夜间保持一致（不收缩）*/
 
   --code-bg: #f4f4f2;
   --code-text: #2b2b2b;
