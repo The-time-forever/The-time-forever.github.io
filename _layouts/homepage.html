@@ -12,7 +12,7 @@
     <link rel="icon" href="/images/favicon.png?v=2" type="image/png" />
         {% include theme-init.html %}
     <link rel="stylesheet" href="/assets/css/site-tokens.css?v=20260723-refactor" />
-    <link rel="stylesheet" href="/assets/css/homepage.css?v=20260723-refactor" />
+    <link rel="stylesheet" href="/assets/css/homepage.css?v=20260723-calendar-init" />
   </head>
   <body>
     <aside class="sidebar" aria-label="站点导航" data-menu-open="false">
@@ -62,7 +62,7 @@
     </aside>
 
     <main class="page" id="top">
-      <section class="hero" aria-label="首页主视觉" data-calendar-state="expanded">
+      <section class="hero" aria-label="首页主视觉" data-calendar-state="expanded" data-calendar-ready="false">
         <picture class="hero-picture">
           <source
             media="(max-width: 760px)"
@@ -190,8 +190,8 @@
     </aside>
     <div id="guestbook-overlay"></div>
 
-        <script src="/assets/js/theme-toggle.js?v=20260723-refactor" defer></script>
-    <script src="/assets/js/homepage.js?v=20260723-refactor" defer></script>
+    <script src="/assets/js/theme-toggle.js?v=20260723-refactor" defer></script>
+    <script src="/assets/js/homepage.js?v=20260723-calendar-init-2" defer></script>
 
     <!-- 不蒜子访问量统计：保留原首页的站点 PV / UV 统计挂载点 -->
     {% include busuanzi-script.html %}

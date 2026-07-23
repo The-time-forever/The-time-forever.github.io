@@ -30,6 +30,7 @@ const root = document.documentElement;
         "SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY",
         "THURSDAY", "FRIDAY", "SATURDAY"
       ];
+      const desktopCalendarMedia = window.matchMedia("(min-width: 761px)");
 
       function regionInkScore(pixels, width, xStart, xEnd, yStart, yEnd) {
         let score = 0;
@@ -70,9 +71,16 @@ const root = document.documentElement;
         return samples ? luminance / samples : 127;
       }
 
+      function useCalendarFallback() {
+        hero.dataset.calendarSide = "left";
+        hero.dataset.calendarDetection = "fallback";
+        hero.dataset.calendarTone = "mid";
+        hero.dataset.calendarReady = "true";
+      }
+
       function detectCalendarSide() {
         if (!heroImage || !heroImage.complete || heroImage.naturalWidth === 0) return;
-        if (!window.matchMedia("(min-width: 761px)").matches) return;
+        if (!desktopCalendarMedia.matches) return;
 
         const canvas = document.createElement("canvas");
         const width = 160;
@@ -80,7 +88,10 @@ const root = document.documentElement;
         canvas.width = width;
         canvas.height = height;
         const context = canvas.getContext("2d", { willReadFrequently: true });
-        if (!context) return;
+        if (!context) {
+          useCalendarFallback();
+          return;
+        }
 
         try {
           context.drawImage(heroImage, 0, 0, width, height);
@@ -99,19 +110,44 @@ const root = document.documentElement;
             calendarLuminance >= 170 ? "light" :
             calendarLuminance <= 95 ? "dark" : "mid";
           hero.dataset.calendarLuminance = String(Math.round(calendarLuminance));
+          hero.dataset.calendarReady = "true";
         } catch (_) {
-          hero.dataset.calendarSide = "left";
-          hero.dataset.calendarDetection = "fallback";
-          hero.dataset.calendarTone = "mid";
+          useCalendarFallback();
         }
       }
 
-      if (heroImage.complete) {
-        detectCalendarSide();
-      } else {
-        heroImage.addEventListener("load", detectCalendarSide, { once: true });
+      function initializeCalendarPlacement() {
+        if (!desktopCalendarMedia.matches) return;
+
+        if (heroImage.complete) {
+          if (heroImage.naturalWidth > 0) {
+            detectCalendarSide();
+          } else {
+            useCalendarFallback();
+          }
+          return;
+        }
+
+        if (typeof heroImage.decode === "function") {
+          heroImage.decode().then(detectCalendarSide).catch(() => {
+            if (!heroImage.complete) return;
+            if (heroImage.naturalWidth > 0) {
+              detectCalendarSide();
+            } else {
+              useCalendarFallback();
+            }
+          });
+        }
       }
-      window.matchMedia("(min-width: 761px)").addEventListener("change", detectCalendarSide);
+
+      heroImage.addEventListener("load", detectCalendarSide);
+      heroImage.addEventListener("error", useCalendarFallback);
+      initializeCalendarPlacement();
+
+      desktopCalendarMedia.addEventListener("change", () => {
+        hero.dataset.calendarReady = "false";
+        initializeCalendarPlacement();
+      });
 
       function setMobileMenu(open) {
         sidebar.dataset.menuOpen = String(open);
