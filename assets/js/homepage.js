@@ -1,4 +1,3 @@
-const root = document.documentElement;
       const sidebar = document.querySelector(".sidebar");
       const mobileMenuToggle = document.querySelector(".mobile-menu-toggle");
       const navLinks = Array.from(document.querySelectorAll(".side-nav a[href^='#']"));
@@ -16,12 +15,7 @@ const root = document.documentElement;
       const calendarDockDate = document.querySelector(".calendar-dock-date");
       const calendarHide = document.querySelector(".calendar-hide-toggle");
       const calendarShow = document.querySelector(".calendar-show-toggle");
-      const guestbookPanel = document.getElementById("guestbook-panel");
-      const guestbookClose = document.getElementById("guestbook-close");
-      const guestbookOverlay = document.getElementById("guestbook-overlay");
-      const guestbookTriggers = Array.from(document.querySelectorAll("[data-open-guestbook]"));
       let calendarKeyboardActivation = false;
-      let giscusLoaded = false;
       const monthNames = [
         "JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE",
         "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"
@@ -163,59 +157,9 @@ const root = document.documentElement;
         link.addEventListener("click", () => setMobileMenu(false));
       });
 
-      function openGuestbook() {
-        guestbookPanel.classList.add("active");
-        guestbookOverlay.classList.add("active");
-        guestbookPanel.setAttribute("aria-hidden", "false");
-        guestbookTriggers.forEach((trigger) => trigger.setAttribute("aria-expanded", "true"));
-
-        if (!giscusLoaded) {
-          const script = document.createElement("script");
-          script.src = "https://giscus.app/client.js";
-          script.setAttribute("data-repo", "The-time-forever/The-time-forever.github.io");
-          script.setAttribute("data-repo-id", "R_kgDOQXvq9w");
-          script.setAttribute("data-category", "General");
-          script.setAttribute("data-category-id", "DIC_kwDOQXvq984CzpQ2");
-          script.setAttribute("data-mapping", "specific");
-          script.setAttribute("data-term", "Guestbook");
-          script.setAttribute("data-strict", "0");
-          script.setAttribute("data-reactions-enabled", "1");
-          script.setAttribute("data-emit-metadata", "0");
-          script.setAttribute("data-input-position", "top");
-          script.setAttribute("data-theme", root.dataset.theme === "light" ? "noborder_light" : "transparent_dark");
-          script.setAttribute("data-lang", "zh-CN");
-          script.setAttribute("crossorigin", "anonymous");
-          script.async = true;
-          document.querySelector(".giscus").appendChild(script);
-          giscusLoaded = true;
-        }
-      }
-
-      function closeGuestbook({ moveFocus = false } = {}) {
-        guestbookPanel.classList.remove("active");
-        guestbookOverlay.classList.remove("active");
-        guestbookPanel.setAttribute("aria-hidden", "true");
-        guestbookTriggers.forEach((trigger) => trigger.setAttribute("aria-expanded", "false"));
-        if (moveFocus) {
-          guestbookTriggers[0]?.focus({ preventScroll: true });
-        }
-      }
-
-      guestbookTriggers.forEach((link) => {
-        link.addEventListener("click", (event) => {
-          event.preventDefault();
-          openGuestbook();
-        });
-      });
-      guestbookClose.addEventListener("click", () => closeGuestbook({ moveFocus: true }));
-      guestbookOverlay.addEventListener("click", () => closeGuestbook());
-
       document.addEventListener("keydown", (event) => {
         if (event.key === "Escape") {
           setMobileMenu(false);
-          if (guestbookPanel.classList.contains("active")) {
-            closeGuestbook({ moveFocus: true });
-          }
         }
       });
 

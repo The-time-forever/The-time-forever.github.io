@@ -13,6 +13,7 @@
         {% include theme-init.html %}
     <link rel="stylesheet" href="/assets/css/site-tokens.css?v=20260723-refactor" />
     <link rel="stylesheet" href="/assets/css/homepage.css?v=20260723-calendar-init" />
+    <link rel="stylesheet" href="/assets/css/guestbook.css?v=20260724-shared" />
   </head>
   <body>
     <aside class="sidebar" aria-label="站点导航" data-menu-open="false">
@@ -179,19 +180,11 @@
       </footer>
     </main>
 
-    <aside id="guestbook-panel" aria-label="留言板" aria-hidden="true">
-      <div class="guestbook-header">
-        <h3>留言板</h3>
-        <button id="guestbook-close" type="button" aria-label="关闭留言板">&times;</button>
-      </div>
-      <div class="guestbook-content">
-        <div class="giscus"></div>
-      </div>
-    </aside>
-    <div id="guestbook-overlay"></div>
+    {% include guestbook-panel.html %}
 
     <script src="/assets/js/theme-toggle.js?v=20260723-refactor" defer></script>
     <script src="/assets/js/homepage.js?v=20260723-calendar-init-2" defer></script>
+    <script src="/assets/js/guestbook.js?v=20260724-shared" defer></script>
 
     <!-- 不蒜子访问量统计：保留原首页的站点 PV / UV 统计挂载点 -->
     {% include busuanzi-script.html %}
