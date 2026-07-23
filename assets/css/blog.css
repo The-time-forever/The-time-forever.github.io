@@ -1,65 +1,65 @@
 /* ==========================================================================
-   博客双主题共享样式层（文章页 + 列表页共用）
-   主题挂在 <html data-theme="dark|light"> 上；默认 = 夜间。
+   博客文章阅读样式层。
+   背景与文章归档页共享纸面色、青色强调和反重力粒子语言。
    ========================================================================== */
 
 /* ---- 🌙 夜间（默认）---- */
 :root {
-  --bg: #000000;
-  --text: #dddddd;
-  --heading-3: #e0e0e0;
-  --heading-4: #cccccc;
-  --muted: #888888;
-  --accent: #00f2ff;
-  --link: #00ffff;
-  --link-hover: #ffffff;
-  --link-hover-glow: 0 0 8px rgba(0, 255, 255, 0.6);
+  --bg: #111414;
+  --text: #eff0eb;
+  --heading-3: #eff0eb;
+  --heading-4: #cdd2cf;
+  --muted: #9da6a4;
+  --accent: #55c7cf;
+  --link: #55c7cf;
+  --link-hover: #9ee7eb;
+  --link-hover-glow: none;
 
-  --card-bg: rgba(20, 20, 30, 0.4);
-  --card-blur: 20px;
-  --card-border: rgba(255, 255, 255, 0.1);
-  --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-  --hairline: rgba(255, 255, 255, 0.1);
+  --card-bg: rgba(17, 20, 20, 0.88);
+  --card-blur: 26px;
+  --card-border: rgba(239, 240, 235, 0.16);
+  --card-shadow: 0 18px 54px rgba(0, 0, 0, 0.22);
+  --hairline: rgba(239, 240, 235, 0.16);
 
-  --heading-glow: 0 0 5px rgba(0, 242, 255, 0.7), 0 0 15px rgba(0, 242, 255, 0.5);
-  --h1-weight: 300;
+  --heading-glow: none;
+  --h1-weight: 500;
   --measure: 900px;
 
   --code-bg: rgba(0, 0, 0, 0.5);
   --code-text: #f8f8f2;
   --code-border: rgba(255, 255, 255, 0.1);
   --inline-code-bg: rgba(255, 255, 255, 0.1);
-  --inline-code-text: #ff79c6;
+  --inline-code-text: #7bd4d9;
 
   --quote-bg: rgba(255, 255, 255, 0.05);
   --table-head-bg: rgba(255, 255, 255, 0.1);
   --table-border: rgba(255, 255, 255, 0.2);
 
   --canvas-display: block;
-  --home-btn-text: rgba(255, 255, 255, 0.8);
-  --home-btn-border: rgba(255, 255, 255, 0.3);
-  --home-btn-hover-bg: rgba(255, 255, 255, 0.1);
+  --home-btn-text: #eff0eb;
+  --home-btn-border: rgba(239, 240, 235, 0.2);
+  --home-btn-hover-bg: rgba(85, 199, 207, 0.12);
   --home-btn-hover-text: #ffffff;
-  --home-btn-hover-border: #ffffff;
+  --home-btn-hover-border: #55c7cf;
 }
 
 /* ---- ☀️ 白天（极简纸感阅读）---- */
 :root[data-theme="light"] {
-  --bg: #faf9f7;
-  --text: #2b2b2b;
-  --heading-3: #333333;
-  --heading-4: #444444;
-  --muted: #777777;
-  --accent: #0b7a75;
-  --link: #0b7a75;
-  --link-hover: #094f4b;
+  --bg: #f3f1eb;
+  --text: #141719;
+  --heading-3: #141719;
+  --heading-4: #3f4647;
+  --muted: #737a7b;
+  --accent: #178f99;
+  --link: #0b626b;
+  --link-hover: #084c53;
   --link-hover-glow: none;
 
-  --card-bg: #ffffff;
-  --card-blur: 0px;
-  --card-border: rgba(0, 0, 0, 0.08);
-  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-  --hairline: rgba(0, 0, 0, 0.08);
+  --card-bg: rgba(243, 241, 235, 0.9);
+  --card-blur: 26px;
+  --card-border: rgba(20, 23, 25, 0.15);
+  --card-shadow: 0 18px 54px rgba(27, 35, 36, 0.1);
+  --hairline: rgba(20, 23, 25, 0.15);
 
   --heading-glow: none;
   --h1-weight: 400;
@@ -68,19 +68,19 @@
   --code-bg: #f4f4f2;
   --code-text: #2b2b2b;
   --code-border: rgba(0, 0, 0, 0.08);
-  --inline-code-bg: #f0efec;
-  --inline-code-text: #9a3b6e;
+  --inline-code-bg: #e7e4dc;
+  --inline-code-text: #0b626b;
 
   --quote-bg: rgba(0, 0, 0, 0.03);
   --table-head-bg: rgba(0, 0, 0, 0.04);
   --table-border: rgba(0, 0, 0, 0.12);
 
-  --canvas-display: none;
-  --home-btn-text: rgba(0, 0, 0, 0.7);
-  --home-btn-border: rgba(0, 0, 0, 0.15);
-  --home-btn-hover-bg: rgba(0, 0, 0, 0.05);
-  --home-btn-hover-text: #000000;
-  --home-btn-hover-border: rgba(0, 0, 0, 0.4);
+  --canvas-display: block;
+  --home-btn-text: #141719;
+  --home-btn-border: rgba(20, 23, 25, 0.16);
+  --home-btn-hover-bg: rgba(23, 143, 153, 0.1);
+  --home-btn-hover-text: #0b626b;
+  --home-btn-hover-border: #178f99;
 }
 
 /* ==========================================================================
@@ -88,15 +88,15 @@
    ========================================================================== */
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, sans-serif;
+  font-family: Inter, "Segoe UI", "PingFang SC", "Microsoft YaHei",
+    sans-serif;
   color: var(--text);
   overflow-x: hidden;
   background-color: var(--bg);
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Canvas 背景（仅夜间显示） */
+/* 与文章归档页一致的透明反重力粒子层 */
 #bg-canvas {
   position: fixed;
   inset: 0;
@@ -104,7 +104,7 @@ body {
   height: 100%;
   z-index: -1;
   display: var(--canvas-display);
-  background: var(--bg);
+  background: transparent;
   pointer-events: none;
 }
 
@@ -117,9 +117,10 @@ body {
   color: var(--home-btn-text);
   text-decoration: none;
   border: 1px solid var(--home-btn-border);
-  border-radius: 20px;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  border-radius: 18px;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   transition: all 0.3s ease;
   z-index: 100;
   font-size: 0.9rem;
@@ -143,11 +144,11 @@ body {
   justify-content: center;
   padding: 0;
   color: var(--home-btn-text);
-  background: transparent;
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
   border: 1px solid var(--home-btn-border);
   border-radius: 50%;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   transition: all 0.3s ease;
   z-index: 100;
   cursor: pointer;
@@ -187,7 +188,7 @@ body {
   background: var(--card-bg);
   backdrop-filter: blur(var(--card-blur));
   -webkit-backdrop-filter: blur(var(--card-blur));
-  border-radius: 16px;
+  border-radius: 2px;
   border: 1px solid var(--card-border);
   box-shadow: var(--card-shadow);
   transition: background 0.3s ease, border-color 0.3s ease,
@@ -201,10 +202,11 @@ body {
   border-bottom: 1px solid var(--hairline);
   padding-bottom: 16px;
   margin-bottom: 10px;
-  text-align: center;
-  color: var(--accent);
+  font-family: "Noto Serif SC", "Songti SC", "STSong", "SimSun", serif;
+  text-align: left;
+  color: var(--text);
   text-shadow: var(--heading-glow);
-  letter-spacing: 2px;
+  letter-spacing: 0.02em;
 }
 
 /* 链接 */

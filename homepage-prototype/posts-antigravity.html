@@ -1,0 +1,942 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>文章归档 · The Time Forever（原型）</title>
+  <script>
+    (function () {
+      try {
+        document.documentElement.dataset.theme =
+          localStorage.getItem("homepage-prototype-posts-theme") || "light";
+      } catch (error) {
+        document.documentElement.dataset.theme = "light";
+      }
+    }());
+  </script>
+  <style>
+    :root {
+      --paper: #f3f1eb;
+      --paper-soft: rgba(243, 241, 235, 0.84);
+      --ink: #141719;
+      --muted: #737a7b;
+      --line: rgba(20, 23, 25, 0.15);
+      --line-strong: rgba(20, 23, 25, 0.38);
+      --accent: #178f99;
+      --accent-soft: rgba(23, 143, 153, 0.12);
+      --accent-dark: #0b626b;
+      --serif: "Noto Serif SC", "Songti SC", "STSong", "SimSun", serif;
+      --sans: Inter, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      --page: min(1320px, calc(100vw - 96px));
+    }
+
+    :root[data-theme="dark"] {
+      --paper: #111414;
+      --paper-soft: rgba(17, 20, 20, 0.84);
+      --ink: #eff0eb;
+      --muted: #9da6a4;
+      --line: rgba(239, 240, 235, 0.16);
+      --line-strong: rgba(239, 240, 235, 0.38);
+      --accent: #55c7cf;
+      --accent-soft: rgba(85, 199, 207, 0.12);
+      --accent-dark: #7bd4d9;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: var(--sans);
+      transition: color 240ms ease, background 240ms ease;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      color: inherit;
+    }
+
+    .particle-field {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .site-shell {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+    }
+
+    .topbar {
+      width: var(--page);
+      min-height: 76px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 32px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 18px;
+      font-family: var(--serif);
+      font-size: clamp(1.1rem, 1.8vw, 1.48rem);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .brand::before {
+      content: "";
+      width: 2px;
+      height: 28px;
+      background: var(--accent);
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: clamp(18px, 3vw, 42px);
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: clamp(18px, 3vw, 42px);
+      font-size: 0.92rem;
+    }
+
+    .nav a {
+      position: relative;
+      padding: 27px 0 24px;
+      text-decoration: none;
+      color: var(--muted);
+    }
+
+    .nav a:hover,
+    .nav a[aria-current="page"] {
+      color: var(--ink);
+    }
+
+    .nav a[aria-current="page"]::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -1px;
+      height: 2px;
+      background: var(--accent);
+    }
+
+    .theme-toggle {
+      --toggle-size: 34px;
+      width: var(--toggle-size);
+      height: var(--toggle-size);
+      padding: 0;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      background: color-mix(in srgb, var(--paper) 82%, transparent);
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .theme-toggle svg {
+      width: 17px;
+      height: 17px;
+    }
+
+    .theme-toggle .moon {
+      display: none;
+    }
+
+    :root[data-theme="dark"] .theme-toggle .sun {
+      display: none;
+    }
+
+    :root[data-theme="dark"] .theme-toggle .moon {
+      display: block;
+    }
+
+    main {
+      width: var(--page);
+      margin: 0 auto;
+    }
+
+    .hero {
+      min-height: 390px;
+      padding: clamp(64px, 8vw, 112px) 0 48px;
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(300px, 1.1fr);
+      align-items: end;
+      gap: 64px;
+    }
+
+    .hero-copy {
+      max-width: 620px;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-family: var(--serif);
+      font-size: clamp(5rem, 10vw, 9.2rem);
+      font-weight: 500;
+      line-height: 0.82;
+      letter-spacing: -0.08em;
+    }
+
+    .hero h1 span {
+      display: block;
+      margin-top: 26px;
+      font-size: 0.48em;
+      letter-spacing: 0.09em;
+    }
+
+    .hero-description {
+      margin: 30px 0 0;
+      max-width: 460px;
+      color: var(--muted);
+      font-size: 0.96rem;
+      line-height: 1.8;
+    }
+
+    .archive-tools {
+      display: grid;
+      grid-template-columns: minmax(250px, 0.8fr) minmax(520px, 1.2fr);
+      align-items: end;
+      gap: 56px;
+      padding: 24px 0 14px;
+      border-top: 1px solid var(--line);
+    }
+
+    .search {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--line-strong);
+    }
+
+    .search svg {
+      width: 19px;
+      height: 19px;
+      flex: 0 0 auto;
+    }
+
+    .search input {
+      width: 100%;
+      height: 46px;
+      padding: 0;
+      color: var(--ink);
+      background: transparent;
+      border: 0;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    .search input::placeholder {
+      color: var(--muted);
+    }
+
+    .filters {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: clamp(18px, 3vw, 44px);
+    }
+
+    .filter {
+      position: relative;
+      padding: 13px 0;
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .filter:hover,
+    .filter[aria-pressed="true"] {
+      color: var(--ink);
+    }
+
+    .filter[aria-pressed="true"]::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 4px;
+      height: 2px;
+      background: var(--accent);
+    }
+
+    .archive {
+      padding: 10px 0 84px;
+    }
+
+    .year-group {
+      display: grid;
+      grid-template-columns: 150px minmax(0, 1fr);
+      gap: 32px;
+      border-top: 1px solid var(--line);
+    }
+
+    .year {
+      position: sticky;
+      top: 28px;
+      align-self: start;
+      margin: 0;
+      padding: 32px 20px 24px 12px;
+      min-height: 220px;
+      border-right: 2px solid var(--accent);
+      color: var(--accent-dark);
+      font-family: var(--serif);
+      font-size: clamp(4.1rem, 7vw, 7rem);
+      font-weight: 500;
+      line-height: 0.9;
+      letter-spacing: -0.03em;
+      writing-mode: vertical-rl;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+
+    .post-list {
+      list-style: none;
+      margin: 0;
+      padding: 10px 0 0;
+    }
+
+    .post-item {
+      display: grid;
+      grid-template-columns: 72px minmax(0, 1fr) 120px 220px;
+      align-items: center;
+      gap: 20px;
+      min-height: 88px;
+      border-bottom: 1px solid var(--line);
+      transition: transform 180ms ease, border-color 180ms ease;
+    }
+
+    .post-item:hover {
+      transform: translateX(8px);
+      border-color: var(--accent);
+    }
+
+    .post-number {
+      color: var(--ink);
+      font-family: var(--serif);
+      font-size: 2.1rem;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+
+    .post-link {
+      padding: 26px 0;
+      font-family: var(--serif);
+      font-size: clamp(1.15rem, 1.7vw, 1.55rem);
+      line-height: 1.4;
+      text-decoration: none;
+      text-wrap: balance;
+    }
+
+    .post-link:focus-visible,
+    .filter:focus-visible,
+    .theme-toggle:focus-visible,
+    .nav a:focus-visible,
+    .brand:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 5px;
+    }
+
+    .post-date,
+    .post-tags {
+      color: var(--muted);
+      font-size: 0.78rem;
+      letter-spacing: 0.1em;
+    }
+
+    .post-date {
+      font-variant-numeric: lining-nums tabular-nums;
+      white-space: nowrap;
+    }
+
+    .post-tags {
+      color: var(--accent-dark);
+      line-height: 1.7;
+      letter-spacing: 0.04em;
+    }
+
+    .post-item[hidden] {
+      display: none;
+    }
+
+    .empty-state {
+      display: none;
+      margin: 0;
+      padding: 72px 0;
+      color: var(--muted);
+      font-family: var(--serif);
+      font-size: 1.3rem;
+      text-align: center;
+    }
+
+    .empty-state.visible {
+      display: block;
+    }
+
+    .site-footer {
+      width: var(--page);
+      margin: 0 auto;
+      padding: 24px 0 32px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+      align-items: center;
+      gap: 32px;
+      border-top: 1px solid var(--line-strong);
+    }
+
+    .stat {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 40px;
+      padding-right: 30px;
+      border-right: 1px solid var(--line);
+    }
+
+    .stat svg {
+      width: 21px;
+      height: 21px;
+      color: var(--accent-dark);
+    }
+
+    .stat-label {
+      display: block;
+      color: var(--muted);
+      font-size: 0.72rem;
+    }
+
+    .stat-value {
+      display: block;
+      margin-top: 2px;
+      font-family: var(--serif);
+      font-size: 1.02rem;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+
+    .copyright {
+      color: var(--muted);
+      font-family: var(--serif);
+      font-size: 0.84rem;
+      text-align: right;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 1050px) {
+      :root {
+        --page: min(100% - 48px, 960px);
+      }
+
+      .hero {
+        grid-template-columns: 1fr 0.6fr;
+      }
+
+      .archive-tools {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .filters {
+        justify-content: flex-start;
+      }
+
+      .post-item {
+        grid-template-columns: 62px minmax(0, 1fr) 105px;
+      }
+
+      .post-tags {
+        display: none;
+      }
+    }
+
+    @media (max-width: 720px) {
+      :root {
+        --page: calc(100% - 36px);
+      }
+
+      .topbar {
+        min-height: 66px;
+      }
+
+      .topbar-actions {
+        gap: 12px;
+      }
+
+      .nav {
+        gap: 18px;
+      }
+
+      .nav a {
+        padding: 23px 0 20px;
+      }
+
+      .nav a:not([aria-current="page"]) {
+        display: none;
+      }
+
+      .hero {
+        min-height: 430px;
+        padding: 72px 0 42px;
+        grid-template-columns: 1fr;
+        gap: 42px;
+        align-content: end;
+      }
+
+      .hero h1 {
+        font-size: clamp(4.6rem, 23vw, 7rem);
+      }
+
+      .filters {
+        width: 100%;
+        gap: 26px;
+        overflow-x: auto;
+        scrollbar-width: none;
+      }
+
+      .filters::-webkit-scrollbar {
+        display: none;
+      }
+
+      .filter {
+        flex: 0 0 auto;
+      }
+
+      .year-group {
+        grid-template-columns: 54px minmax(0, 1fr);
+        gap: 16px;
+      }
+
+      .year {
+        top: 16px;
+        padding: 24px 8px 18px 0;
+        font-size: 3rem;
+        border-right-width: 1px;
+      }
+
+      .post-item {
+        grid-template-columns: 42px minmax(0, 1fr);
+        gap: 10px;
+        min-height: 0;
+        padding: 20px 0;
+      }
+
+      .post-number {
+        align-self: start;
+        padding-top: 1px;
+        font-size: 1.3rem;
+      }
+
+      .post-link {
+        padding: 0;
+        font-size: 1.08rem;
+      }
+
+      .post-date {
+        grid-column: 2;
+        margin-top: -4px;
+      }
+
+      .site-footer {
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+      }
+
+      .stat {
+        padding-right: 0;
+        border-right: 0;
+      }
+
+      .stat:nth-child(3) {
+        display: none;
+      }
+
+      .copyright {
+        text-align: left;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      *,
+      *::before,
+      *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas class="particle-field" id="particle-field" aria-hidden="true"></canvas>
+
+  <div class="site-shell">
+    <header class="topbar">
+      <a class="brand" href="./">The Time Forever</a>
+      <div class="topbar-actions">
+        <nav class="nav" aria-label="主要导航">
+          <a href="./">首页</a>
+          <a href="#" aria-current="page">文章</a>
+          <a href="./#guestbook">留言</a>
+          <a href="https://github.com/The-time-forever">GitHub</a>
+        </nav>
+        <button class="theme-toggle" type="button" aria-label="切换深浅色模式" title="切换深浅色模式">
+          <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path>
+          </svg>
+          <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <path d="M20.3 15.2A8.5 8.5 0 0 1 8.8 3.7 8.5 8.5 0 1 0 20.3 15.2Z"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="archive-title">
+        <div class="hero-copy">
+          <h1 id="archive-title">文章<span>ARCHIVE</span></h1>
+          <p class="hero-description">记录技术探索、工具实践与思考沉淀，按时间顺序归档仓库中的所有文章。</p>
+        </div>
+      </section>
+
+      <section aria-label="文章检索与筛选">
+        <div class="archive-tools">
+          <label class="search" for="post-search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+              <circle cx="11" cy="11" r="7"></circle>
+              <path d="m20 20-4-4"></path>
+            </svg>
+            <input id="post-search" type="search" autocomplete="off" placeholder="搜索文章标题、关键词…" aria-label="搜索文章">
+          </label>
+          <div class="filters" aria-label="文章分类">
+            <button class="filter" type="button" data-filter="all" aria-pressed="true">全部</button>
+            <button class="filter" type="button" data-filter="tech" aria-pressed="false">技术折腾</button>
+            <button class="filter" type="button" data-filter="writing" aria-pressed="false">学术写作</button>
+            <button class="filter" type="button" data-filter="tools" aria-pressed="false">工具效率</button>
+            <button class="filter" type="button" data-filter="notes" aria-pressed="false">知识笔记</button>
+          </div>
+        </div>
+
+        <div class="archive">
+          <section class="year-group" aria-labelledby="year-2026">
+            <h2 class="year" id="year-2026">2026</h2>
+            <div>
+              <ol class="post-list" id="post-list">
+                <li class="post-item" data-category="tech writing" data-search="latex overleaf 本地环境 排版 学术写作">
+                  <span class="post-number">01</span>
+                  <a class="post-link" href="../posts/2026/07/04/latex-guide/">LaTeX 使用指南：从 Overleaf 到本地环境搭建</a>
+                  <time class="post-date" datetime="2026-07-04">2026-07-04</time>
+                  <span class="post-tags">技术折腾 · LaTeX · 学术写作</span>
+                </li>
+                <li class="post-item" data-category="writing tools" data-search="academic writing suite 学术写作 技能包">
+                  <span class="post-number">02</span>
+                  <a class="post-link" href="../posts/2026/07/03/academic-writing-suite/">Academic Writing Suite：一个面向学术写作的技能包</a>
+                  <time class="post-date" datetime="2026-07-03">2026-07-03</time>
+                  <span class="post-tags">学术写作 · Skill · 工具</span>
+                </li>
+                <li class="post-item" data-category="tools notes" data-search="压缩 解压 文件 工具">
+                  <span class="post-number">03</span>
+                  <a class="post-link" href="../posts/2026/07/03/zip-guide/">压缩与解压</a>
+                  <time class="post-date" datetime="2026-07-03">2026-07-03</time>
+                  <span class="post-tags">工具效率 · 文件管理</span>
+                </li>
+                <li class="post-item" data-category="tech notes" data-search="agent llm mcp claude code rag 术语">
+                  <span class="post-number">04</span>
+                  <a class="post-link" href="../posts/2026/07/03/agent-glossary/">你真的知道 Agent 的这些名词吗？LLM / Agent 生态高频术语全解析</a>
+                  <time class="post-date" datetime="2026-07-03">2026-07-03</time>
+                  <span class="post-tags">技术折腾 · Agent · MCP</span>
+                </li>
+                <li class="post-item" data-category="tools tech" data-search="整理 电脑 文件 windows 效率">
+                  <span class="post-number">05</span>
+                  <a class="post-link" href="../posts/2026/07/03/organize-files-guide/">拒绝混乱：教你整理电脑文件</a>
+                  <time class="post-date" datetime="2026-07-03">2026-07-03</time>
+                  <span class="post-tags">工具效率 · Windows · 教程</span>
+                </li>
+                <li class="post-item" data-category="tech notes" data-search="cli 命令行 入门 实用 指南">
+                  <span class="post-number">06</span>
+                  <a class="post-link" href="../posts/2026/03/09/cli-guide/">CLI 命令行入门与实用指南</a>
+                  <time class="post-date" datetime="2026-03-09">2026-03-09</time>
+                  <span class="post-tags">技术折腾 · CLI · 教程</span>
+                </li>
+                <li class="post-item" data-category="tools notes" data-search="苹果 妙控板 手势 快捷 操作 效率">
+                  <span class="post-number">07</span>
+                  <a class="post-link" href="../posts/2026/03/09/magic-trackpad-guide/">苹果妙控板使用指南：手势、快捷操作与效率技巧</a>
+                  <time class="post-date" datetime="2026-03-09">2026-03-09</time>
+                  <span class="post-tags">工具效率 · macOS · 手势</span>
+                </li>
+                <li class="post-item" data-category="tools notes" data-search="windows 快捷键 指南 效率">
+                  <span class="post-number">08</span>
+                  <a class="post-link" href="../posts/2026/03/02/windows-shortcuts-guide/">Windows 快捷键指南</a>
+                  <time class="post-date" datetime="2026-03-02">2026-03-02</time>
+                  <span class="post-tags">工具效率 · Windows · 快捷键</span>
+                </li>
+                <li class="post-item" data-category="writing notes" data-search="markdown 使用 指南 写作">
+                  <span class="post-number">09</span>
+                  <a class="post-link" href="../posts/2026/03/02/markdown-guide/">Markdown 使用指南</a>
+                  <time class="post-date" datetime="2026-03-02">2026-03-02</time>
+                  <span class="post-tags">知识笔记 · Markdown · 写作</span>
+                </li>
+                <li class="post-item" data-category="tech notes" data-search="git 完全 指南 入门 精通">
+                  <span class="post-number">10</span>
+                  <a class="post-link" href="../posts/2026/03/02/git-complete-guide/">Git 完全指南：从入门到精通</a>
+                  <time class="post-date" datetime="2026-03-02">2026-03-02</time>
+                  <span class="post-tags">技术折腾 · Git · 教程</span>
+                </li>
+                <li class="post-item" data-category="tech tools" data-search="python 虚拟环境 venv 依赖 开发">
+                  <span class="post-number">11</span>
+                  <a class="post-link" href="../posts/2026/02/20/python-virtualenv-guide/">Python 虚拟环境完全指南：告别“依赖地狱”</a>
+                  <time class="post-date" datetime="2026-02-20">2026-02-20</time>
+                  <span class="post-tags">技术折腾 · Python · 开发环境</span>
+                </li>
+              </ol>
+              <p class="empty-state" id="empty-state">没有找到匹配的文章。</p>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="stat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+          <path d="M4 20v-8h4v8M10 20V5h4v15M16 20v-5h4v5M2 20h20"></path>
+        </svg>
+        <span><small class="stat-label">文章总数</small><strong class="stat-value">11</strong></span>
+      </div>
+      <div class="stat" id="busuanzi_container_site_pv">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+          <path d="M2 12s3.8-6 10-6 10 6 10 6-3.8 6-10 6S2 12 2 12Z"></path>
+          <circle cx="12" cy="12" r="2.5"></circle>
+        </svg>
+        <span><small class="stat-label">全站访问</small><strong class="stat-value" id="busuanzi_value_site_pv">—</strong></span>
+      </div>
+      <div class="stat" id="busuanzi_container_site_uv">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+          <circle cx="9" cy="8" r="3"></circle>
+          <path d="M3 20c0-4 2.2-7 6-7s6 3 6 7M16 5.5a3 3 0 0 1 0 5.8M17 13c2.7.6 4 3.1 4 6"></path>
+        </svg>
+        <span><small class="stat-label">访客</small><strong class="stat-value" id="busuanzi_value_site_uv">—</strong></span>
+      </div>
+      <p class="copyright">© 2026 The Time Forever<br>文章归档页设计原型</p>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      var root = document.documentElement;
+      var toggle = document.querySelector(".theme-toggle");
+      toggle.addEventListener("click", function () {
+        var next = root.dataset.theme === "dark" ? "light" : "dark";
+        root.dataset.theme = next;
+        try {
+          localStorage.setItem("homepage-prototype-posts-theme", next);
+        } catch (error) {}
+      });
+
+      var query = "";
+      var activeFilter = "all";
+      var search = document.getElementById("post-search");
+      var filters = Array.prototype.slice.call(document.querySelectorAll(".filter"));
+      var posts = Array.prototype.slice.call(document.querySelectorAll(".post-item"));
+      var empty = document.getElementById("empty-state");
+
+      function updatePosts() {
+        var visible = 0;
+        posts.forEach(function (post) {
+          var content = (post.textContent + " " + post.dataset.search).toLowerCase();
+          var matchesQuery = !query || content.indexOf(query) !== -1;
+          var matchesFilter = activeFilter === "all" ||
+            post.dataset.category.split(" ").indexOf(activeFilter) !== -1;
+          var show = matchesQuery && matchesFilter;
+          post.hidden = !show;
+          if (show) visible += 1;
+        });
+        empty.classList.toggle("visible", visible === 0);
+      }
+
+      search.addEventListener("input", function () {
+        query = search.value.trim().toLowerCase();
+        updatePosts();
+      });
+
+      filters.forEach(function (filter) {
+        filter.addEventListener("click", function () {
+          activeFilter = filter.dataset.filter;
+          filters.forEach(function (item) {
+            item.setAttribute("aria-pressed", String(item === filter));
+          });
+          updatePosts();
+        });
+      });
+    }());
+
+    (function () {
+      var canvas = document.getElementById("particle-field");
+      var context = canvas.getContext("2d");
+      var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var particles = [];
+      var pointer = { x: -9999, y: -9999, active: false };
+      var animationFrame = 0;
+      var paletteLight = ["#148f99", "#2e63dd", "#68499b", "#171a1b"];
+      var paletteDark = ["#55c7cf", "#7697ff", "#aa89df", "#e8e9e4"];
+      var dpr = 1;
+      var width = 0;
+      var height = 0;
+
+      function makeParticle(index) {
+        var leftBias = Math.pow(Math.random(), 1.8);
+        var x = width * (0.02 + leftBias * 0.83);
+        var y = height * (0.08 + Math.random() * 0.78);
+        return {
+          x: x,
+          y: y,
+          homeX: x,
+          homeY: y,
+          vx: (Math.random() - 0.5) * 0.08,
+          vy: -0.035 - Math.random() * 0.06,
+          width: 1 + Math.random() * 4.4,
+          height: 1 + Math.random() * 1.7,
+          rotation: Math.random() * Math.PI,
+          colorIndex: index % 4,
+          alpha: 0.18 + Math.random() * 0.55
+        };
+      }
+
+      function resize() {
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = Math.round(width * dpr);
+        canvas.height = Math.round(height * dpr);
+        canvas.style.width = width + "px";
+        canvas.style.height = height + "px";
+        context.setTransform(dpr, 0, 0, dpr, 0, 0);
+        var count = width < 720 ? 74 : Math.min(190, Math.round(width / 8));
+        particles = Array.from({ length: count }, function (_, index) {
+          return makeParticle(index);
+        });
+      }
+
+      function update(particle) {
+        if (pointer.active) {
+          var dx = particle.x - pointer.x;
+          var dy = particle.y - pointer.y;
+          var distanceSquared = dx * dx + dy * dy;
+          var radius = width < 720 ? 92 : 150;
+          if (distanceSquared < radius * radius && distanceSquared > 1) {
+            var distance = Math.sqrt(distanceSquared);
+            var force = (1 - distance / radius) * 0.78;
+            particle.vx += (dx / distance) * force;
+            particle.vy += (dy / distance) * force;
+          }
+        }
+
+        particle.vx += (particle.homeX - particle.x) * 0.00024;
+        particle.vy += (particle.homeY - particle.y) * 0.00018 - 0.0015;
+        particle.vx *= 0.965;
+        particle.vy *= 0.965;
+        particle.x += particle.vx;
+        particle.y += particle.vy;
+
+        if (particle.y < -24) {
+          particle.y = height + 24;
+          particle.homeY = height * (0.1 + Math.random() * 0.76);
+        }
+      }
+
+      function draw() {
+        context.clearRect(0, 0, width, height);
+        var dark = document.documentElement.dataset.theme === "dark";
+        var palette = dark ? paletteDark : paletteLight;
+
+        particles.forEach(function (particle) {
+          if (!reducedMotion) update(particle);
+          context.save();
+          context.globalAlpha = particle.alpha;
+          context.fillStyle = palette[particle.colorIndex];
+          context.translate(particle.x, particle.y);
+          context.rotate(particle.rotation);
+          context.fillRect(
+            -particle.width / 2,
+            -particle.height / 2,
+            particle.width,
+            particle.height
+          );
+          context.restore();
+        });
+
+        window.__postsParticleState = {
+          count: particles.length,
+          pointerActive: pointer.active,
+          width: width,
+          height: height
+        };
+
+        if (!reducedMotion && !document.hidden) {
+          animationFrame = requestAnimationFrame(draw);
+        }
+      }
+
+      function setPointer(event) {
+        pointer.x = event.clientX;
+        pointer.y = event.clientY;
+        pointer.active = true;
+      }
+
+      window.addEventListener("pointermove", setPointer, { passive: true });
+      window.addEventListener("pointerdown", setPointer, { passive: true });
+      window.addEventListener("pointerleave", function () {
+        pointer.active = false;
+      });
+      window.addEventListener("resize", function () {
+        cancelAnimationFrame(animationFrame);
+        resize();
+        draw();
+      }, { passive: true });
+      document.addEventListener("visibilitychange", function () {
+        if (!document.hidden) {
+          cancelAnimationFrame(animationFrame);
+          draw();
+        }
+      });
+
+      resize();
+      draw();
+    }());
+  </script>
+</body>
+</html>

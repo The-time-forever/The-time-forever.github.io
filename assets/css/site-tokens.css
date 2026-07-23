@@ -1,0 +1,15 @@
+:root {
+  --site-paper: #f3f1eb;
+  --site-ink: #17191a;
+  --site-muted: #6e7576;
+  --site-line: rgba(23, 25, 26, 0.16);
+  --site-accent: #178d96;
+}
+
+:root[data-theme="dark"] {
+  --site-paper: #111414;
+  --site-ink: #ecece7;
+  --site-muted: #a3aaaa;
+  --site-line: rgba(236, 236, 231, 0.14);
+  --site-accent: #55c7cf;
+}

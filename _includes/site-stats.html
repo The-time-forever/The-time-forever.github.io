@@ -1,0 +1,30 @@
+{%- if include.variant == "archive" -%}
+<div class="stat" id="busuanzi_container_site_pv" style="display:none">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+    <path d="M2 12s3.8-6 10-6 10 6 10 6-3.8 6-10 6S2 12 2 12Z"></path>
+    <circle cx="12" cy="12" r="2.5"></circle>
+  </svg>
+  <span><small class="stat-label">全站访问</small><strong class="stat-value" id="busuanzi_value_site_pv">—</strong></span>
+</div>
+<div class="stat" id="busuanzi_container_site_uv" style="display:none">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+    <circle cx="9" cy="8" r="3"></circle>
+    <path d="M3 20c0-4 2.2-7 6-7s6 3 6 7M16 5.5a3 3 0 0 1 0 5.8M17 13c2.7.6 4 3.1 4 6"></path>
+  </svg>
+  <span><small class="stat-label">访客</small><strong class="stat-value" id="busuanzi_value_site_uv">—</strong></span>
+</div>
+{%- else -%}
+<span id="busuanzi_container_site_pv" style="display:none" class="site-stats">
+  <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+    <circle cx="12" cy="12" r="3"></circle>
+  </svg>
+  全站访问 <span id="busuanzi_value_site_pv"></span> 次
+  <span aria-hidden="true">·</span>
+  <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+    <circle cx="12" cy="7" r="4"></circle>
+  </svg>
+  访客 <span id="busuanzi_value_site_uv"></span> 人
+</span>
+{%- endif -%}
