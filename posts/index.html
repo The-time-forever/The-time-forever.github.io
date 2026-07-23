@@ -1,219 +1,126 @@
 ---
 layout: null
 ---
-<!DOCTYPE html>
-<html lang="zh-CN">
-
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>文章列表 | The Time Forever</title>
-  <!-- 防主题闪烁：渲染前确定 data-theme（默认夜间） -->
-  <script>
-    (function () {
-      try {
-        var t = localStorage.getItem('theme') || 'dark';
-        document.documentElement.setAttribute('data-theme', t);
-      } catch (e) {
-        document.documentElement.setAttribute('data-theme', 'dark');
-      }
-    })();
-  </script>
-  <link rel="stylesheet" href="/assets/css/blog.css">
-  <style>
-    /* 列表页专属样式（骨架与主题变量见 /assets/css/blog.css） */
-    .glass-container h1 {
-      margin-bottom: 24px;
-    }
-
-    /* 全站访问统计 */
-    .site-stats {
-      text-align: center;
-      color: var(--muted);
-      font-size: 0.85em;
-      margin: -12px 0 24px;
-    }
-
-    .site-stats span {
-      color: var(--accent);
-      opacity: 0.85;
-    }
-
-    /* 列表样式 */
-    .glass-container ul {
-      list-style: none;
-      padding: 0;
-    }
-
-    .glass-container li {
-      margin-bottom: 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid var(--hairline);
-      gap: 12px;
-      padding-bottom: 8px;
-    }
-
-    .glass-container li a {
-      flex: 1;
-      min-width: 0;
-      line-height: 1.6;
-    }
-
-    .glass-container .post-date {
-      font-size: 0.85rem;
-      color: var(--muted);
-      margin-left: 16px;
-      white-space: nowrap;
-      font-family: monospace;
-    }
-
-    /* 响应式调整（列表专属；骨架断点见 blog.css） */
-    @media (max-width: 600px) {
-      .glass-container li {
-        align-items: flex-start;
-        flex-direction: column;
-        gap: 4px;
-        padding-bottom: 12px;
-      }
-
-      .glass-container .post-date {
-        margin-left: 0;
-      }
-    }
-
-    /* 搜索框 */
-    .search-box {
-      display: block;
-      width: 100%;
-      padding: 10px 14px;
-      margin-bottom: 24px;
-      font-size: 0.95rem;
-      color: var(--text);
-      background: var(--card-bg);
-      border: 1px solid var(--hairline);
-      border-radius: 10px;
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-
-    .search-box::placeholder {
-      color: var(--muted);
-    }
-
-    .search-box:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
-    }
-
-    .glass-container li.search-hidden {
-      display: none;
-    }
-
-    .search-empty {
-      display: none;
-      color: var(--muted);
-      text-align: center;
-      padding: 12px 0;
-    }
-
-    .search-empty.visible {
-      display: block;
-    }
-  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>文章归档 · The Time Forever</title>
+    {% include theme-init.html %}
+  <link rel="stylesheet" href="/assets/css/site-tokens.css?v=20260723-refactor">
+  <link rel="stylesheet" href="/assets/css/posts-archive.css?v=20260723-refactor">
 </head>
-
 <body>
+  <canvas class="particle-field" id="particle-field" aria-hidden="true"></canvas>
 
-  <!-- Canvas 背景：不影响可访问性 -->
-  <canvas id="bg-canvas" aria-hidden="true"></canvas>
+  <div class="site-shell">
+    <header class="topbar">
+      <a class="brand" href="/">The Time Forever</a>
+      <div class="topbar-actions">
+        <nav class="nav" aria-label="主要导航">
+          <a href="/">首页</a>
+          <a href="/posts/" aria-current="page">文章</a>
+          <a href="/#guestbook">留言</a>
+          <a href="https://github.com/The-time-forever">GitHub</a>
+        </nav>
+        <button class="theme-toggle" type="button" aria-label="切换深浅色模式" title="切换深浅色模式">
+          <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path>
+          </svg>
+          <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <path d="M20.3 15.2A8.5 8.5 0 0 1 8.8 3.7 8.5 8.5 0 1 0 20.3 15.2Z"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
 
-  <!-- 返回首页按钮 -->
-  <a href="/" class="home-btn">← 返回首页</a>
+    <main>
+      <section class="hero" aria-labelledby="archive-title">
+        <div class="hero-copy">
+          <h1 id="archive-title">文章<span>ARCHIVE</span></h1>
+          <p class="hero-description">记录技术探索、工具实践与思考沉淀，按时间顺序归档仓库中的所有文章。</p>
+        </div>
+      </section>
 
-  <!-- 主题切换按钮：夜间显示太阳，白天显示月亮 -->
-  <button class="theme-toggle" type="button" aria-label="切换日间/夜间模式" title="切换日间/夜间模式">
-    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-      stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <circle cx="12" cy="12" r="5"></circle>
-      <line x1="12" y1="1" x2="12" y2="3"></line>
-      <line x1="12" y1="21" x2="12" y2="23"></line>
-      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-      <line x1="1" y1="12" x2="3" y2="12"></line>
-      <line x1="21" y1="12" x2="23" y2="12"></line>
-      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-    </svg>
-    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-      stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-    </svg>
-  </button>
+      <section aria-label="文章检索与筛选">
+        <div class="archive-tools">
+          <label class="search" for="post-search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+              <circle cx="11" cy="11" r="7"></circle>
+              <path d="m20 20-4-4"></path>
+            </svg>
+            <input id="post-search" type="search" autocomplete="off" placeholder="搜索文章标题、关键词…" aria-label="搜索文章">
+          </label>
+          <div class="filters" aria-label="文章分类">
+            <button class="filter" type="button" data-filter="all" aria-pressed="true">全部</button>
+            <button class="filter" type="button" data-filter="tech" aria-pressed="false">技术折腾</button>
+            <button class="filter" type="button" data-filter="writing" aria-pressed="false">学术写作</button>
+            <button class="filter" type="button" data-filter="tools" aria-pressed="false">工具效率</button>
+            <button class="filter" type="button" data-filter="notes" aria-pressed="false">知识笔记</button>
+          </div>
+        </div>
 
-  <div class="glass-container">
-    <h1>文章列表</h1>
-    <p class="site-stats" id="busuanzi_container_site_pv" style="display:none">
-      <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-        stroke-linecap="round" stroke-linejoin="round">
-        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-        <circle cx="12" cy="12" r="3"></circle>
-      </svg>
-      全站访问 <span id="busuanzi_value_site_pv"></span> 次
-      ·
-      <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-        stroke-linecap="round" stroke-linejoin="round">
-        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-        <circle cx="12" cy="7" r="4"></circle>
-      </svg>
-      访客 <span id="busuanzi_value_site_uv"></span> 人
-    </p>
+        <div class="archive">
+          {% assign posts_by_year = site.posts | group_by_exp: "post", "post.date | date: '%Y'" %}
+          {% assign archive_index = 0 %}
+          {% for year in posts_by_year %}
+          <section class="year-group" aria-labelledby="year-{{ year.name }}">
+            <h2 class="year" id="year-{{ year.name }}">{{ year.name }}</h2>
+            <ol class="post-list">
+              {% for post in year.items %}
+              {% assign archive_index = archive_index | plus: 1 %}
+              {% capture post_groups %}
+                notes
+                {% if post.categories contains "技术折腾" or post.tags contains "LLM" or post.tags contains "Agent" or post.tags contains "Python" or post.title contains "Git" or post.title contains "CLI" %} tech{% endif %}
+                {% if post.tags contains "学术写作" or post.title contains "Academic Writing" or post.title contains "Markdown" %} writing{% endif %}
+                {% if post.tags contains "效率" or post.tags contains "Windows" or post.title contains "压缩" or post.title contains "妙控板" or post.title contains "快捷键" or post.title contains "整理电脑" %} tools{% endif %}
+              {% endcapture %}
+              {% capture padded_index %}0{{ archive_index }}{% endcapture %}
+              <li
+                class="post-item"
+                data-category="{{ post_groups | strip | replace: '  ', ' ' }}"
+                data-search="{{ post.title | downcase | escape }} {{ post.tags | join: ' ' | downcase | escape }} {{ post.categories | join: ' ' | downcase | escape }}"
+              >
+                <span class="post-number">{{ padded_index | slice: -2, 2 }}</span>
+                {% if post.redirect_to %}
+                <a class="post-link" href="{{ post.redirect_to }}" target="_blank" rel="noopener noreferrer">{{ post.title }}</a>
+                {% else %}
+                <a class="post-link" href="{{ post.url | relative_url }}">{{ post.title }}</a>
+                {% endif %}
+                <time class="post-date" datetime="{{ post.date | date: '%Y-%m-%d' }}">{{ post.date | date: "%Y-%m-%d" }}</time>
+                <span class="post-tags">
+                  {% if post.categories.size > 0 %}{{ post.categories | join: " · " }}{% endif %}
+                  {% if post.categories.size > 0 and post.tags.size > 0 %} · {% endif %}
+                  {% if post.tags.size > 0 %}{{ post.tags | slice: 0, 3 | join: " · " }}{% else %}知识笔记{% endif %}
+                </span>
+              </li>
+              {% endfor %}
+            </ol>
+          </section>
+          {% endfor %}
+          <p class="empty-state" id="empty-state">没有找到匹配的文章。</p>
+        </div>
+      </section>
+    </main>
 
-    <input type="search" id="post-search" class="search-box" placeholder="搜索文章标题…" aria-label="搜索文章标题">
-
-    <ul id="post-list">
-      {% for post in site.posts %}
-      <li data-title="{{ post.title | downcase | escape }}">
-        {% if post.redirect_to %}
-        <a href="{{ post.redirect_to }}" target="_blank">{{ post.title }}</a>
-        {% else %}
-        <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
-        {% endif %}
-        <span class="post-date">{{ post.date | date: "%Y-%m-%d" }}</span>
-      </li>
-      {% endfor %}
-    </ul>
-    <p class="search-empty" id="search-empty">没有找到匹配的文章</p>
-
-    <p style="font-size:0.9rem;color:#bbb;margin-top:2rem;">提示：鼠标移动会产生拖尾并影响周围粒子；按住 <strong>Alt</strong>
-      可切换吸引（Alt）/排斥（默认）效果。</p>
+    <footer class="site-footer">
+      <div class="stat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+          <path d="M4 20v-8h4v8M10 20V5h4v15M16 20v-5h4v5M2 20h20"></path>
+        </svg>
+        <span><small class="stat-label">文章总数</small><strong class="stat-value">{{ site.posts | size }}</strong></span>
+      </div>
+      {% include site-stats.html variant="archive" %}
+      <p class="copyright">© 2026 The Time Forever<br>持续记录，持续构建。</p>
+    </footer>
   </div>
 
-  <script>
-    (function () {
-      var input = document.getElementById('post-search');
-      var items = Array.prototype.slice.call(document.querySelectorAll('#post-list li'));
-      var emptyMsg = document.getElementById('search-empty');
-
-      input.addEventListener('input', function () {
-        var query = input.value.trim().toLowerCase();
-        var visibleCount = 0;
-
-        items.forEach(function (li) {
-          var matches = !query || li.dataset.title.indexOf(query) !== -1;
-          li.classList.toggle('search-hidden', !matches);
-          if (matches) visibleCount++;
-        });
-
-        emptyMsg.classList.toggle('visible', visibleCount === 0);
-      });
-    })();
-  </script>
-
-  <script src="/assets/js/space-particles.js" defer></script>
-  <script src="/assets/js/theme-toggle.js" defer></script>
-  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <script src="/assets/js/theme-toggle.js?v=20260723-refactor" defer></script>
+  <script src="/assets/js/particle-field.js?v=20260723-refactor" defer></script>
+  <script src="/assets/js/posts-archive.js?v=20260723-refactor" defer></script>
+  {% include busuanzi-script.html %}
 </body>
-
 </html>

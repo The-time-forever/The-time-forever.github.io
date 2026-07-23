@@ -1,0 +1,12 @@
+<script>
+  (function () {
+    try {
+      var savedTheme = localStorage.getItem("theme");
+      if (savedTheme === "dark" || savedTheme === "light") {
+        document.documentElement.dataset.theme = savedTheme;
+      }
+    } catch (_) {
+      // Storage may be unavailable in restricted previews.
+    }
+  }());
+</script>

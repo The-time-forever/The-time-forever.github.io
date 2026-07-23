@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="The Time Forever — 记录生活、学习与思考"
+    />
+    <title>The Time Forever</title>
+    <link rel="shortcut icon" href="/favicon.ico?v=2" type="image/x-icon" />
+    <link rel="icon" href="/images/favicon.png?v=2" type="image/png" />
+        {% include theme-init.html %}
+    <link rel="stylesheet" href="/assets/css/site-tokens.css?v=20260723-refactor" />
+    <link rel="stylesheet" href="/assets/css/homepage.css?v=20260723-refactor" />
+  </head>
+  <body>
+    <aside class="sidebar" aria-label="站点导航" data-menu-open="false">
+      <a class="identity" href="#top" aria-label="返回首页顶部">
+        <div class="avatar-frame">
+          <img src="/images/avatar1.png" alt="The Time Forever 头像" />
+        </div>
+        <p class="brand-title">The Time<br />Forever</p>
+        <p class="brand-tagline">记录生活、学习与思考</p>
+        <div class="brand-rule" aria-hidden="true"></div>
+      </a>
+
+      <nav class="side-nav" id="site-navigation">
+        <a href="#top" aria-current="page">首页</a>
+        <a href="/posts/">文章</a>
+        <a href="#guestbook-panel" data-open-guestbook aria-controls="guestbook-panel" aria-expanded="false">留言</a>
+        <a href="https://github.com/the-time-forever" target="_blank" rel="noreferrer">GitHub</a>
+      </nav>
+
+      <div class="side-utilities">
+        <button class="theme-toggle" type="button" aria-pressed="false">
+          <span class="theme-label">浅色模式</span>
+          <span class="eclipse-control" aria-hidden="true">
+            <span class="eclipse-orbit">
+              <span class="eclipse-disc"></span>
+              <span class="eclipse-accent"></span>
+            </span>
+          </span>
+        </button>
+        <button
+          class="mobile-menu-toggle"
+          type="button"
+          aria-label="打开导航菜单"
+          aria-controls="site-navigation"
+          aria-expanded="false"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <line x1="3" y1="6" x2="21" y2="6" stroke="currentColor" stroke-width="1.6" />
+            <line x1="3" y1="12" x2="21" y2="12" stroke="currentColor" stroke-width="1.6" />
+            <line x1="3" y1="18" x2="21" y2="18" stroke="currentColor" stroke-width="1.6" />
+          </svg>
+        </button>
+        <p class="copyright">
+          © 2026 The Time Forever<br />Hosted on GitHub Pages
+        </p>
+      </div>
+    </aside>
+
+    <main class="page" id="top">
+      <section class="hero" aria-label="首页主视觉" data-calendar-state="expanded">
+        <picture class="hero-picture">
+          <source
+            media="(max-width: 760px)"
+            srcset="/assets/images/homepage/hero-calendar-mobile.jpg"
+          />
+          <img
+            class="hero-media"
+            src="/assets/images/homepage/hero-calendar-desktop.jpg"
+            alt="蓝黑漫画风格的七月日历插画"
+          />
+        </picture>
+        <div class="calendar-stage">
+          <aside class="hero-calendar" id="hero-calendar" aria-label="当前月份日历">
+            <button class="calendar-hide-toggle" type="button" aria-label="隐藏日历" aria-controls="hero-calendar" aria-expanded="true">
+              <span aria-hidden="true">−</span>
+            </button>
+            <div class="calendar-head">
+              <div>
+                <p class="calendar-label">CALENDAR · <span class="calendar-year"></span></p>
+                <p class="calendar-month"></p>
+              </div>
+              <p class="calendar-date"><strong></strong><span></span></p>
+            </div>
+            <div class="calendar-grid" aria-hidden="true">
+              <span class="calendar-weekday">SUN</span><span class="calendar-weekday">MON</span><span class="calendar-weekday">TUE</span><span class="calendar-weekday">WED</span><span class="calendar-weekday">THU</span><span class="calendar-weekday">FRI</span><span class="calendar-weekday">SAT</span>
+              <div class="calendar-days" style="display: contents"></div>
+            </div>
+          </aside>
+        </div>
+        <div class="calendar-dock" aria-hidden="true">
+          <div class="calendar-dock-copy" aria-live="polite">
+            <strong class="calendar-dock-month"></strong>
+            <span class="calendar-dock-date"></span>
+          </div>
+          <button class="calendar-show-toggle" type="button" aria-controls="hero-calendar" aria-expanded="false">
+            显示日历
+          </button>
+        </div>
+      </section>
+
+      {% assign featured = site.posts | first %}
+      <section id="articles" aria-labelledby="articles-title">
+        <div class="content-shell">
+          <div class="section-topline">
+            <h2 class="section-heading" id="articles-title">最新文章</h2>
+            <a class="section-link" href="/posts/">
+              查看全部文章 →
+              <svg class="section-arrow" viewBox="0 0 150 12" aria-hidden="true">
+                <path d="M0 6H148M143 1L148 6L143 11" fill="none" stroke="currentColor" stroke-width="1" />
+              </svg>
+            </a>
+          </div>
+
+          {% if featured %}
+          <article class="featured-post">
+            {% if featured.redirect_to %}
+            <a class="featured-media" href="{{ featured.redirect_to }}" target="_blank" tabindex="-1" aria-hidden="true">
+            {% else %}
+            <a class="featured-media" href="{{ featured.url | relative_url }}" tabindex="-1" aria-hidden="true">
+            {% endif %}
+              <img src="/assets/images/homepage/project-visual-banner.png" alt="时间、知识与思考主题的黑白漫画横幅" />
+            </a>
+            <div class="featured-copy">
+              <span class="eyeline">
+                置顶{% if featured.categories.size > 0 %} · {{ featured.categories | join: " · " }}{% endif %}
+              </span>
+              <h3>
+                {% if featured.redirect_to %}
+                <a href="{{ featured.redirect_to }}" target="_blank">{{ featured.title }}</a>
+                {% else %}
+                <a href="{{ featured.url | relative_url }}">{{ featured.title }}</a>
+                {% endif %}
+              </h3>
+              <p>{{ featured.excerpt | strip_html | strip_newlines | truncate: 120 }}</p>
+              <div class="featured-meta">
+                <time datetime="{{ featured.date | date: "%Y-%m-%d" }}">{{ featured.date | date: "%Y-%m-%d" }}</time>
+                {% if featured.tags.size > 0 %}<span>{{ featured.tags | join: " · " }}</span>{% endif %}
+              </div>
+            </div>
+          </article>
+          {% endif %}
+
+          <ol class="post-list">
+            {% for post in site.posts offset:1 limit:4 %}
+            {% assign display_index = forloop.index | plus: 1 %}
+            <li class="post-row">
+              <span class="post-number">{% if display_index < 10 %}0{% endif %}{{ display_index }}</span>
+              <time class="post-date" datetime="{{ post.date | date: "%Y-%m-%d" }}">{{ post.date | date: "%Y-%m-%d" }}</time>
+              <h3 class="post-title">
+                {% if post.redirect_to %}
+                <a href="{{ post.redirect_to }}" target="_blank">{{ post.title }}</a>
+                {% else %}
+                <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+                {% endif %}
+              </h3>
+              <p class="post-excerpt">{{ post.excerpt | strip_html | strip_newlines | truncate: 90 }}</p>
+              <span class="post-tags">
+                {% if post.tags.size > 0 %}{{ post.tags | join: " · " }}{% elsif post.categories.size > 0 %}{{ post.categories | join: " · " }}{% else %}随笔{% endif %}
+              </span>
+            </li>
+            {% endfor %}
+          </ol>
+        </div>
+      </section>
+
+      <footer class="site-footer content-shell">
+        <span class="footer-brand">The Time Forever</span>
+        <span class="footer-motto">Time stays long enough for those who use it.</span>
+        {% include site-stats.html variant="homepage" %}
+        <span class="footer-links">
+          <a href="/posts/">文章</a> ·
+          <a href="https://github.com/the-time-forever" target="_blank" rel="noreferrer">GitHub</a>
+        </span>
+      </footer>
+    </main>
+
+    <aside id="guestbook-panel" aria-label="留言板" aria-hidden="true">
+      <div class="guestbook-header">
+        <h3>留言板</h3>
+        <button id="guestbook-close" type="button" aria-label="关闭留言板">&times;</button>
+      </div>
+      <div class="guestbook-content">
+        <div class="giscus"></div>
+      </div>
+    </aside>
+    <div id="guestbook-overlay"></div>
+
+        <script src="/assets/js/theme-toggle.js?v=20260723-refactor" defer></script>
+    <script src="/assets/js/homepage.js?v=20260723-refactor" defer></script>
+
+    <!-- 不蒜子访问量统计：保留原首页的站点 PV / UV 统计挂载点 -->
+    {% include busuanzi-script.html %}
+  </body>
+</html>

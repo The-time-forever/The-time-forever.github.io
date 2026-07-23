@@ -1,61 +1,85 @@
-// 主题切换：夜间 <-> 白天，持久化并联动粒子 / giscus / mermaid。
+// Shared theme controller for the homepage, archive and post layouts.
 (function () {
-  var STORAGE_KEY = 'theme';
+  var STORAGE_KEY = "theme";
   var root = document.documentElement;
 
   function currentTheme() {
-    return root.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+    return root.dataset.theme === "dark" ? "dark" : "light";
   }
 
-  // giscus：主题映射
   function giscusTheme(theme) {
-    return theme === 'light' ? 'light' : 'transparent_dark';
+    return theme === "dark" ? "transparent_dark" : "noborder_light";
+  }
+
+  function syncControls(theme) {
+    var dark = theme === "dark";
+    document.querySelectorAll(".theme-toggle").forEach(function (button) {
+      button.setAttribute("aria-pressed", String(dark));
+      var label = button.querySelector(".theme-label");
+      if (label) label.textContent = dark ? "浅色模式" : "深色模式";
+    });
   }
 
   function syncGiscus(theme) {
-    var frame = document.querySelector('iframe.giscus-frame');
-    if (!frame || !frame.contentWindow) return;
-    frame.contentWindow.postMessage(
-      { giscus: { setConfig: { theme: giscusTheme(theme) } } },
-      'https://giscus.app'
-    );
+    document.querySelectorAll("iframe.giscus-frame").forEach(function (frame) {
+      if (!frame.contentWindow) return;
+      frame.contentWindow.postMessage(
+        { giscus: { setConfig: { theme: giscusTheme(theme) } } },
+        "https://giscus.app"
+      );
+    });
   }
 
-  function syncParticles(theme) {
-    if (!window.spaceParticles) return;
-    if (theme === 'dark') {
-      window.spaceParticles.start();
-    } else {
-      window.spaceParticles.stop();
-    }
-  }
-
-  function syncMermaid(theme) {
-    // post.html 在有 Mermaid 时定义此函数；无则跳过。
-    if (typeof window.renderMermaidForTheme === 'function') {
+  function syncDependentModules(theme) {
+    if (window.particleField) window.particleField.start();
+    if (typeof window.renderMermaidForTheme === "function") {
       window.renderMermaidForTheme(theme);
     }
-  }
-
-  function applyTheme(theme) {
-    root.setAttribute('data-theme', theme);
-    try {
-      localStorage.setItem(STORAGE_KEY, theme);
-    } catch (e) {}
-    syncParticles(theme);
     syncGiscus(theme);
-    syncMermaid(theme);
   }
 
-  document.addEventListener('DOMContentLoaded', function () {
-    var btn = document.querySelector('.theme-toggle');
-    if (btn) {
-      btn.addEventListener('click', function () {
-        applyTheme(currentTheme() === 'dark' ? 'light' : 'dark');
-      });
+  function applyTheme(theme, persist) {
+    var next = theme === "dark" ? "dark" : "light";
+    root.dataset.theme = next;
+    syncControls(next);
+    syncDependentModules(next);
+    if (persist !== false) {
+      try {
+        localStorage.setItem(STORAGE_KEY, next);
+      } catch (_) {
+        // The page remains usable when storage is unavailable.
+      }
     }
-    // 初次进入时，让粒子/评论与已生效主题保持一致
-    // （粒子脚本自身会按主题决定是否自启，这里只处理评论延迟加载的情况）
-    syncGiscus(currentTheme());
+    document.dispatchEvent(new CustomEvent("site-theme-change", {
+      detail: { theme: next }
+    }));
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    syncControls(currentTheme());
+
+    document.querySelectorAll(".theme-toggle").forEach(function (button) {
+      button.addEventListener("click", function () {
+        applyTheme(currentTheme() === "dark" ? "light" : "dark", true);
+      });
+    });
+
+    var observer = new MutationObserver(function () {
+      syncGiscus(currentTheme());
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
   });
-})();
+
+  window.addEventListener("storage", function (event) {
+    if (event.key === STORAGE_KEY &&
+        (event.newValue === "light" || event.newValue === "dark")) {
+      applyTheme(event.newValue, false);
+    }
+  });
+
+  window.siteTheme = {
+    apply: applyTheme,
+    current: currentTheme,
+    giscusTheme: giscusTheme
+  };
+}());

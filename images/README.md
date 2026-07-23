@@ -1,22 +1,18 @@
 # 图片资源说明
 
-此文件夹存放博客网站使用的静态图片资源。
+正式站点的图片按页面职责存放：
 
-## 1. 头像 (Avatar)
-- **文件名**: `avatar.jpg`
-- **用途**: 首页和各个页面显示的圆形头像。
-- **如何更换**: 直接用你的新头像图片覆盖此文件即可。建议使用正方形图片，系统会自动裁剪为圆形。
+- `images/`：头像、favicon 和文章正文长期使用的通用图片。
+- `assets/images/homepage/`：正式首页的 Hero 与专题视觉资源。
+- `homepage-prototype/assets/`：仅供设计原稿与演示页使用，不应被正式布局引用。
 
-## 2. 背景轮播图 (Background Slideshow)
-- **文件名**: `bg1.jpg`, `bg2.jpg`, `bg3.jpg`
-- **用途**: 首页的全屏背景轮播。
-- **如何更换**: 用你的新壁纸覆盖对应的文件。建议使用高分辨率图片 (如 1920x1080 或更高)。
+## 常用修改入口
 
-### 如何添加更多背景图？
-如果你想增加背景图数量（例如添加 `bg4.jpg`）：
-1. 将新图片 `bg4.jpg` 放入此文件夹。
-2. 修改 `_layouts/default.html` 文件。
-3. 找到 `<div class="bg-slideshow">` 区域，添加一行新的 `img` 标签：
-   ```html
-   <img src="images/bg4.jpg" alt="background 4" />
-   ```
+- 首页结构：`_layouts/homepage.html`
+- 首页样式：`assets/css/homepage.css`
+- 首页交互：`assets/js/homepage.js`
+- 文章列表：`posts/index.html`、`assets/css/posts-archive.css`、`assets/js/posts-archive.js`
+- 文章详情：`_layouts/post.html`、`assets/css/blog.css`、`assets/css/post.css`
+
+替换首页图片时，请保持文件用途和宽高比稳定，或同步调整
+`assets/css/homepage.css` 中对应容器的 `object-fit`、`object-position`。
