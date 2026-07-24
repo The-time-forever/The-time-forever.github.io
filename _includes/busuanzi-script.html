@@ -1,1 +1,34 @@
-<script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script>
+  (function () {
+    var loaderSelector = "script[data-busuanzi-loader]";
+
+    function loadBusuanzi() {
+      if (document.querySelector(loaderSelector)) return;
+
+      var script = document.createElement("script");
+      script.src = "https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js";
+      script.async = true;
+      script.setAttribute("data-busuanzi-loader", "");
+      script.onerror = function () {
+        document.documentElement.setAttribute("data-busuanzi-state", "unavailable");
+      };
+      document.head.appendChild(script);
+    }
+
+    function scheduleBusuanzi() {
+      window.setTimeout(function () {
+        if ("requestIdleCallback" in window) {
+          window.requestIdleCallback(loadBusuanzi, { timeout: 2000 });
+        } else {
+          loadBusuanzi();
+        }
+      }, 1500);
+    }
+
+    if (document.readyState === "complete") {
+      scheduleBusuanzi();
+    } else {
+      window.addEventListener("load", scheduleBusuanzi, { once: true });
+    }
+  }());
+</script>

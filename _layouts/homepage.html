@@ -124,7 +124,12 @@
             {% else %}
             <a class="featured-media" href="{{ featured.url | relative_url }}" tabindex="-1" aria-hidden="true">
             {% endif %}
-              <img src="/assets/images/homepage/project-visual-banner.png" alt="时间、知识与思考主题的黑白漫画横幅" />
+              <img
+                src="/assets/images/homepage/project-visual-banner.png"
+                alt="时间、知识与思考主题的黑白漫画横幅"
+                loading="lazy"
+                decoding="async"
+              />
             </a>
             <div class="featured-copy">
               <span class="eyeline">
