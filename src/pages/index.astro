@@ -15,7 +15,7 @@ const allPosts = (await getCollection('posts')).sort(
 );
 
 const featured = allPosts.find((p) => p.data.featured) ?? allPosts[0]; // 显式置顶优先，否则取最新
-const recentPosts = allPosts.slice(1, 5); // 第 2-5 篇为列表
+const recentPosts = featured ? allPosts.filter((p) => p !== featured).slice(0, 4) : []; // 排除置顶文章
 
 // 工具函数：格式化日期为 YYYY-MM-DD（schema 已保证 date 为纯 YYYY-MM-DD 字符串，无时区歧义）
 function formatDate(d: string): string {
