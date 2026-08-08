@@ -166,6 +166,7 @@
             var cfg = window.mermaidConfigs[theme] || window.mermaidConfigs.dark;
             mermaid.initialize({
                 startOnLoad: false,
+                securityLevel: 'strict',
                 theme: cfg.theme,
                 themeVariables: cfg.themeVariables
             });
@@ -178,7 +179,7 @@
                     node.setAttribute('data-src', src);
                 }
                 node.removeAttribute('data-processed');
-                node.innerHTML = src;
+                node.textContent = src;
             });
             if (nodes.length) {
                 mermaid.init(undefined, nodes);
@@ -186,24 +187,47 @@
         };
 
 document.addEventListener('DOMContentLoaded', function() {
-            // 查找所有 language-mermaid 的代码块
+            // 查找所有 language-mermaid 的代码块，替换为 .mermaid div
             document.querySelectorAll('pre code.language-mermaid').forEach(function(block) {
-                // 获取 Mermaid 代码
                 const code = block.textContent;
-
-                // 创建一个新的 div 元素来替换 pre 标签
                 const mermaidDiv = document.createElement('div');
                 mermaidDiv.className = 'mermaid';
                 mermaidDiv.setAttribute('data-src', code); // 存源码供主题切换重渲染
                 mermaidDiv.textContent = code;
-
-                // 替换原来的 pre 元素
                 block.parentElement.replaceWith(mermaidDiv);
             });
 
-            // 按当前主题初次渲染
-            var theme = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
-            if (typeof window.renderMermaidForTheme === 'function') {
-                window.renderMermaidForTheme(theme);
+            var mermaidNodes = document.querySelectorAll('.mermaid');
+            if (!mermaidNodes.length) return;
+
+            // Mermaid 库懒加载：图进入视口时才加载 mermaid.min.js（约 2.8MB）
+            var mermaidLoaded = false;
+            function loadMermaid() {
+                if (mermaidLoaded) return;
+                mermaidLoaded = true;
+                var s = document.createElement('script');
+                s.src = '/assets/js/mermaid.min.js';
+                s.onload = function() {
+                    var theme = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+                    if (typeof window.renderMermaidForTheme === 'function') {
+                        window.renderMermaidForTheme(theme);
+                    }
+                };
+                document.body.appendChild(s);
+            }
+
+            if ('IntersectionObserver' in window) {
+                var io = new IntersectionObserver(function(entries) {
+                    entries.forEach(function(entry) {
+                        if (entry.isIntersecting) {
+                            io.disconnect();
+                            loadMermaid();
+                        }
+                    });
+                }, { rootMargin: '200px' });
+                mermaidNodes.forEach(function(n) { io.observe(n); });
+            } else {
+                // 回退：无 IntersectionObserver 时直接加载
+                loadMermaid();
             }
         });

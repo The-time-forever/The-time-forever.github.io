@@ -1,23 +1,25 @@
 ---
 import { getCollection } from 'astro:content';
-import ThemeInit from '../components/ThemeInit.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
 import BusuanziScript from '../components/BusuanziScript.astro';
 import SiteStats from '../components/SiteStats.astro';
 import GuestbookPanel from '../components/GuestbookPanel.astro';
 import { getPostUrl } from '../utils/permalink';
+import { Image } from 'astro:assets';
+import heroDesktop from '../assets/images/homepage/hero-calendar-desktop.jpg';
+import banner from '../assets/images/homepage/project-visual-banner.png';
 
-// 取所有文章，按 date 降序（与 Jekyll site.posts 默认行为一致）
+// 取所有文章，按 date 降序（date 为 YYYY-MM-DD 字符串，字典序即日期序）
 const allPosts = (await getCollection('posts')).sort(
-  (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
+  (a, b) => b.data.date.localeCompare(a.data.date)
 );
 
-const featured = allPosts[0];           // 第 1 篇为置顶
+const featured = allPosts.find((p) => p.data.featured) ?? allPosts[0]; // 显式置顶优先，否则取最新
 const recentPosts = allPosts.slice(1, 5); // 第 2-5 篇为列表
 
-// 工具函数：格式化日期为 YYYY-MM-DD
-function formatDate(d: Date): string {
-  const date = new Date(d);
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+// 工具函数：格式化日期为 YYYY-MM-DD（schema 已保证 date 为纯 YYYY-MM-DD 字符串，无时区歧义）
+function formatDate(d: string): string {
+  return d;
 }
 
 // 工具函数：去除 HTML 标签和换行
@@ -59,24 +61,18 @@ function categoriesArr(c: unknown): string[] {
   return [String(c)];
 }
 ---
-<!doctype html>
-<html lang="zh-CN" data-theme="light">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+<BaseLayout title="The Time Forever">
+  <Fragment slot="head">
     <meta
       name="description"
       content="The Time Forever — 记录生活、学习与思考"
     />
-    <title>The Time Forever</title>
     <link rel="shortcut icon" href="/favicon.ico?v=2" type="image/x-icon" />
     <link rel="icon" href="/images/favicon.png?v=2" type="image/png" />
-    <ThemeInit />
     <link rel="stylesheet" href="/assets/css/site-tokens.css?v=20260723-refactor" />
     <link rel="stylesheet" href="/assets/css/homepage.css?v=20260723-calendar-init" />
     <link rel="stylesheet" href="/assets/css/guestbook.css?v=20260724-shared" />
-  </head>
-  <body>
+  </Fragment>
     <aside class="sidebar" aria-label="站点导航" data-menu-open="false">
       <a class="identity" href="#top" aria-label="返回首页顶部">
         <div class="avatar-frame">
@@ -130,10 +126,13 @@ function categoriesArr(c: unknown): string[] {
             media="(max-width: 760px)"
             srcset="/assets/images/homepage/hero-calendar-mobile.jpg"
           />
-          <img
+          <Image
             class="hero-media"
-            src="/assets/images/homepage/hero-calendar-desktop.jpg"
+            src={heroDesktop}
             alt="蓝黑漫画风格的七月日历插画"
+            widths={[640, 1280, 1920, 2560]}
+            sizes="100vw"
+            format="webp"
           />
         </picture>
         <div class="calendar-stage">
@@ -186,11 +185,13 @@ function categoriesArr(c: unknown): string[] {
                 tabindex="-1"
                 aria-hidden="true"
               >
-                <img
-                  src="/assets/images/homepage/project-visual-banner.png"
+                <Image
+                  src={banner}
                   alt="时间、知识与思考主题的黑白漫画横幅"
                   loading="lazy"
-                  decoding="async"
+                  widths={[240, 480, 800, 1200]}
+                  sizes="(max-width: 760px) 100vw, 40vw"
+                  format="webp"
                 />
               </a>
               <div class="featured-copy">
@@ -256,5 +257,4 @@ function categoriesArr(c: unknown): string[] {
 
     <!-- 不蒜子访问量统计：保留原首页的站点 PV / UV 统计挂载点 -->
     <BusuanziScript />
-  </body>
-</html>
+</BaseLayout>

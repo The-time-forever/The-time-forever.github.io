@@ -1,7 +1,7 @@
 ---
 title: 用 Playwright 写爬虫：对抗反爬与动态渲染的实战指南
 date: 2026-02-03
-categories: [技术, Python]
+categories: [技术折腾]
 tags: [爬虫, Playwright, 自动化]
 ---
 

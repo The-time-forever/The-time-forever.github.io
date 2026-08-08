@@ -1,29 +1,28 @@
 ---
 import { getCollection } from 'astro:content';
-import ThemeInit from '../../components/ThemeInit.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
 import BusuanziScript from '../../components/BusuanziScript.astro';
 import SiteStats from '../../components/SiteStats.astro';
 import GuestbookPanel from '../../components/GuestbookPanel.astro';
 import { getPostUrl } from '../../utils/permalink';
 
-// 取所有文章按 date 降序（与 Jekyll site.posts 一致）
+// 取所有文章按 date 降序（date 为 YYYY-MM-DD 字符串，字典序即日期序）
 const allPosts = (await getCollection('posts')).sort(
-  (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
+  (a, b) => b.data.date.localeCompare(a.data.date)
 );
 
 // 按年份分组（年份降序）
 const postsByYear = new Map<string, typeof allPosts>();
 for (const post of allPosts) {
-  const year = String(new Date(post.data.date).getFullYear());
+  const year = post.data.date.slice(0, 4);
   if (!postsByYear.has(year)) postsByYear.set(year, []);
   postsByYear.get(year)!.push(post);
 }
 const yearGroups = Array.from(postsByYear.entries()).map(([year, posts]) => ({ year, posts }));
 
-// 工具函数
-function formatDate(d: Date): string {
-  const date = new Date(d);
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+// 工具函数：格式化日期为 YYYY-MM-DD（schema 已保证 date 为纯 YYYY-MM-DD 字符串，无时区歧义）
+function formatDate(d: string): string {
+  return d;
 }
 
 function categoriesArr(c: unknown): string[] {
@@ -32,22 +31,21 @@ function categoriesArr(c: unknown): string[] {
   return [String(c)];
 }
 
-// 分类判定：复刻原 Jekyll capture post_groups 逻辑
-function computeCategories(post: { data: { categories?: unknown; tags?: string[]; title: string } }): string {
+// 分类判定：基于 frontmatter categories 枚举映射为归档页 filter key
+const CATEGORY_KEY: Record<string, string> = {
+  '技术折腾': 'tech',
+  '学术写作': 'writing',
+  '工具效率': 'tools',
+  '知识笔记': 'notes',
+};
+function computeCategories(post: { data: { categories?: unknown } }): string {
   const cats = categoriesArr(post.data.categories);
-  const tags = post.data.tags ?? [];
-  const title = post.data.title;
-  const groups = ['notes'];
-  if (cats.includes('技术折腾') || tags.includes('LLM') || tags.includes('Agent') || tags.includes('Python') || title.includes('Git') || title.includes('CLI')) {
-    groups.push('tech');
+  const keys = new Set<string>(['notes']);
+  for (const c of cats) {
+    const k = CATEGORY_KEY[c];
+    if (k) keys.add(k);
   }
-  if (tags.includes('学术写作') || title.includes('Academic Writing') || title.includes('Markdown')) {
-    groups.push('writing');
-  }
-  if (tags.includes('效率') || tags.includes('Windows') || title.includes('压缩') || title.includes('妙控板') || title.includes('快捷键') || title.includes('整理电脑')) {
-    groups.push('tools');
-  }
-  return groups.join(' ');
+  return Array.from(keys).join(' ');
 }
 
 // data-search：复刻原 Jekyll 逻辑
@@ -81,19 +79,13 @@ const totalPosts = allPosts.length;
 let archiveIndex = 0;
 ---
 
-<!doctype html>
-<html lang="zh-CN" data-theme="light">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+<BaseLayout title="文章归档 · The Time Forever">
+<Fragment slot="head">
   <meta name="color-scheme" content="light dark">
-  <title>文章归档 · The Time Forever</title>
-  <ThemeInit />
   <link rel="stylesheet" href="/assets/css/site-tokens.css?v=20260723-refactor">
   <link rel="stylesheet" href="/assets/css/posts-archive.css?v=20260723-refactor">
   <link rel="stylesheet" href="/assets/css/guestbook.css?v=20260724-shared">
-</head>
-<body>
+</Fragment>
   <canvas class="particle-field" id="particle-field" aria-hidden="true"></canvas>
 
   <div class="site-shell">
@@ -197,5 +189,4 @@ let archiveIndex = 0;
   <script src="/assets/js/posts-archive.js?v=20260723-refactor" defer></script>
   <script src="/assets/js/guestbook.js?v=20260724-shared" defer></script>
   <BusuanziScript />
-</body>
-</html>
+</BaseLayout>

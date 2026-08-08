@@ -1,44 +1,27 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import ThemeInit from '../components/ThemeInit.astro';
+import BaseLayout from './BaseLayout.astro';
 import BusuanziScript from '../components/BusuanziScript.astro';
 import GiscusComments from '../components/GiscusComments.astro';
 import MathJaxConfig from '../components/MathJaxConfig.astro';
 
 interface Props {
   post: CollectionEntry<'posts'>;
-  rawBody?: string; // 原始 markdown 正文，用于检测 math/mermaid
 }
 
-const { post, rawBody = '' } = Astro.props;
+const { post } = Astro.props;
 const { title, date, math, mermaid } = post.data;
 
-// needs_math 检测：frontmatter 优先，否则扫正文
-let needs_math = false;
-if (math === true) needs_math = true;
-else if (math === false) needs_math = false;
-else needs_math = rawBody.includes('\\(') || rawBody.includes('\\[') || rawBody.includes('$$') || /\$[^\s$]/.test(rawBody);
+// 按需加载：仅当 frontmatter 显式声明 math/mermaid: true 时加载对应库，避免正文正则误判
+const needs_math = math === true;
+const needs_mermaid = mermaid === true;
 
-// needs_mermaid 检测：frontmatter 优先，否则扫正文
-let needs_mermaid = false;
-if (mermaid === true) needs_mermaid = true;
-else if (mermaid === false) needs_mermaid = false;
-else needs_mermaid = rawBody.includes('language-mermaid') || rawBody.includes('```mermaid');
-
-// YYYY-MM-DD 格式化（Jekyll date | date: "%Y-%m-%d"）
-const d = new Date(date);
-const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+// YYYY-MM-DD 格式化（schema 已保证 date 为纯 YYYY-MM-DD 字符串，无时区歧义）
+const dateStr = date;
 ---
-<!DOCTYPE html>
-<html lang="zh-CN">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{title} | The Time Forever</title>
+<BaseLayout title={`${title} | The Time Forever`}>
+<Fragment slot="head">
     <link rel="icon" href="/images/favicon.png" type="image/png">
-    <!-- 防主题闪烁：与首页、文章归档共用全站 theme -->
-    <ThemeInit />
     <link rel="stylesheet" href="/assets/css/blog.css?v=20260723-archive-bg">
     <link rel="stylesheet" href="/assets/css/site-tokens.css?v=20260723-refactor">
     <link rel="stylesheet" href="/assets/css/post.css?v=20260723-refactor">
@@ -56,14 +39,11 @@ const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}
 
     {needs_mermaid && (
       <>
-        {/* Mermaid Configuration */}
-        <script is:inline src="/assets/js/mermaid.min.js" defer></script>
-        <script is:inline src="/assets/js/mermaid-renderer.js?v=20260723-refactor" defer></script>
+        {/* Mermaid：仅加载渲染器，2.8MB mermaid.min.js 由渲染器在图进入视口时懒加载 */}
+        <script is:inline src="/assets/js/mermaid-renderer.js?v=20260808-lazy" defer></script>
       </>
     )}
-</head>
-
-<body>
+</Fragment>
 
     {/* Canvas 背景：不影响可访问性 */}
     <canvas id="bg-canvas" aria-hidden="true"></canvas>
@@ -118,6 +98,4 @@ const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}
     <script is:inline src="/assets/js/particle-field.js?v=20260723-refactor" defer></script>
     <script is:inline src="/assets/js/theme-toggle.js?v=20260723-refactor" defer></script>
 
-</body>
-
-</html>
+</BaseLayout>

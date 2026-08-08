@@ -19,10 +19,9 @@ function slugify(title: string): string {
 export function getPostUrl(post: CollectionEntry<'posts'>): string {
   const { permalink, date } = post.data;
   if (permalink) return permalink;
-  const d = new Date(date);
-  const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
+  const year = date.slice(0, 4);
+  const month = date.slice(5, 7);
+  const day = date.slice(8, 10);
   const titleSlug = slugify(post.data.title);
   return `/posts/${year}/${month}/${day}/${titleSlug}/`;
 }
