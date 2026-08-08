@@ -5,9 +5,17 @@ import BusuanziScript from '../components/BusuanziScript.astro';
 import SiteStats from '../components/SiteStats.astro';
 import GuestbookPanel from '../components/GuestbookPanel.astro';
 import { getPostUrl } from '../utils/permalink';
-import { Image } from 'astro:assets';
+import { Image, getImage } from 'astro:assets';
 import heroDesktop from '../assets/images/homepage/hero-calendar-desktop.jpg';
+import heroMobile from '../assets/images/homepage/hero-calendar-mobile.jpg';
 import banner from '../assets/images/homepage/project-visual-banner.png';
+
+// 为移动端首图生成 WebP 响应式 srcset（通过 getImage 走 Astro 图片优化管线）
+const mobileWidths = [375, 480, 640, 760];
+const mobileImages = await Promise.all(
+  mobileWidths.map((w) => getImage({ src: heroMobile, width: w, format: 'webp', quality: 75 }))
+);
+const mobileSrcset = mobileImages.map((img, i) => `${img.src} ${mobileWidths[i]}w`).join(', ');
 
 // 取所有文章，按 date 降序（date 为 YYYY-MM-DD 字符串，字典序即日期序）
 const allPosts = (await getCollection('posts')).sort(
@@ -138,7 +146,8 @@ function categoriesArr(c: unknown): string[] {
         <picture class="hero-picture">
           <source
             media="(max-width: 760px)"
-            srcset="/assets/images/homepage/hero-calendar-mobile.jpg"
+            srcset={mobileSrcset}
+            sizes="100vw"
           />
           <Image
             class="hero-media"
@@ -147,6 +156,8 @@ function categoriesArr(c: unknown): string[] {
             widths={[640, 1280, 1920, 2560]}
             sizes="100vw"
             format="webp"
+            quality={75}
+            loading="eager"
           />
         </picture>
         <div class="calendar-stage">
