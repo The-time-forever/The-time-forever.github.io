@@ -40,11 +40,12 @@ const CATEGORY_KEY: Record<string, string> = {
 };
 function computeCategories(post: { data: { categories?: unknown } }): string {
   const cats = categoriesArr(post.data.categories);
-  const keys = new Set<string>(['notes']);
+  const keys = new Set<string>();
   for (const c of cats) {
     const k = CATEGORY_KEY[c];
     if (k) keys.add(k);
   }
+  if (keys.size === 0) keys.add('notes');
   return Array.from(keys).join(' ');
 }
 
