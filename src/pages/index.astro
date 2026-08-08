@@ -1,3 +1,64 @@
+---
+import { getCollection } from 'astro:content';
+import ThemeInit from '../components/ThemeInit.astro';
+import BusuanziScript from '../components/BusuanziScript.astro';
+import SiteStats from '../components/SiteStats.astro';
+import GuestbookPanel from '../components/GuestbookPanel.astro';
+import { getPostUrl } from '../utils/permalink';
+
+// 取所有文章，按 date 降序（与 Jekyll site.posts 默认行为一致）
+const allPosts = (await getCollection('posts')).sort(
+  (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
+);
+
+const featured = allPosts[0];           // 第 1 篇为置顶
+const recentPosts = allPosts.slice(1, 5); // 第 2-5 篇为列表
+
+// 工具函数：格式化日期为 YYYY-MM-DD
+function formatDate(d: Date): string {
+  const date = new Date(d);
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
+
+// 工具函数：去除 HTML 标签和换行
+function stripHtml(s: string): string {
+  return s.replace(/<[^>]*>/g, '').replace(/\n/g, '').trim();
+}
+
+// 工具函数：截断到指定长度（Jekyll truncate 行为：截断到指定字符数，超长加 …）
+function truncate(s: string, len: number): string {
+  if (s.length <= len) return s;
+  return s.slice(0, len) + '…';
+}
+
+// 工具函数：获取文章 excerpt（Astro 默认渲染的 excerpt 来自 markdown 中第一个空行之前的内容）
+// 但 Jekyll 的 excerpt 是文章第一段（到第一个空行）。Astro content collection 无 excerpt 字段时需自行提取。
+// 这里用 post.body 的第一段作为 excerpt
+function getExcerpt(post: { body: string }): string {
+  const body = post.body;
+  // 取第一个非空行到第一个空行之间的内容作为 excerpt
+  const lines = body.split('\n');
+  let excerpt = '';
+  let inExcerpt = false;
+  for (const line of lines) {
+    if (line.trim() === '') {
+      if (inExcerpt) break;
+      continue;
+    }
+    // 跳过 frontmatter 已被 Astro 移除，body 是纯正文
+    inExcerpt = true;
+    excerpt += line + ' ';
+  }
+  return stripHtml(excerpt.trim());
+}
+
+// 工具函数：categories 归一化为数组
+function categoriesArr(c: unknown): string[] {
+  if (!c) return [];
+  if (Array.isArray(c)) return c;
+  return [String(c)];
+}
+---
 <!doctype html>
 <html lang="zh-CN" data-theme="light">
   <head>
@@ -10,7 +71,7 @@
     <title>The Time Forever</title>
     <link rel="shortcut icon" href="/favicon.ico?v=2" type="image/x-icon" />
     <link rel="icon" href="/images/favicon.png?v=2" type="image/png" />
-        {% include theme-init.html %}
+    <ThemeInit />
     <link rel="stylesheet" href="/assets/css/site-tokens.css?v=20260723-refactor" />
     <link rel="stylesheet" href="/assets/css/homepage.css?v=20260723-calendar-init" />
     <link rel="stylesheet" href="/assets/css/guestbook.css?v=20260724-shared" />
@@ -104,7 +165,6 @@
         </div>
       </section>
 
-      {% assign featured = site.posts | first %}
       <section id="articles" aria-labelledby="articles-title">
         <div class="content-shell">
           <div class="section-topline">
@@ -117,59 +177,62 @@
             </a>
           </div>
 
-          {% if featured %}
-          <article class="featured-post">
-            {% if featured.redirect_to %}
-            <a class="featured-media" href="{{ featured.redirect_to }}" target="_blank" tabindex="-1" aria-hidden="true">
-            {% else %}
-            <a class="featured-media" href="{{ featured.url | relative_url }}" tabindex="-1" aria-hidden="true">
-            {% endif %}
-              <img
-                src="/assets/images/homepage/project-visual-banner.png"
-                alt="时间、知识与思考主题的黑白漫画横幅"
-                loading="lazy"
-                decoding="async"
-              />
-            </a>
-            <div class="featured-copy">
-              <span class="eyeline">
-                置顶{% if featured.categories.size > 0 %} · {{ featured.categories | join: " · " }}{% endif %}
-              </span>
-              <h3>
-                {% if featured.redirect_to %}
-                <a href="{{ featured.redirect_to }}" target="_blank">{{ featured.title }}</a>
-                {% else %}
-                <a href="{{ featured.url | relative_url }}">{{ featured.title }}</a>
-                {% endif %}
-              </h3>
-              <p>{{ featured.excerpt | strip_html | strip_newlines | truncate: 120 }}</p>
-              <div class="featured-meta">
-                <time datetime="{{ featured.date | date: "%Y-%m-%d" }}">{{ featured.date | date: "%Y-%m-%d" }}</time>
-                {% if featured.tags.size > 0 %}<span>{{ featured.tags | join: " · " }}</span>{% endif %}
+          {featured && (
+            <article class="featured-post">
+              <a
+                class="featured-media"
+                href={featured.data.redirect_to ?? getPostUrl(featured)}
+                target={featured.data.redirect_to ? '_blank' : undefined}
+                tabindex="-1"
+                aria-hidden="true"
+              >
+                <img
+                  src="/assets/images/homepage/project-visual-banner.png"
+                  alt="时间、知识与思考主题的黑白漫画横幅"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </a>
+              <div class="featured-copy">
+                <span class="eyeline">
+                  置顶{categoriesArr(featured.data.categories).length > 0 ? ` · ${categoriesArr(featured.data.categories).join(' · ')}` : ''}
+                </span>
+                <h3>
+                  <a
+                    href={featured.data.redirect_to ?? getPostUrl(featured)}
+                    target={featured.data.redirect_to ? '_blank' : undefined}
+                  >{featured.data.title}</a>
+                </h3>
+                <p>{truncate(stripHtml(getExcerpt(featured)), 120)}</p>
+                <div class="featured-meta">
+                  <time datetime={formatDate(featured.data.date)}>{formatDate(featured.data.date)}</time>
+                  {(featured.data.tags?.length ?? 0) > 0 && <span>{featured.data.tags?.join(' · ')}</span>}
+                </div>
               </div>
-            </div>
-          </article>
-          {% endif %}
+            </article>
+          )}
 
           <ol class="post-list">
-            {% for post in site.posts offset:1 limit:4 %}
-            {% assign display_index = forloop.index | plus: 1 %}
-            <li class="post-row">
-              <span class="post-number">{% if display_index < 10 %}0{% endif %}{{ display_index }}</span>
-              <time class="post-date" datetime="{{ post.date | date: "%Y-%m-%d" }}">{{ post.date | date: "%Y-%m-%d" }}</time>
-              <h3 class="post-title">
-                {% if post.redirect_to %}
-                <a href="{{ post.redirect_to }}" target="_blank">{{ post.title }}</a>
-                {% else %}
-                <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
-                {% endif %}
-              </h3>
-              <p class="post-excerpt">{{ post.excerpt | strip_html | strip_newlines | truncate: 90 }}</p>
-              <span class="post-tags">
-                {% if post.tags.size > 0 %}{{ post.tags | join: " · " }}{% elsif post.categories.size > 0 %}{{ post.categories | join: " · " }}{% else %}随笔{% endif %}
-              </span>
-            </li>
-            {% endfor %}
+            {recentPosts.map((post, idx) => (
+              <li class="post-row">
+                <span class="post-number">{String(idx + 2).padStart(2, '0')}</span>
+                <time class="post-date" datetime={formatDate(post.data.date)}>{formatDate(post.data.date)}</time>
+                <h3 class="post-title">
+                  <a
+                    href={post.data.redirect_to ?? getPostUrl(post)}
+                    target={post.data.redirect_to ? '_blank' : undefined}
+                  >{post.data.title}</a>
+                </h3>
+                <p class="post-excerpt">{truncate(stripHtml(getExcerpt(post)), 90)}</p>
+                <span class="post-tags">
+                  {(post.data.tags?.length ?? 0) > 0
+                    ? post.data.tags?.join(' · ')
+                    : categoriesArr(post.data.categories).length > 0
+                      ? categoriesArr(post.data.categories).join(' · ')
+                      : '随笔'}
+                </span>
+              </li>
+            ))}
           </ol>
         </div>
       </section>
@@ -177,7 +240,7 @@
       <footer class="site-footer content-shell">
         <span class="footer-brand">The Time Forever</span>
         <span class="footer-motto">Time stays long enough for those who use it.</span>
-        {% include site-stats.html variant="homepage" %}
+        <SiteStats variant="homepage" />
         <span class="footer-links">
           <a href="/posts/">文章</a> ·
           <a href="https://github.com/the-time-forever" target="_blank" rel="noreferrer">GitHub</a>
@@ -185,13 +248,13 @@
       </footer>
     </main>
 
-    {% include guestbook-panel.html %}
+    <GuestbookPanel />
 
-    <script src="/assets/js/theme-toggle.js?v=20260723-refactor" defer></script>
-    <script src="/assets/js/homepage.js?v=20260723-calendar-init-2" defer></script>
-    <script src="/assets/js/guestbook.js?v=20260724-shared" defer></script>
+    <script is:inline src="/assets/js/theme-toggle.js?v=20260723-refactor" defer></script>
+    <script is:inline src="/assets/js/homepage.js?v=20260723-calendar-init-2" defer></script>
+    <script is:inline src="/assets/js/guestbook.js?v=20260724-shared" defer></script>
 
     <!-- 不蒜子访问量统计：保留原首页的站点 PV / UV 统计挂载点 -->
-    {% include busuanzi-script.html %}
+    <BusuanziScript />
   </body>
 </html>

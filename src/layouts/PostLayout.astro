@@ -1,59 +1,77 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import ThemeInit from '../components/ThemeInit.astro';
+import BusuanziScript from '../components/BusuanziScript.astro';
+import GiscusComments from '../components/GiscusComments.astro';
+import MathJaxConfig from '../components/MathJaxConfig.astro';
+
+interface Props {
+  post: CollectionEntry<'posts'>;
+  rawBody?: string; // 原始 markdown 正文，用于检测 math/mermaid
+}
+
+const { post, rawBody = '' } = Astro.props;
+const { title, date, math, mermaid } = post.data;
+
+// needs_math 检测：frontmatter 优先，否则扫正文
+let needs_math = false;
+if (math === true) needs_math = true;
+else if (math === false) needs_math = false;
+else needs_math = rawBody.includes('\\(') || rawBody.includes('\\[') || rawBody.includes('$$') || /\$[^\s$]/.test(rawBody);
+
+// needs_mermaid 检测：frontmatter 优先，否则扫正文
+let needs_mermaid = false;
+if (mermaid === true) needs_mermaid = true;
+else if (mermaid === false) needs_mermaid = false;
+else needs_mermaid = rawBody.includes('language-mermaid') || rawBody.includes('```mermaid');
+
+// YYYY-MM-DD 格式化（Jekyll date | date: "%Y-%m-%d"）
+const d = new Date(date);
+const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+---
 <!DOCTYPE html>
 <html lang="zh-CN">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ page.title }} | The Time Forever</title>
+    <title>{title} | The Time Forever</title>
     <link rel="icon" href="/images/favicon.png" type="image/png">
     <!-- 防主题闪烁：与首页、文章归档共用全站 theme -->
-        {% include theme-init.html %}
+    <ThemeInit />
     <link rel="stylesheet" href="/assets/css/blog.css?v=20260723-archive-bg">
-    {%- assign needs_math = false -%}
-    {%- if page.math == true -%}
-      {%- assign needs_math = true -%}
-    {%- elsif page.math == false -%}
-      {%- assign needs_math = false -%}
-    {%- elsif content contains '\(' or content contains '\[' -%}
-      {%- assign needs_math = true -%}
-    {%- endif -%}
-    {%- assign needs_mermaid = false -%}
-    {%- if page.mermaid == true -%}
-      {%- assign needs_mermaid = true -%}
-    {%- elsif page.mermaid == false -%}
-      {%- assign needs_mermaid = false -%}
-    {%- elsif content contains 'language-mermaid' -%}
-      {%- assign needs_mermaid = true -%}
-    {%- endif -%}
     <link rel="stylesheet" href="/assets/css/site-tokens.css?v=20260723-refactor">
     <link rel="stylesheet" href="/assets/css/post.css?v=20260723-refactor">
 
-    {%- if needs_math %}
-    <!-- MathJax Configuration -->
-    {% include mathjax-config.html %}
-    <script type="text/javascript" id="MathJax-script" async src="/assets/js/mathjax.js">
-    </script>
-    {%- endif %}
+    {needs_math && (
+      <>
+        {/* MathJax Configuration */}
+        <MathJaxConfig />
+        <script is:inline type="text/javascript" id="MathJax-script" async src="/assets/js/mathjax.js"></script>
+      </>
+    )}
 
-    <!-- 不蒜子访问量统计 -->
-    {% include busuanzi-script.html %}
+    {/* 不蒜子访问量统计 */}
+    <BusuanziScript />
 
-    {%- if needs_mermaid %}
-    <!-- Mermaid Configuration -->
-    <script src="/assets/js/mermaid.min.js" defer></script>
-    <script src="/assets/js/mermaid-renderer.js?v=20260723-refactor" defer></script>
-    {%- endif %}
+    {needs_mermaid && (
+      <>
+        {/* Mermaid Configuration */}
+        <script is:inline src="/assets/js/mermaid.min.js" defer></script>
+        <script is:inline src="/assets/js/mermaid-renderer.js?v=20260723-refactor" defer></script>
+      </>
+    )}
 </head>
 
 <body>
 
-    <!-- Canvas 背景：不影响可访问性 -->
+    {/* Canvas 背景：不影响可访问性 */}
     <canvas id="bg-canvas" aria-hidden="true"></canvas>
 
-    <!-- 返回首页按钮 -->
+    {/* 返回首页按钮 */}
     <a href="/posts" class="home-btn">← 返回文章列表</a>
 
-    <!-- 主题切换按钮：夜间显示太阳，白天显示月亮 -->
+    {/* 主题切换按钮：夜间显示太阳，白天显示月亮 */}
     <button class="theme-toggle" type="button" aria-label="切换日间/夜间模式" title="切换日间/夜间模式">
         <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -74,9 +92,9 @@
     </button>
 
     <div class="glass-container">
-        <h1>{{ page.title }}</h1>
+        <h1>{title}</h1>
         <p class="post-meta">
-            发布于 {{ page.date | date: "%Y-%m-%d" }}
+            发布于 {dateStr}
             <span class="view-count" id="busuanzi_container_page_pv" style="display:none">
                 ·
                 <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -88,17 +106,17 @@
             </span>
         </p>
 
-        {{ content }}
+        <slot />
 
-        <!-- Giscus 评论区 -->
+        {/* Giscus 评论区 */}
         <div class="post-comments">
-            {% include giscus-comments.html %}
+            <GiscusComments />
         </div>
 
     </div>
 
-    <script src="/assets/js/particle-field.js?v=20260723-refactor" defer></script>
-    <script src="/assets/js/theme-toggle.js?v=20260723-refactor" defer></script>
+    <script is:inline src="/assets/js/particle-field.js?v=20260723-refactor" defer></script>
+    <script is:inline src="/assets/js/theme-toggle.js?v=20260723-refactor" defer></script>
 
 </body>
 
