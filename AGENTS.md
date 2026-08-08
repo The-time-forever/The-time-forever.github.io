@@ -2,7 +2,7 @@
 
 ## Project Structure & Module Organization
 
-This repository is a static personal blog built with Astro and deployed to GitHub Pages. Keep page routes in `src/pages/`, shared page shells in `src/layouts/`, reusable UI in `src/components/`, and build-time helpers in `src/utils/`. Posts live in `src/content/posts/`; their schema is defined in `src/content/config.ts`. Put files that must retain stable public URLs—such as images, stylesheets, and browser scripts—in `public/`. Deployment automation is in `.github/workflows/deploy.yml`.
+This repository is a static personal blog built with Astro and deployed to GitHub Pages. Keep page routes in `src/pages/`, shared page shells in `src/layouts/`, reusable UI in `src/components/`, and build-time helpers in `src/utils/`. Posts live in `src/content/posts/`; their schema is defined in `src/content.config.ts`. Put files that must retain stable public URLs—such as images, stylesheets, and browser scripts—in `public/`. Deployment automation is in `.github/workflows/deploy.yml`.
 
 ## Build, Test, and Development Commands
 
