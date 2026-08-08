@@ -1,0 +1,101 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import BaseLayout from './BaseLayout.astro';
+import BusuanziScript from '../components/BusuanziScript.astro';
+import GiscusComments from '../components/GiscusComments.astro';
+import MathJaxConfig from '../components/MathJaxConfig.astro';
+
+interface Props {
+  post: CollectionEntry<'posts'>;
+}
+
+const { post } = Astro.props;
+const { title, date, math, mermaid } = post.data;
+
+// 按需加载：仅当 frontmatter 显式声明 math/mermaid: true 时加载对应库，避免正文正则误判
+const needs_math = math === true;
+const needs_mermaid = mermaid === true;
+
+// YYYY-MM-DD 格式化（schema 已保证 date 为纯 YYYY-MM-DD 字符串，无时区歧义）
+const dateStr = date;
+---
+<BaseLayout title={`${title} | The Time Forever`}>
+<Fragment slot="head">
+    <link rel="icon" href="/images/favicon.png" type="image/png">
+    <link rel="stylesheet" href="/assets/css/blog.css?v=20260723-archive-bg">
+    <link rel="stylesheet" href="/assets/css/site-tokens.css?v=20260723-refactor">
+    <link rel="stylesheet" href="/assets/css/post.css?v=20260723-refactor">
+
+    {needs_math && (
+      <>
+        {/* MathJax Configuration */}
+        <MathJaxConfig />
+        <script is:inline type="text/javascript" id="MathJax-script" async src="/assets/js/mathjax.js"></script>
+      </>
+    )}
+
+    {/* 不蒜子访问量统计 */}
+    <BusuanziScript />
+
+    {needs_mermaid && (
+      <>
+        {/* Mermaid：仅加载渲染器，2.8MB mermaid.min.js 由渲染器在图进入视口时懒加载 */}
+        <script is:inline src="/assets/js/mermaid-renderer.js?v=20260808-lazy" defer></script>
+      </>
+    )}
+</Fragment>
+
+    {/* Canvas 背景：不影响可访问性 */}
+    <canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+    {/* 返回首页按钮 */}
+    <a href="/posts" class="home-btn">← 返回文章列表</a>
+
+    {/* 主题切换按钮：夜间显示太阳，白天显示月亮 */}
+    <button class="theme-toggle" type="button" aria-label="切换日间/夜间模式" title="切换日间/夜间模式">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+    </button>
+
+    <div class="glass-container">
+        <h1>{title}</h1>
+        <p class="post-meta">
+            发布于 {dateStr}
+            <span class="view-count" id="busuanzi_container_page_pv" style="display:none">
+                ·
+                <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                <span id="busuanzi_value_page_pv"></span> 次阅读
+            </span>
+        </p>
+
+        <slot />
+
+        {/* Giscus 评论区 */}
+        <div class="post-comments">
+            <GiscusComments />
+        </div>
+
+    </div>
+
+    <script is:inline src="/assets/js/particle-field.js?v=20260723-refactor" defer></script>
+    <script is:inline src="/assets/js/theme-toggle.js?v=20260723-refactor" defer></script>
+
+</BaseLayout>

@@ -1,0 +1,28 @@
+---
+import { getCollection, render } from 'astro:content';
+import PostLayout from '../../layouts/PostLayout.astro';
+import { getPostUrl } from '../../utils/permalink';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts');
+  // 只为无 redirect_to 的文章生成详情页
+  const renderablePosts = posts.filter((post) => !post.data.redirect_to);
+
+  return renderablePosts.map((post) => {
+    const fullUrl = getPostUrl(post); // 如 /posts/2026/07/03/xxx/
+    // 去掉 /posts/ 前缀和首尾斜杠，得到相对路径
+    const slug = fullUrl.replace(/^\/posts\//, '').replace(/\/$/, ''); // 如 2026/07/03/xxx
+    return {
+      params: { slug },
+      props: { post },
+    };
+  });
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+---
+
+<PostLayout post={post}>
+  <Content />
+</PostLayout>

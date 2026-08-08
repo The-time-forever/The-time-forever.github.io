@@ -1,0 +1,285 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import BusuanziScript from '../components/BusuanziScript.astro';
+import SiteStats from '../components/SiteStats.astro';
+import GuestbookPanel from '../components/GuestbookPanel.astro';
+import { getPostUrl } from '../utils/permalink';
+import { Image, getImage } from 'astro:assets';
+import heroDesktop from '../assets/images/homepage/hero-calendar-desktop.jpg';
+import heroMobile from '../assets/images/homepage/hero-calendar-mobile.jpg';
+import banner from '../assets/images/homepage/project-visual-banner.png';
+
+// 为移动端首图生成 WebP 响应式 srcset（通过 getImage 走 Astro 图片优化管线）
+const mobileWidths = [375, 480, 640, 760];
+const mobileImages = await Promise.all(
+  mobileWidths.map((w) => getImage({ src: heroMobile, width: w, format: 'webp', quality: 75 }))
+);
+const mobileSrcset = mobileImages.map((img, i) => `${img.src} ${mobileWidths[i]}w`).join(', ');
+
+// 取所有文章，按 date 降序（date 为 YYYY-MM-DD 字符串，字典序即日期序）
+const allPosts = (await getCollection('posts')).sort(
+  (a, b) => b.data.date.localeCompare(a.data.date)
+);
+
+const featured = allPosts.find((p) => p.data.featured) ?? allPosts[0]; // 显式置顶优先，否则取最新
+const recentPosts = featured ? allPosts.filter((p) => p !== featured).slice(0, 4) : []; // 排除置顶文章
+
+// 工具函数：格式化日期为 YYYY-MM-DD（schema 已保证 date 为纯 YYYY-MM-DD 字符串，无时区歧义）
+function formatDate(d: string): string {
+  return d;
+}
+
+// 工具函数：去除 HTML 标签和换行
+function stripHtml(s: string): string {
+  return s.replace(/<[^>]*>/g, '').replace(/\n/g, '').trim();
+}
+
+// 工具函数：去除 Markdown 内联标记（加粗、斜体、链接、代码等），保留纯文本
+function stripMarkdown(s: string): string {
+  return s
+    .replace(/!\[([^\]]*)\]\([^)]*\)/g, '$1')   // 图片 → alt
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')     // 链接 → 文本
+    .replace(/\*\*([^*]+)\*\*/g, '$1')           // **加粗**
+    .replace(/__([^_]+)__/g, '$1')               // __加粗__
+    .replace(/\*([^*]+)\*/g, '$1')               // *斜体*
+    .replace(/_([^_]+)_/g, '$1')                 // _斜体_
+    .replace(/`([^`]+)`/g, '$1');                // `行内代码`
+}
+
+// 工具函数：截断到指定长度（Jekyll truncate 行为：截断到指定字符数，超长加 …）
+function truncate(s: string, len: number): string {
+  if (s.length <= len) return s;
+  return s.slice(0, len) + '…';
+}
+
+// 工具函数：获取文章 excerpt（Astro 默认渲染的 excerpt 来自 markdown 中第一个空行之前的内容）
+// 但 Jekyll 的 excerpt 是文章第一段（到第一个空行）。Astro content collection 无 excerpt 字段时需自行提取。
+// 这里用 post.body 的首个正文段落作为 excerpt，跳过标题行
+function getExcerpt(post: { body: string }): string {
+  const body = post.body;
+  const lines = body.split('\n');
+  let excerpt = '';
+  let inExcerpt = false;
+  for (const line of lines) {
+    if (line.trim() === '') {
+      if (inExcerpt) break;
+      continue;
+    }
+    // 跳过 Markdown 标题行（## 一句话总结 等），取其后的首个正文段落
+    if (/^#{1,6}\s/.test(line)) {
+      continue;
+    }
+    inExcerpt = true;
+    excerpt += line + ' ';
+  }
+  return stripMarkdown(stripHtml(excerpt.trim()));
+}
+
+// 工具函数：categories 归一化为数组
+function categoriesArr(c: unknown): string[] {
+  if (!c) return [];
+  if (Array.isArray(c)) return c;
+  return [String(c)];
+}
+---
+<BaseLayout title="The Time Forever">
+  <Fragment slot="head">
+    <meta
+      name="description"
+      content="The Time Forever — 记录生活、学习与思考"
+    />
+    <link rel="shortcut icon" href="/favicon.ico?v=2" type="image/x-icon" />
+    <link rel="icon" href="/images/favicon.png?v=2" type="image/png" />
+    <link rel="stylesheet" href="/assets/css/site-tokens.css?v=20260723-refactor" />
+    <link rel="stylesheet" href="/assets/css/homepage.css?v=20260723-calendar-init" />
+    <link rel="stylesheet" href="/assets/css/guestbook.css?v=20260724-shared" />
+  </Fragment>
+    <aside class="sidebar" aria-label="站点导航" data-menu-open="false">
+      <a class="identity" href="#top" aria-label="返回首页顶部">
+        <div class="avatar-frame">
+          <img src="/images/avatar1.png" alt="The Time Forever 头像" />
+        </div>
+        <p class="brand-title">The Time<br />Forever</p>
+        <p class="brand-tagline">记录生活、学习与思考</p>
+        <div class="brand-rule" aria-hidden="true"></div>
+      </a>
+
+      <nav class="side-nav" id="site-navigation">
+        <a href="#top" aria-current="page">首页</a>
+        <a href="/posts/">文章</a>
+        <a href="#guestbook-panel" data-open-guestbook aria-controls="guestbook-panel" aria-expanded="false">留言</a>
+        <a href="https://github.com/the-time-forever" target="_blank" rel="noreferrer">GitHub</a>
+      </nav>
+
+      <div class="side-utilities">
+        <button class="theme-toggle" type="button" aria-pressed="false">
+          <span class="theme-label">浅色模式</span>
+          <span class="eclipse-control" aria-hidden="true">
+            <span class="eclipse-orbit">
+              <span class="eclipse-disc"></span>
+              <span class="eclipse-accent"></span>
+            </span>
+          </span>
+        </button>
+        <button
+          class="mobile-menu-toggle"
+          type="button"
+          aria-label="打开导航菜单"
+          aria-controls="site-navigation"
+          aria-expanded="false"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <line x1="3" y1="6" x2="21" y2="6" stroke="currentColor" stroke-width="1.6" />
+            <line x1="3" y1="12" x2="21" y2="12" stroke="currentColor" stroke-width="1.6" />
+            <line x1="3" y1="18" x2="21" y2="18" stroke="currentColor" stroke-width="1.6" />
+          </svg>
+        </button>
+        <p class="copyright">
+          © 2026 The Time Forever<br />Hosted on GitHub Pages
+        </p>
+      </div>
+    </aside>
+
+    <main class="page" id="top">
+      <section class="hero" aria-label="首页主视觉" data-calendar-state="expanded" data-calendar-ready="false">
+        <picture class="hero-picture">
+          <source
+            media="(max-width: 760px)"
+            srcset={mobileSrcset}
+            sizes="100vw"
+          />
+          <Image
+            class="hero-media"
+            src={heroDesktop}
+            alt="蓝黑漫画风格的七月日历插画"
+            widths={[640, 1280, 1920, 2560]}
+            sizes="100vw"
+            format="webp"
+            quality={75}
+            loading="eager"
+          />
+        </picture>
+        <div class="calendar-stage">
+          <aside class="hero-calendar" id="hero-calendar" aria-label="当前月份日历">
+            <button class="calendar-hide-toggle" type="button" aria-label="隐藏日历" aria-controls="hero-calendar" aria-expanded="true">
+              <span aria-hidden="true">−</span>
+            </button>
+            <div class="calendar-head">
+              <div>
+                <p class="calendar-label">CALENDAR · <span class="calendar-year"></span></p>
+                <p class="calendar-month"></p>
+              </div>
+              <p class="calendar-date"><strong></strong><span></span></p>
+            </div>
+            <div class="calendar-grid" aria-hidden="true">
+              <span class="calendar-weekday">SUN</span><span class="calendar-weekday">MON</span><span class="calendar-weekday">TUE</span><span class="calendar-weekday">WED</span><span class="calendar-weekday">THU</span><span class="calendar-weekday">FRI</span><span class="calendar-weekday">SAT</span>
+              <div class="calendar-days" style="display: contents"></div>
+            </div>
+          </aside>
+        </div>
+        <div class="calendar-dock" aria-hidden="true">
+          <div class="calendar-dock-copy" aria-live="polite">
+            <strong class="calendar-dock-month"></strong>
+            <span class="calendar-dock-date"></span>
+          </div>
+          <button class="calendar-show-toggle" type="button" aria-controls="hero-calendar" aria-expanded="false">
+            显示日历
+          </button>
+        </div>
+      </section>
+
+      <section id="articles" aria-labelledby="articles-title">
+        <div class="content-shell">
+          <div class="section-topline">
+            <h2 class="section-heading" id="articles-title">最新文章</h2>
+            <a class="section-link" href="/posts/">
+              查看全部文章 →
+              <svg class="section-arrow" viewBox="0 0 150 12" aria-hidden="true">
+                <path d="M0 6H148M143 1L148 6L143 11" fill="none" stroke="currentColor" stroke-width="1" />
+              </svg>
+            </a>
+          </div>
+
+          {featured && (
+            <article class="featured-post">
+              <a
+                class="featured-media"
+                href={featured.data.redirect_to ?? getPostUrl(featured)}
+                target={featured.data.redirect_to ? '_blank' : undefined}
+                tabindex="-1"
+                aria-hidden="true"
+              >
+                <Image
+                  src={banner}
+                  alt="时间、知识与思考主题的黑白漫画横幅"
+                  loading="lazy"
+                  widths={[240, 480, 800, 1200]}
+                  sizes="(max-width: 760px) 100vw, 40vw"
+                  format="webp"
+                />
+              </a>
+              <div class="featured-copy">
+                <span class="eyeline">
+                  置顶{categoriesArr(featured.data.categories).length > 0 ? ` · ${categoriesArr(featured.data.categories).join(' · ')}` : ''}
+                </span>
+                <h3>
+                  <a
+                    href={featured.data.redirect_to ?? getPostUrl(featured)}
+                    target={featured.data.redirect_to ? '_blank' : undefined}
+                  >{featured.data.title}</a>
+                </h3>
+                <p>{truncate(stripHtml(getExcerpt(featured)), 120)}</p>
+                <div class="featured-meta">
+                  <time datetime={formatDate(featured.data.date)}>{formatDate(featured.data.date)}</time>
+                  {(featured.data.tags?.length ?? 0) > 0 && <span>{featured.data.tags?.join(' · ')}</span>}
+                </div>
+              </div>
+            </article>
+          )}
+
+          <ol class="post-list">
+            {recentPosts.map((post, idx) => (
+              <li class="post-row">
+                <span class="post-number">{String(idx + 2).padStart(2, '0')}</span>
+                <time class="post-date" datetime={formatDate(post.data.date)}>{formatDate(post.data.date)}</time>
+                <h3 class="post-title">
+                  <a
+                    href={post.data.redirect_to ?? getPostUrl(post)}
+                    target={post.data.redirect_to ? '_blank' : undefined}
+                  >{post.data.title}</a>
+                </h3>
+                <p class="post-excerpt">{truncate(stripHtml(getExcerpt(post)), 90)}</p>
+                <span class="post-tags">
+                  {(post.data.tags?.length ?? 0) > 0
+                    ? post.data.tags?.join(' · ')
+                    : categoriesArr(post.data.categories).length > 0
+                      ? categoriesArr(post.data.categories).join(' · ')
+                      : '随笔'}
+                </span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      <footer class="site-footer content-shell">
+        <span class="footer-brand">The Time Forever</span>
+        <span class="footer-motto">Time stays long enough for those who use it.</span>
+        <SiteStats variant="homepage" />
+        <span class="footer-links">
+          <a href="/posts/">文章</a> ·
+          <a href="https://github.com/the-time-forever" target="_blank" rel="noreferrer">GitHub</a>
+        </span>
+      </footer>
+    </main>
+
+    <GuestbookPanel />
+
+    <script is:inline src="/assets/js/theme-toggle.js?v=20260723-refactor" defer></script>
+    <script is:inline src="/assets/js/homepage.js?v=20260723-calendar-init-2" defer></script>
+    <script is:inline src="/assets/js/guestbook.js?v=20260724-shared" defer></script>
+
+    <!-- 不蒜子访问量统计：保留原首页的站点 PV / UV 统计挂载点 -->
+    <BusuanziScript />
+</BaseLayout>

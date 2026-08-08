@@ -2,3 +2,12 @@ _site/
 .jekyll-cache/
 .jekyll-metadata
 .sass-cache/
+
+# Astro
+node_modules/
+dist/
+.astro/
+.trae/
+
+# MiMoCode
+.mimocode/
