@@ -989,30 +989,65 @@ if (typeof document !== 'undefined') {
           colors: palette.colors,
           background: palette.background,
         });
-        const onThemeChange = (event) => {
-          const nextTheme = event.detail?.theme || document.documentElement.dataset.theme || 'light';
-          inst.setTheme(nextTheme, readPalette(nextTheme));
-        };
-        document.addEventListener('site-theme-change', onThemeChange);
         let intersecting = false;
         let rafId = null;
+        const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
         const io = new IntersectionObserver((entries) => {
           entries.forEach((en) => {
             intersecting = en.isIntersecting;
-            if (en.isIntersecting) inst.resume();
-            else inst.stop();
+            if (en.isIntersecting) {
+              inst.resume();
+              if (motionQuery.matches) renderStaticFrame();
+            } else {
+              inst.stop();
+            }
           });
         }, { root: null, rootMargin: '0px', threshold: 0 });
         io.observe(container);
+
+        const renderStaticFrame = () => {
+          inst.lastTime = performance.now();
+          inst.dt = 0;
+          inst.resume();
+          inst.render();
+        };
         const loop = () => {
           rafId = requestAnimationFrame(loop);
           if (intersecting) inst.render();
         };
-        loop();
+        const startLoop = () => {
+          if (rafId === null) loop();
+        };
+        const stopLoop = () => {
+          if (rafId !== null) {
+            cancelAnimationFrame(rafId);
+            rafId = null;
+          }
+        };
+        const syncMotionPreference = () => {
+          if (motionQuery.matches) {
+            stopLoop();
+            renderStaticFrame();
+          } else {
+            startLoop();
+          }
+        };
+        const onThemeChange = (event) => {
+          const nextTheme = event.detail?.theme || document.documentElement.dataset.theme || 'light';
+          inst.setTheme(nextTheme, readPalette(nextTheme));
+          if (motionQuery.matches) renderStaticFrame();
+        };
+        const onMotionChange = () => syncMotionPreference();
+        document.addEventListener('site-theme-change', onThemeChange);
+        if (motionQuery.addEventListener) motionQuery.addEventListener('change', onMotionChange);
+        else motionQuery.addListener(onMotionChange);
+        syncMotionPreference();
         window.addEventListener('beforeunload', () => {
           io.disconnect();
           document.removeEventListener('site-theme-change', onThemeChange);
-          if (rafId !== null) cancelAnimationFrame(rafId);
+          if (motionQuery.removeEventListener) motionQuery.removeEventListener('change', onMotionChange);
+          else motionQuery.removeListener(onMotionChange);
+          stopLoop();
           inst.kill();
         });
       } catch (err) {
