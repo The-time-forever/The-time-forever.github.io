@@ -15,6 +15,14 @@ const { title, lang = 'zh-CN' } = Astro.props;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <ThemeInit />
+    {/* GA4 后台访问统计：异步加载，不向页面渲染任何前端数据。 */}
+    <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-5NHV5RMBSB"></script>
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { window.dataLayer.push(arguments); }
+      gtag('js', new Date());
+      gtag('config', 'G-5NHV5RMBSB');
+    </script>
     <slot name="head" />
   </head>
   <body>

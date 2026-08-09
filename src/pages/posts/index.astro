@@ -84,8 +84,8 @@ let archiveIndex = 0;
 <Fragment slot="head">
   <meta name="color-scheme" content="light dark">
   <link rel="stylesheet" href="/assets/css/site-tokens.css?v=20260723-refactor">
-  <link rel="stylesheet" href="/assets/css/posts-archive.css?v=20260723-refactor">
-  <link rel="stylesheet" href="/assets/css/guestbook.css?v=20260724-shared">
+  <link rel="stylesheet" href="/assets/css/posts-archive.css?v=20260809-antigravity">
+  <link rel="stylesheet" href="/assets/css/guestbook.css?v=20260810-close-center">
 </Fragment>
   <canvas class="particle-field" id="particle-field" aria-hidden="true"></canvas>
 
@@ -112,14 +112,48 @@ let archiveIndex = 0;
     </header>
 
     <main>
-      <section class="hero" aria-labelledby="archive-title">
+      <section
+        class="hero"
+        aria-labelledby="archive-title"
+        data-main-particles-component
+        data-theme="light"
+        data-ring-width="0.006"
+        data-ring-width2="0.107"
+        data-ring-displacement="0.42"
+        data-density="196"
+        data-particles-scale="0.46"
+        data-particle-color-1="#178f99"
+        data-particle-color-2="#2e63dd"
+        data-particle-color-3="#68499b"
+        data-particle-background="#f3f1eb"
+        data-particle-color-1-dark="#55c7cf"
+        data-particle-color-2-dark="#8197f4"
+        data-particle-color-3-dark="#b294d2"
+        data-particle-background-dark="#111414"
+      >
+        <div class="archive-particle-stage" data-container aria-hidden="true"></div>
         <div class="hero-copy">
-          <h1 id="archive-title">文章<span>ARCHIVE</span></h1>
-          <p class="hero-description">记录技术探索、工具实践与思考沉淀，按时间顺序归档仓库中的所有文章。</p>
+          <h1 id="archive-title" aria-label="文章 ARCHIVE">
+            <span class="archive-typed" data-archive-typed data-typed-delay="0.16" aria-hidden="true">
+              <span class="typed-content" data-typed-content aria-hidden="true">文章</span>
+              <span class="archive-typed-cursor" data-typed-cursor aria-hidden="true"></span>
+            </span>
+            <span class="archive-title-subtitle archive-typed" data-archive-typed data-typed-delay="0.48" aria-hidden="true">
+              <span class="typed-content" data-typed-content aria-hidden="true">ARCHIVE</span>
+              <span class="archive-typed-cursor" data-typed-cursor aria-hidden="true"></span>
+            </span>
+          </h1>
+          <p class="hero-description">
+            <span class="visually-hidden">记录技术探索、工具实践与思考沉淀。</span>
+            <span class="archive-typed" data-archive-typed data-typed-delay="1.02" aria-hidden="true">
+              <span class="typed-content" data-typed-content aria-hidden="true">记录技术探索、工具实践与思考沉淀。</span>
+              <span class="archive-typed-cursor" data-typed-cursor aria-hidden="true"></span>
+            </span>
+          </p>
         </div>
       </section>
 
-      <section aria-label="文章检索与筛选">
+      <section class="archive-content" aria-label="文章检索与筛选">
         <div class="archive-tools">
           <label class="search" for="post-search">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
@@ -187,6 +221,8 @@ let archiveIndex = 0;
 
   <script src="/assets/js/theme-toggle.js?v=20260723-refactor" defer></script>
   <script src="/assets/js/particle-field.js?v=20260723-refactor" defer></script>
+  <script src="/assets/js/antigravity-particles.js?v=20260810-antigravity-motion" defer></script>
+  <script src="/assets/js/archive-hero-typed.js?v=20260809-antigravity" defer></script>
   <script src="/assets/js/posts-archive.js?v=20260723-refactor" defer></script>
   <script src="/assets/js/guestbook.js?v=20260724-shared" defer></script>
   <BusuanziScript />
