@@ -1,7 +1,7 @@
 ---
 title: Windows 下的完美 Linux 体验：WSL2 配置与避坑全指南
 date: 2026-02-19
-tags: [WSL, Linux, Windows, 开发环境, 教程]
+tags: [WSL, Linux, Windows, 开发环境]
 categories: [技术折腾]
 permalink: /posts/2026/02/19/wsl2-setup-guide/
 ---
