@@ -25,6 +25,7 @@
         "THURSDAY", "FRIDAY", "SATURDAY"
       ];
       const desktopCalendarMedia = window.matchMedia("(min-width: 761px)");
+      let calendarFeaturesInitialized = false;
 
       function regionInkScore(pixels, width, xStart, xEnd, yStart, yEnd) {
         let score = 0;
@@ -66,6 +67,7 @@
       }
 
       function useCalendarFallback() {
+        if (!desktopCalendarMedia.matches) return;
         hero.dataset.calendarSide = "left";
         hero.dataset.calendarDetection = "fallback";
         hero.dataset.calendarTone = "mid";
@@ -139,8 +141,13 @@
       initializeCalendarPlacement();
 
       desktopCalendarMedia.addEventListener("change", () => {
+        if (!desktopCalendarMedia.matches) {
+          hero.dataset.calendarReady = "false";
+          return;
+        }
         hero.dataset.calendarReady = "false";
         initializeCalendarPlacement();
+        ensureCalendarFeatures();
       });
 
       function setMobileMenu(open) {
@@ -226,33 +233,184 @@
         }
       }
 
-      renderCalendar();
+      function ensureCalendarFeatures() {
+        if (calendarFeaturesInitialized) return;
+        if (!desktopCalendarMedia.matches) return;
+        if (!calendarStage || !calendarDock || !calendarHide || !calendarShow) return;
+        calendarFeaturesInitialized = true;
 
-      let savedCalendarState = "expanded";
-      try {
-        savedCalendarState = localStorage.getItem("homepage-calendar-state") || "expanded";
-      } catch (_) {
-        // Use the expanded state when storage is unavailable.
-      }
-      setCalendarState(savedCalendarState, { persist: false });
+        renderCalendar();
 
-      [calendarHide, calendarShow].forEach((button) => {
-        button.addEventListener("keydown", (event) => {
-          if (event.key === "Enter" || event.key === " ") {
-            calendarKeyboardActivation = true;
-          }
+        let savedCalendarState = "expanded";
+        try {
+          savedCalendarState = localStorage.getItem("homepage-calendar-state") || "expanded";
+        } catch (_) {
+          // Use the expanded state when storage is unavailable.
+        }
+        setCalendarState(savedCalendarState, { persist: false });
+
+        [calendarHide, calendarShow].forEach((button) => {
+          button.addEventListener("keydown", (event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              calendarKeyboardActivation = true;
+            }
+          });
         });
-      });
 
-      calendarHide.addEventListener("click", () => {
-        setCalendarState("collapsed", { moveFocus: calendarKeyboardActivation });
-        calendarKeyboardActivation = false;
-      });
+        calendarHide.addEventListener("click", () => {
+          setCalendarState("collapsed", { moveFocus: calendarKeyboardActivation });
+          calendarKeyboardActivation = false;
+        });
 
-      calendarShow.addEventListener("click", () => {
-        setCalendarState("expanded", { moveFocus: calendarKeyboardActivation });
-        calendarKeyboardActivation = false;
-      });
+        calendarShow.addEventListener("click", () => {
+          setCalendarState("expanded", { moveFocus: calendarKeyboardActivation });
+          calendarKeyboardActivation = false;
+        });
+
+        /* === Liquid Glass — pointer-tracked specular highlight === */
+        (function initLiquidGlass() {
+          const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
+          if (!finePointer.matches) return;
+          const supportsBackdrop =
+            CSS.supports("backdrop-filter", "blur(1px)") ||
+            CSS.supports("-webkit-backdrop-filter", "blur(1px)");
+          if (!supportsBackdrop) return;
+
+          const targets = document.querySelectorAll(".calendar-stage, .calendar-dock");
+          if (!targets.length) return;
+
+          const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+          targets.forEach((target) => {
+            let raf = 0;
+            let nextX = 50;
+            let nextY = 30;
+
+            const apply = () => {
+              raf = 0;
+              target.style.setProperty("--liquid-pointer-x", `${nextX}%`);
+              target.style.setProperty("--liquid-pointer-y", `${nextY}%`);
+              target.style.setProperty("--liquid-pointer-strength", "1");
+            };
+
+            target.addEventListener("pointermove", (event) => {
+              const rect = target.getBoundingClientRect();
+              nextX = ((event.clientX - rect.left) / rect.width) * 100;
+              nextY = ((event.clientY - rect.top) / rect.height) * 100;
+              if (raf) return;
+              raf = requestAnimationFrame(apply);
+            }, { passive: true });
+
+            target.addEventListener("pointerenter", () => {
+              if (reducedMotion.matches) return;
+              target.style.setProperty("--liquid-pointer-strength", "1");
+            });
+
+            target.addEventListener("pointerleave", () => {
+              if (raf) {
+                cancelAnimationFrame(raf);
+                raf = 0;
+              }
+              target.style.setProperty("--liquid-pointer-strength", "0");
+            });
+
+            target.addEventListener("pointerdown", () => {
+              target.style.setProperty("--liquid-pointer-strength", "1");
+            });
+          });
+
+          finePointer.addEventListener("change", () => {
+            if (!finePointer.matches) {
+              targets.forEach((target) => {
+                target.style.removeProperty("--liquid-pointer-strength");
+              });
+            }
+          });
+        })();
+
+        /* === Calendar Dock — slide-up on hover, slide-down on leave === */
+        (function initDockSlide() {
+          const dock = document.querySelector(".calendar-dock");
+          if (!dock) return;
+
+          const DOCK_AUTO_HIDE_MS = 1400;
+          const HIDE_DELAY = 500;
+
+          let hideTimer = 0;
+          let autoHideTimer = 0;
+          let userInteracted = false;
+
+          const clearAllTimers = () => {
+            if (hideTimer) { clearTimeout(hideTimer); hideTimer = 0; }
+            if (autoHideTimer) { clearTimeout(autoHideTimer); autoHideTimer = 0; }
+          };
+
+          const showDock = () => {
+            if (hideTimer) { clearTimeout(hideTimer); hideTimer = 0; }
+            if (autoHideTimer) { clearTimeout(autoHideTimer); autoHideTimer = 0; }
+            dock.classList.add("is-visible");
+          };
+
+          const scheduleHide = () => {
+            if (hideTimer) clearTimeout(hideTimer);
+            hideTimer = setTimeout(() => {
+              dock.classList.remove("is-visible");
+              hideTimer = 0;
+            }, HIDE_DELAY);
+          };
+
+          dock.addEventListener("pointerenter", () => {
+            userInteracted = true;
+            showDock();
+          });
+          dock.addEventListener("pointerleave", () => {
+            scheduleHide();
+          });
+
+          const toggle = dock.querySelector(".calendar-show-toggle");
+          if (toggle) {
+            toggle.addEventListener("focus", () => {
+              userInteracted = true;
+              showDock();
+            });
+            toggle.addEventListener("blur", () => {
+              if (!dock.matches(":hover")) scheduleHide();
+            });
+          }
+
+          const hero = document.querySelector(".hero");
+          if (hero) {
+            const observer = new MutationObserver(() => {
+              const state = hero.dataset.calendarState;
+              clearAllTimers();
+
+              if (state === "expanded") {
+                dock.classList.remove("is-visible");
+                userInteracted = false;
+                return;
+              }
+
+              if (state === "collapsed") {
+                userInteracted = false;
+                // Reveal dock immediately — it slides up while the stage
+                // shrinks down, so visually the stage "becomes" the dock.
+                dock.classList.add("is-visible");
+
+                autoHideTimer = setTimeout(() => {
+                  autoHideTimer = 0;
+                  if (!userInteracted && !dock.matches(":hover")) {
+                    scheduleHide();
+                  }
+                }, DOCK_AUTO_HIDE_MS);
+              }
+            });
+            observer.observe(hero, { attributes: true, attributeFilter: ["data-calendar-state"] });
+          }
+        })();
+      }
+
+      // Boot calendar features immediately when above threshold.
+      ensureCalendarFeatures();
 
       function updateActiveNavigation() {
         navLinks.forEach((link) => {
