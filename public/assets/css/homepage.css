@@ -68,11 +68,12 @@
       }
 
       .sidebar {
-        position: fixed;
-        inset: 0 auto 0 0;
+        position: sticky;
+        top: 0;
         z-index: 20;
+        flex: 0 0 var(--rail-width);
         width: var(--rail-width);
-        min-height: 100vh;
+        height: 100vh;
         padding: 46px 32px 30px;
         display: flex;
         flex-direction: column;
@@ -264,8 +265,234 @@
       }
 
       .page {
-        margin-left: var(--rail-width);
+        min-width: 0;
         min-height: 100vh;
+        flex: 1 1 auto;
+      }
+
+      .site-shell {
+        min-height: 100vh;
+        display: flex;
+      }
+
+      .dome-canvas {
+        position: relative;
+        width: 100%;
+        height: 100vh;
+        overflow: hidden;
+        border-bottom: 1px solid var(--line);
+        background: #070a18;
+      }
+
+      .dome-canvas-media {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        display: block;
+        object-fit: cover;
+        object-position: center;
+        animation: dome-scene-breathe 18s ease-in-out infinite alternate;
+      }
+
+      .dome-motion {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        overflow: hidden;
+        pointer-events: none;
+      }
+
+      .dome-flag-ripple {
+        position: absolute;
+        top: 55%;
+        left: 38.5%;
+        width: 16.5%;
+        height: 11%;
+        clip-path: polygon(
+          0 14%,
+          18% 17%,
+          38% 25%,
+          59% 38%,
+          79% 53%,
+          100% 72%,
+          93% 91%,
+          77% 72%,
+          58% 58%,
+          37% 44%,
+          17% 32%,
+          0 29%
+        );
+        transform-origin: right center;
+        animation: dome-flag-billow 7.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      }
+
+      .dome-flag-ripple::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 76%;
+        background: linear-gradient(
+          105deg,
+          transparent 0 28%,
+          rgba(113, 198, 255, 0.02) 37%,
+          rgba(234, 247, 255, 0.18) 49%,
+          rgba(126, 112, 255, 0.06) 58%,
+          transparent 70% 100%
+        );
+        mix-blend-mode: screen;
+        transform: translateX(-135%);
+        animation: dome-flag-sheen 7.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      }
+
+      .dome-particle {
+        position: absolute;
+        width: 3px;
+        height: 3px;
+        border-radius: 50%;
+        background: rgba(181, 104, 255, 0.88);
+        box-shadow: 0 0 8px rgba(154, 115, 255, 0.55);
+        opacity: 0;
+        animation: dome-drift var(--drift-duration) linear var(--drift-delay) infinite;
+      }
+
+      .dome-particle-1 {
+        --drift-duration: 12s;
+        --drift-delay: -2s;
+        top: 55%;
+        left: 64%;
+      }
+
+      .dome-particle-2 {
+        --drift-duration: 15s;
+        --drift-delay: -8s;
+        top: 48%;
+        left: 72%;
+        width: 4px;
+        height: 4px;
+      }
+
+      .dome-particle-3 {
+        --drift-duration: 10s;
+        --drift-delay: -4s;
+        top: 62%;
+        left: 57%;
+      }
+
+      .dome-particle-4 {
+        --drift-duration: 14s;
+        --drift-delay: -11s;
+        top: 58%;
+        left: 83%;
+        width: 2px;
+        height: 2px;
+      }
+
+      .dome-particle-5 {
+        --drift-duration: 17s;
+        --drift-delay: -7s;
+        top: 53%;
+        left: 45%;
+      }
+
+      .dome-particle-6 {
+        --drift-duration: 11s;
+        --drift-delay: -5s;
+        top: 67%;
+        left: 70%;
+        width: 2px;
+        height: 2px;
+      }
+
+      .dome-particle-7 {
+        --drift-duration: 16s;
+        --drift-delay: -13s;
+        top: 50%;
+        left: 52%;
+        width: 4px;
+        height: 4px;
+      }
+
+      .dome-particle-8 {
+        --drift-duration: 13s;
+        --drift-delay: -1s;
+        top: 60%;
+        left: 90%;
+        width: 2px;
+        height: 2px;
+      }
+
+      @keyframes dome-scene-breathe {
+        from {
+          filter: brightness(0.98) saturate(0.99);
+          transform: scale(1);
+        }
+
+        to {
+          filter: brightness(1.025) saturate(1.02);
+          transform: scale(1.018);
+        }
+      }
+
+      @keyframes dome-flag-billow {
+        0%,
+        100% {
+          transform: translate3d(0, 0, 0) skewY(0deg);
+        }
+
+        31% {
+          transform: translate3d(-0.4%, -0.25%, 0) scaleY(0.94) skewY(-0.45deg);
+        }
+
+        58% {
+          transform: translate3d(0.18%, 0.28%, 0) scaleY(1.05) skewY(0.35deg);
+        }
+
+        82% {
+          transform: translate3d(-0.12%, -0.1%, 0) scaleY(0.98) skewY(-0.18deg);
+        }
+      }
+
+      @keyframes dome-flag-sheen {
+        0%,
+        24%,
+        100% {
+          opacity: 0;
+          transform: translateX(-135%);
+        }
+
+        36% {
+          opacity: 0.8;
+        }
+
+        57% {
+          opacity: 0.7;
+          transform: translateX(155%);
+        }
+
+        69% {
+          opacity: 0;
+          transform: translateX(180%);
+        }
+      }
+
+      @keyframes dome-drift {
+        0% {
+          opacity: 0;
+          transform: translate3d(0, 7px, 0) scale(0.75);
+        }
+
+        15%,
+        78% {
+          opacity: 0.9;
+        }
+
+        100% {
+          opacity: 0;
+          transform: translate3d(-24vw, -8vh, 0) scale(1.15);
+        }
       }
 
       .hero {
@@ -810,7 +1037,9 @@
         }
 
         .sidebar {
+          position: fixed;
           inset: 0 0 auto;
+          flex: none;
           width: 100%;
           min-height: 0;
           height: 86px;
@@ -973,6 +1202,14 @@
         .page {
           margin-left: 0;
           padding-top: 86px;
+        }
+
+        .site-shell {
+          display: block;
+        }
+
+        .dome-canvas {
+          display: none;
         }
 
         .hero {
@@ -1176,5 +1413,13 @@
 
         .avatar-frame img {
           animation: none;
+        }
+
+        .dome-canvas-media {
+          animation: none;
+        }
+
+        .dome-motion {
+          display: none;
         }
       }

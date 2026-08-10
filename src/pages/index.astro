@@ -9,6 +9,7 @@ import { Image, getImage } from 'astro:assets';
 import heroDesktop from '../assets/images/homepage/hero-calendar-desktop.jpg';
 import heroMobile from '../assets/images/homepage/hero-calendar-mobile.jpg';
 import banner from '../assets/images/homepage/project-visual-banner.png';
+import domeWallpaper from '../assets/images/homepage/dome-wallpaper.png';
 
 // 为移动端首图生成 WebP 响应式 srcset（通过 getImage 走 Astro 图片优化管线）
 const mobileWidths = [375, 480, 640, 760];
@@ -92,9 +93,35 @@ function categoriesArr(c: unknown): string[] {
     <link rel="shortcut icon" href="/favicon.ico?v=2" type="image/x-icon" />
     <link rel="icon" href="/images/favicon.png?v=2" type="image/png" />
     <link rel="stylesheet" href="/assets/css/site-tokens.css?v=20260723-refactor" />
-    <link rel="stylesheet" href="/assets/css/homepage.css?v=20260809-hero-theme-overlay" />
+    <link rel="stylesheet" href="/assets/css/homepage.css?v=20260810-dome-motion" />
     <link rel="stylesheet" href="/assets/css/guestbook.css?v=20260810-close-center" />
   </Fragment>
+
+  <section class="dome-canvas" id="top" aria-label="穹顶壁纸">
+    <Image
+      class="dome-canvas-media"
+      src={domeWallpaper}
+      alt="蓝紫色能量穹顶笼罩冰原的壁纸"
+      widths={[640, 960, 1280, 1600, 2048]}
+      sizes="100vw"
+      format="webp"
+      quality={82}
+      loading="eager"
+    />
+    <div class="dome-motion" aria-hidden="true">
+      <span class="dome-flag-ripple"></span>
+      <span class="dome-particle dome-particle-1"></span>
+      <span class="dome-particle dome-particle-2"></span>
+      <span class="dome-particle dome-particle-3"></span>
+      <span class="dome-particle dome-particle-4"></span>
+      <span class="dome-particle dome-particle-5"></span>
+      <span class="dome-particle dome-particle-6"></span>
+      <span class="dome-particle dome-particle-7"></span>
+      <span class="dome-particle dome-particle-8"></span>
+    </div>
+  </section>
+
+  <div class="site-shell">
     <aside class="sidebar" aria-label="站点导航" data-menu-open="false">
       <a class="identity" href="#top" aria-label="返回首页顶部">
         <div class="avatar-frame">
@@ -141,7 +168,7 @@ function categoriesArr(c: unknown): string[] {
       </div>
     </aside>
 
-    <main class="page" id="top">
+    <main class="page">
       <section class="hero" aria-label="首页主视觉" data-calendar-state="expanded" data-calendar-ready="false">
         <picture class="hero-picture">
           <source
@@ -273,6 +300,7 @@ function categoriesArr(c: unknown): string[] {
         </span>
       </footer>
     </main>
+  </div>
 
     <GuestbookPanel />
 
