@@ -91,7 +91,7 @@
         border: 1px solid var(--line);
         border-radius: 50%;
         overflow: hidden;
-        background: #080a0a;
+        background: transparent;
       }
 
       .avatar-frame img {
@@ -102,6 +102,21 @@
         animation: avatar-rotate 18s linear infinite;
         transform-origin: center;
         will-change: transform;
+        cursor: pointer;
+        transition: filter 220ms ease;
+      }
+
+      .avatar-frame img:hover {
+        filter: brightness(1.12) saturate(1.06);
+      }
+
+      .avatar-frame img:focus-visible {
+        outline: 2px solid var(--focus);
+        outline-offset: 3px;
+      }
+
+      .avatar-frame img:active {
+        filter: brightness(0.94);
       }
 
       @keyframes avatar-rotate {
