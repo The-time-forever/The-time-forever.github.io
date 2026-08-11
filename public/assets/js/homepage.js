@@ -35,21 +35,3 @@
       window.addEventListener("scroll", updateActiveNavigation, { passive: true });
       window.addEventListener("hashchange", updateActiveNavigation);
       updateActiveNavigation();
-
-      // 头像点击 / 键盘激活 → 跳转至「关于我」
-      const avatarImg = document.querySelector(".avatar-frame img");
-      if (avatarImg) {
-        const goAbout = () => { window.location.href = "/about/"; };
-        avatarImg.addEventListener("click", (event) => {
-          event.preventDefault();
-          event.stopPropagation();
-          goAbout();
-        });
-        avatarImg.addEventListener("keydown", (event) => {
-          if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault();
-            event.stopPropagation();
-            goAbout();
-          }
-        });
-      }

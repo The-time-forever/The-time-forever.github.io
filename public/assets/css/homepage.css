@@ -80,8 +80,18 @@
         border-right: 1px solid var(--line);
       }
 
-      .identity {
+      .identity a {
         text-decoration: none;
+        color: inherit;
+      }
+
+      .avatar-link {
+        display: inline-block;
+        border-radius: 50%;
+      }
+
+      .brand-link {
+        display: block;
       }
 
       .avatar-frame {
@@ -102,21 +112,20 @@
         animation: avatar-rotate 18s linear infinite;
         transform-origin: center;
         will-change: transform;
-        cursor: pointer;
         transition: filter 220ms ease;
       }
 
-      .avatar-frame img:hover {
+      .avatar-link:hover .avatar-frame img {
         filter: brightness(1.12) saturate(1.06);
       }
 
-      .avatar-frame img:focus-visible {
-        outline: 2px solid var(--focus);
-        outline-offset: 3px;
+      .avatar-link:active .avatar-frame img {
+        filter: brightness(0.94);
       }
 
-      .avatar-frame img:active {
-        filter: brightness(0.94);
+      .avatar-link:focus-visible {
+        outline: 2px solid var(--focus);
+        outline-offset: 3px;
       }
 
       @keyframes avatar-rotate {
