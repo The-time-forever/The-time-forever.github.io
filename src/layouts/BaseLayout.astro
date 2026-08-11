@@ -14,6 +14,7 @@ const { title, lang = 'zh-CN' } = Astro.props;
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
+    <link rel="alternate" type="application/rss+xml" title="The Time Forever" href="/rss.xml" />
     <ThemeInit />
     {/* GA4 后台访问统计：异步加载，不向页面渲染任何前端数据。 */}
     <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-5NHV5RMBSB"></script>

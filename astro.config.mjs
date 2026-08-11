@@ -1,4 +1,5 @@
 import { defineConfig } from 'astro/config';
+import sitemap from '@astrojs/sitemap';
 import { unified } from '@astrojs/markdown-remark';
 import remarkToc from 'remark-toc';
 import remarkSlug from 'remark-slug';
@@ -9,6 +10,7 @@ import remarkMathPassthrough from './src/utils/remark-math-passthrough.ts';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://the-time-forever.github.io',
+  integrations: [sitemap()],
   markdown: {
     syntaxHighlight: false,
     processor: unified({
