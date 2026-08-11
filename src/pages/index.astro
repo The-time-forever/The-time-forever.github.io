@@ -143,7 +143,7 @@ function categoriesArr(c: unknown): string[] {
     </aside>
 
     <main class="page" id="top">
-      <section class="hero" aria-label="首页主视觉" data-calendar-state="expanded" data-calendar-ready="false">
+      <section class="hero" aria-label="首页主视觉">
         <picture class="hero-picture">
           <source
             media="(max-width: 760px)"
@@ -161,33 +161,6 @@ function categoriesArr(c: unknown): string[] {
             loading="eager"
           />
         </picture>
-        <div class="calendar-stage">
-          <aside class="hero-calendar" id="hero-calendar" aria-label="当前月份日历">
-            <button class="calendar-hide-toggle" type="button" aria-label="隐藏日历" aria-controls="hero-calendar" aria-expanded="true">
-              <span aria-hidden="true">−</span>
-            </button>
-            <div class="calendar-head">
-              <div>
-                <p class="calendar-label">CALENDAR · <span class="calendar-year"></span></p>
-                <p class="calendar-month"></p>
-              </div>
-              <p class="calendar-date"><strong></strong><span></span></p>
-            </div>
-            <div class="calendar-grid" aria-hidden="true">
-              <span class="calendar-weekday">SUN</span><span class="calendar-weekday">MON</span><span class="calendar-weekday">TUE</span><span class="calendar-weekday">WED</span><span class="calendar-weekday">THU</span><span class="calendar-weekday">FRI</span><span class="calendar-weekday">SAT</span>
-              <div class="calendar-days" style="display: contents"></div>
-            </div>
-          </aside>
-        </div>
-        <div class="calendar-dock" aria-hidden="true">
-          <div class="calendar-dock-copy" aria-live="polite">
-            <strong class="calendar-dock-month"></strong>
-            <span class="calendar-dock-date"></span>
-          </div>
-          <button class="calendar-show-toggle" type="button" aria-controls="hero-calendar" aria-expanded="false">
-            显示日历
-          </button>
-        </div>
       </section>
 
       <section id="articles" aria-labelledby="articles-title">
@@ -278,7 +251,7 @@ function categoriesArr(c: unknown): string[] {
     <GuestbookPanel />
 
     <script is:inline src="/assets/js/theme-toggle.js?v=20260723-refactor" defer></script>
-    <script is:inline src="/assets/js/homepage.js?v=20260723-calendar-init-2" defer></script>
+    <script is:inline src="/assets/js/homepage.js?v=20260811-rm-calendar" defer></script>
     <script is:inline src="/assets/js/guestbook.js?v=20260724-shared" defer></script>
 
     <!-- 不蒜子访问量统计：保留原首页的站点 PV / UV 统计挂载点 -->
