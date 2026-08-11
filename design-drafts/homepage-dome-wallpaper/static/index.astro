@@ -9,6 +9,7 @@ import { Image, getImage } from 'astro:assets';
 import heroDesktop from '../assets/images/homepage/hero-calendar-desktop.jpg';
 import heroMobile from '../assets/images/homepage/hero-calendar-mobile.jpg';
 import banner from '../assets/images/homepage/project-visual-banner.png';
+import domeWallpaper from '../assets/images/homepage/dome-wallpaper.png';
 
 // 为移动端首图生成 WebP 响应式 srcset（通过 getImage 走 Astro 图片优化管线）
 const mobileWidths = [375, 480, 640, 760];
@@ -16,6 +17,14 @@ const mobileImages = await Promise.all(
   mobileWidths.map((w) => getImage({ src: heroMobile, width: w, format: 'webp', quality: 75 }))
 );
 const mobileSrcset = mobileImages.map((img, i) => `${img.src} ${mobileWidths[i]}w`).join(', ');
+
+// 穹顶画布仅在桌面端由浏览器脚本挂载图片，避免移动端下载壁纸资源。
+const domeWidths = [640, 960, 1280, 1600, 2048];
+const domeImages = await Promise.all(
+  domeWidths.map((w) => getImage({ src: domeWallpaper, width: w, format: 'webp', quality: 82 }))
+);
+const domeSrcset = domeImages.map((img, i) => `${img.src} ${domeWidths[i]}w`).join(', ');
+const domeSrc = domeImages[domeImages.length - 1].src;
 
 // 取所有文章，按 date 降序（date 为 YYYY-MM-DD 字符串，字典序即日期序）
 const allPosts = (await getCollection('posts')).sort(
@@ -92,27 +101,36 @@ function categoriesArr(c: unknown): string[] {
     <link rel="shortcut icon" href="/favicon.ico?v=2" type="image/x-icon" />
     <link rel="icon" href="/images/favicon.png?v=2" type="image/png" />
     <link rel="stylesheet" href="/assets/css/site-tokens.css?v=20260723-refactor" />
-    <link rel="stylesheet" href="/assets/css/homepage.css?v=20260813-avatar-anchor" />
+    <link rel="stylesheet" href="/assets/css/homepage.css?v=20260810-dome-static" />
     <link rel="stylesheet" href="/assets/css/guestbook.css?v=20260810-close-center" />
   </Fragment>
+
+  <section class="dome-canvas" id="top" aria-label="穹顶壁纸" data-dome-canvas>
+    <img
+      class="dome-canvas-media"
+      alt="蓝紫色能量穹顶笼罩冰原的壁纸"
+      width="2560"
+      height="1080"
+      data-dome-src={domeSrc}
+      data-dome-srcset={domeSrcset}
+      data-dome-sizes="100vw"
+    />
+  </section>
+
+  <div class="site-shell">
     <aside class="sidebar" aria-label="站点导航" data-menu-open="false">
-      <div class="identity">
-        <a class="avatar-link" href="/about/" aria-label="前往关于我">
-          <div class="avatar-frame">
-            <img src="/images/avatar1.png" alt="The Time Forever 头像" />
-          </div>
-        </a>
-        <a class="brand-link" href="#top" aria-label="返回首页顶部">
-          <p class="brand-title">The Time<br />Forever</p>
-          <p class="brand-tagline">记录生活、学习与思考</p>
-          <div class="brand-rule" aria-hidden="true"></div>
-        </a>
-      </div>
+      <a class="identity" href="#top" aria-label="返回首页顶部">
+        <div class="avatar-frame">
+          <img src="/images/avatar1.png" alt="The Time Forever 头像" />
+        </div>
+        <p class="brand-title">The Time<br />Forever</p>
+        <p class="brand-tagline">记录生活、学习与思考</p>
+        <div class="brand-rule" aria-hidden="true"></div>
+      </a>
 
       <nav class="side-nav" id="site-navigation">
         <a href="#top" aria-current="page">首页</a>
         <a href="/posts/">文章</a>
-        <a href="/about/">关于我</a>
         <a href="#guestbook-panel" data-open-guestbook aria-controls="guestbook-panel" aria-expanded="false">留言</a>
         <a href="https://github.com/the-time-forever" target="_blank" rel="noreferrer">GitHub</a>
       </nav>
@@ -146,8 +164,8 @@ function categoriesArr(c: unknown): string[] {
       </div>
     </aside>
 
-    <main class="page" id="top">
-      <section class="hero" aria-label="首页主视觉">
+    <main class="page" data-home-content>
+      <section class="hero" aria-label="首页主视觉" data-calendar-state="expanded" data-calendar-ready="false">
         <picture class="hero-picture">
           <source
             media="(max-width: 760px)"
@@ -165,6 +183,33 @@ function categoriesArr(c: unknown): string[] {
             loading="eager"
           />
         </picture>
+        <div class="calendar-stage">
+          <aside class="hero-calendar" id="hero-calendar" aria-label="当前月份日历">
+            <button class="calendar-hide-toggle" type="button" aria-label="隐藏日历" aria-controls="hero-calendar" aria-expanded="true">
+              <span aria-hidden="true">−</span>
+            </button>
+            <div class="calendar-head">
+              <div>
+                <p class="calendar-label">CALENDAR · <span class="calendar-year"></span></p>
+                <p class="calendar-month"></p>
+              </div>
+              <p class="calendar-date"><strong></strong><span></span></p>
+            </div>
+            <div class="calendar-grid" aria-hidden="true">
+              <span class="calendar-weekday">SUN</span><span class="calendar-weekday">MON</span><span class="calendar-weekday">TUE</span><span class="calendar-weekday">WED</span><span class="calendar-weekday">THU</span><span class="calendar-weekday">FRI</span><span class="calendar-weekday">SAT</span>
+              <div class="calendar-days" style="display: contents"></div>
+            </div>
+          </aside>
+        </div>
+        <div class="calendar-dock" aria-hidden="true">
+          <div class="calendar-dock-copy" aria-live="polite">
+            <strong class="calendar-dock-month"></strong>
+            <span class="calendar-dock-date"></span>
+          </div>
+          <button class="calendar-show-toggle" type="button" aria-controls="hero-calendar" aria-expanded="false">
+            显示日历
+          </button>
+        </div>
       </section>
 
       <section id="articles" aria-labelledby="articles-title">
@@ -251,11 +296,30 @@ function categoriesArr(c: unknown): string[] {
         </span>
       </footer>
     </main>
+  </div>
 
-    <GuestbookPanel />
+  <script is:inline>
+    const domeCanvas = document.querySelector('[data-dome-canvas]');
+
+    if (domeCanvas instanceof HTMLElement) {
+      const isDesktop = window.matchMedia('(min-width: 761px)').matches;
+      const domeMedia = domeCanvas.querySelector('.dome-canvas-media');
+
+      if (isDesktop && domeMedia instanceof HTMLImageElement) {
+        domeMedia.src = domeMedia.dataset.domeSrc ?? '';
+        domeMedia.srcset = domeMedia.dataset.domeSrcset ?? '';
+        domeMedia.sizes = domeMedia.dataset.domeSizes ?? '100vw';
+      } else {
+        domeCanvas.remove();
+        document.querySelector('[data-home-content]')?.setAttribute('id', 'top');
+      }
+    }
+  </script>
+
+  <GuestbookPanel />
 
     <script is:inline src="/assets/js/theme-toggle.js?v=20260723-refactor" defer></script>
-    <script is:inline src="/assets/js/homepage.js?v=20260813-avatar-anchor" defer></script>
+    <script is:inline src="/assets/js/homepage.js?v=20260723-calendar-init-2" defer></script>
     <script is:inline src="/assets/js/guestbook.js?v=20260724-shared" defer></script>
 
     <!-- 不蒜子访问量统计：保留原首页的站点 PV / UV 统计挂载点 -->

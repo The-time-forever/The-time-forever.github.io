@@ -3,6 +3,7 @@ title: "Academic Writing Suite：一个面向学术写作的技能包"
 date: 2026-07-03
 permalink: /posts/2026/07/03/academic-writing-suite/
 categories: [学术写作]
+tags: [学术写作, Skills, AI]
 ---
 
 ## 一句话总结

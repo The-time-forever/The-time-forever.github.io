@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+Host: https://the-time-forever.github.io
+Sitemap: https://the-time-forever.github.io/sitemap-index.xml
