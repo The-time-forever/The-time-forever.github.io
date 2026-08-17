@@ -51,6 +51,8 @@ const {
   <body>
     {busuanzi && <BusuanziScript />}
 
+    <slot />
+
     {guestbook && <GuestbookPanel />}
 
     <script is:inline src="/assets/js/theme-toggle.js?v=20260723-refactor" defer></script>
@@ -60,7 +62,5 @@ const {
     {particleField && (
       <script is:inline src="/assets/js/particle-field.js?v=20260723-refactor" defer></script>
     )}
-
-    <slot />
   </body>
 </html>
