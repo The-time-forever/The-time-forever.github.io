@@ -1,9 +1,8 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import BusuanziScript from '../components/BusuanziScript.astro';
 import SiteStats from '../components/SiteStats.astro';
-import GuestbookPanel from '../components/GuestbookPanel.astro';
+import SiteSidebar from '../components/SiteSidebar.astro';
 import { getPostUrl } from '../utils/permalink';
 import { Image, getImage } from 'astro:assets';
 import heroDesktop from '../assets/images/homepage/hero-calendar-desktop.jpg';
@@ -83,68 +82,15 @@ function categoriesArr(c: unknown): string[] {
   return [String(c)];
 }
 ---
-<BaseLayout title="The Time Forever">
+<BaseLayout title="The Time Forever" guestbook busuanzi>
   <Fragment slot="head">
     <meta
       name="description"
       content="The Time Forever — 记录生活、学习与思考"
     />
-    <link rel="shortcut icon" href="/favicon.ico?v=2" type="image/x-icon" />
-    <link rel="icon" href="/images/favicon.png?v=2" type="image/png" />
-    <link rel="stylesheet" href="/assets/css/site-tokens.css?v=20260723-refactor" />
     <link rel="stylesheet" href="/assets/css/homepage.css?v=20260813-avatar-anchor" />
-    <link rel="stylesheet" href="/assets/css/guestbook.css?v=20260810-close-center" />
   </Fragment>
-    <aside class="sidebar" aria-label="站点导航" data-menu-open="false">
-      <div class="identity">
-        <a class="avatar-link" href="/about/" aria-label="前往关于我">
-          <div class="avatar-frame">
-            <img src="/images/avatar1.png" alt="The Time Forever 头像" />
-          </div>
-        </a>
-        <a class="brand-link" href="#top" aria-label="返回首页顶部">
-          <p class="brand-title">The Time<br />Forever</p>
-          <p class="brand-tagline">记录生活、学习与思考</p>
-          <div class="brand-rule" aria-hidden="true"></div>
-        </a>
-      </div>
-
-      <nav class="side-nav" id="site-navigation">
-        <a href="#top" aria-current="page">首页</a>
-        <a href="/posts/">文章</a>
-        <a href="/about/">关于我</a>
-        <a href="#guestbook-panel" data-open-guestbook aria-controls="guestbook-panel" aria-expanded="false">留言</a>
-        <a href="https://github.com/the-time-forever" target="_blank" rel="noreferrer">GitHub</a>
-      </nav>
-
-      <div class="side-utilities">
-        <button class="theme-toggle" type="button" aria-pressed="false">
-          <span class="theme-label">浅色模式</span>
-          <span class="eclipse-control" aria-hidden="true">
-            <span class="eclipse-orbit">
-              <span class="eclipse-disc"></span>
-              <span class="eclipse-accent"></span>
-            </span>
-          </span>
-        </button>
-        <button
-          class="mobile-menu-toggle"
-          type="button"
-          aria-label="打开导航菜单"
-          aria-controls="site-navigation"
-          aria-expanded="false"
-        >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <line x1="3" y1="6" x2="21" y2="6" stroke="currentColor" stroke-width="1.6" />
-            <line x1="3" y1="12" x2="21" y2="12" stroke="currentColor" stroke-width="1.6" />
-            <line x1="3" y1="18" x2="21" y2="18" stroke="currentColor" stroke-width="1.6" />
-          </svg>
-        </button>
-        <p class="copyright">
-          © 2026 The Time Forever<br />Hosted on GitHub Pages
-        </p>
-      </div>
-    </aside>
+    <SiteSidebar />
 
     <main class="page" id="top">
       <section class="hero" aria-label="首页主视觉">
@@ -252,12 +198,5 @@ function categoriesArr(c: unknown): string[] {
       </footer>
     </main>
 
-    <GuestbookPanel />
-
-    <script is:inline src="/assets/js/theme-toggle.js?v=20260723-refactor" defer></script>
     <script is:inline src="/assets/js/homepage.js?v=20260813-avatar-anchor" defer></script>
-    <script is:inline src="/assets/js/guestbook.js?v=20260724-shared" defer></script>
-
-    <!-- 不蒜子访问量统计：保留原首页的站点 PV / UV 统计挂载点 -->
-    <BusuanziScript />
 </BaseLayout>

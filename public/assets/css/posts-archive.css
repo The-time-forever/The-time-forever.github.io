@@ -441,11 +441,6 @@
 
     @media (max-width: 720px) {
       :root { --page: calc(100% - 36px); }
-      .topbar { min-height: 66px; }
-      .topbar-actions { gap: 12px; }
-      .nav { gap: 18px; }
-      .nav a { padding: 23px 0 20px; }
-      .nav a:not([aria-current="page"]) { display: none; }
       .hero {
         min-height: calc(100svh - 66px);
         padding: 56px 0;

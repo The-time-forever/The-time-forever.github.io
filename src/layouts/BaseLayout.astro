@@ -1,20 +1,41 @@
 ---
 import ThemeInit from '../components/ThemeInit.astro';
+import BusuanziScript from '../components/BusuanziScript.astro';
+import GuestbookPanel from '../components/GuestbookPanel.astro';
 
 interface Props {
   title: string;
   lang?: string;
+  guestbook?: boolean;
+  particleField?: boolean;
+  busuanzi?: boolean;
 }
 
-const { title, lang = 'zh-CN' } = Astro.props;
+const {
+  title,
+  lang = 'zh-CN',
+  guestbook = false,
+  particleField = false,
+  busuanzi = false,
+} = Astro.props;
+
+// 全站共用的 CSS / favicon 由 BaseLayout 集中注入，页面只需在 <slot name="head" />
+// 里追加页面专属样式。site-tokens.css 承载浅 / 深色 CSS 变量与基础 token，
+// 是 BaseLayout 唯一加载的样式表；页面样式通过 slot 顺序排在它之后以保证可覆盖。
 ---
 <!doctype html>
 <html lang={lang} data-theme="light">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
     <title>{title}</title>
     <link rel="alternate" type="application/rss+xml" title="The Time Forever" href="/rss.xml" />
+    <link rel="icon" href="/images/favicon.png?v=3" type="image/png" />
+    <link rel="stylesheet" href="/assets/css/site-tokens.css?v=20260723-refactor" />
+    {guestbook && (
+      <link rel="stylesheet" href="/assets/css/guestbook.css?v=20260810-close-center" />
+    )}
     <ThemeInit />
     {/* GA4 后台访问统计：异步加载，不向页面渲染任何前端数据。 */}
     <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-5NHV5RMBSB"></script>
@@ -24,9 +45,22 @@ const { title, lang = 'zh-CN' } = Astro.props;
       gtag('js', new Date());
       gtag('config', 'G-5NHV5RMBSB');
     </script>
+    {/* 页面专属 head 注入（页面 CSS、description 等） */}
     <slot name="head" />
   </head>
   <body>
+    {busuanzi && <BusuanziScript />}
+
     <slot />
+
+    {guestbook && <GuestbookPanel />}
+
+    <script is:inline src="/assets/js/theme-toggle.js?v=20260723-refactor" defer></script>
+    {guestbook && (
+      <script is:inline src="/assets/js/guestbook.js?v=20260724-shared" defer></script>
+    )}
+    {particleField && (
+      <script is:inline src="/assets/js/particle-field.js?v=20260723-refactor" defer></script>
+    )}
   </body>
 </html>

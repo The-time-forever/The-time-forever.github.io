@@ -46,16 +46,19 @@
     panel.classList.add("active");
     overlay.classList.add("active");
     panel.setAttribute("aria-hidden", "false");
+    panel.removeAttribute("inert");
     triggers.forEach(function (item) {
       item.setAttribute("aria-expanded", "true");
     });
     loadGiscus();
+    closeButton.focus({ preventScroll: true });
   }
 
   function closeGuestbook(moveFocus) {
     panel.classList.remove("active");
     overlay.classList.remove("active");
     panel.setAttribute("aria-hidden", "true");
+    panel.setAttribute("inert", "");
     triggers.forEach(function (item) {
       item.setAttribute("aria-expanded", "false");
     });
@@ -76,7 +79,7 @@
     closeGuestbook(true);
   });
   overlay.addEventListener("click", function () {
-    closeGuestbook(false);
+    closeGuestbook(true);
   });
   document.addEventListener("keydown", function (event) {
     if (event.key === "Escape" && panel.classList.contains("active")) {

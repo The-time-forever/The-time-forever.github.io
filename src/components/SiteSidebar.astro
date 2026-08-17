@@ -1,0 +1,71 @@
+---
+import { Image } from 'astro:assets';
+import avatar from '../assets/images/avatar/avatar.png';
+
+// 桌面侧栏 + 移动折叠菜单，仅首页使用。
+// 视觉与交互（含 .theme-toggle、.mobile-menu-toggle）依赖 homepage.css。
+// 头像源图 1000×1000 PNG，移动端 54px / 桌面 100px，输出响应式 WebP srcset。
+---
+<aside class="sidebar" aria-label="站点导航" data-menu-open="false">
+  <div class="identity">
+    <a class="avatar-link" href="/about/" aria-label="前往关于我">
+      <div class="avatar-frame">
+        <Image
+          src={avatar}
+          alt="The Time Forever 头像"
+          widths={[54, 100, 168]}
+          sizes="(max-width: 760px) 54px, 100px"
+          format="webp"
+          quality={80}
+          loading="eager"
+          decoding="async"
+        />
+      </div>
+    </a>
+    <a class="brand-link" href="#top" aria-label="返回首页顶部">
+      <p class="brand-title">The Time<br />Forever</p>
+      <p class="brand-tagline">记录生活、学习与思考</p>
+      <div class="brand-rule" aria-hidden="true"></div>
+    </a>
+  </div>
+
+  <nav class="side-nav" id="site-navigation">
+    <a href="#top" aria-current="page">首页</a>
+    <a href="/posts/">文章</a>
+    <a href="/about/">关于我</a>
+    <a
+      href="#guestbook-panel"
+      data-open-guestbook
+      aria-controls="guestbook-panel"
+      aria-expanded="false">留言</a>
+    <a href="https://github.com/the-time-forever" target="_blank" rel="noreferrer">GitHub</a>
+  </nav>
+
+  <div class="side-utilities">
+    <button class="theme-toggle" type="button" aria-pressed="false">
+      <span class="theme-label">浅色模式</span>
+      <span class="eclipse-control" aria-hidden="true">
+        <span class="eclipse-orbit">
+          <span class="eclipse-disc"></span>
+          <span class="eclipse-accent"></span>
+        </span>
+      </span>
+    </button>
+    <button
+      class="mobile-menu-toggle"
+      type="button"
+      aria-label="打开导航菜单"
+      aria-controls="site-navigation"
+      aria-expanded="false"
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <line x1="3" y1="6" x2="21" y2="6" stroke="currentColor" stroke-width="1.6" />
+        <line x1="3" y1="12" x2="21" y2="12" stroke="currentColor" stroke-width="1.6" />
+        <line x1="3" y1="18" x2="21" y2="18" stroke="currentColor" stroke-width="1.6" />
+      </svg>
+    </button>
+    <p class="copyright">
+      © 2026 The Time Forever<br />Hosted on GitHub Pages
+    </p>
+  </div>
+</aside>

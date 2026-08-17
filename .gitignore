@@ -11,3 +11,6 @@ dist/
 
 # MiMoCode
 .mimocode/
+
+# KiloCode
+.kilo/

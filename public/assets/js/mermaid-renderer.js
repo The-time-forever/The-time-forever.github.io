@@ -187,8 +187,8 @@
         };
 
 document.addEventListener('DOMContentLoaded', function() {
-            // 查找所有 language-mermaid 的代码块，替换为 .mermaid div
-            document.querySelectorAll('pre code.language-mermaid').forEach(function(block) {
+            // 同时兼容原始 Markdown 输出和 Shiki 的 pre[data-language="mermaid"] 输出。
+            document.querySelectorAll('pre code.language-mermaid, pre[data-language="mermaid"] > code').forEach(function(block) {
                 const code = block.textContent;
                 const mermaidDiv = document.createElement('div');
                 mermaidDiv.className = 'mermaid';

@@ -1,7 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import BaseLayout from './BaseLayout.astro';
-import BusuanziScript from '../components/BusuanziScript.astro';
 import GiscusComments from '../components/GiscusComments.astro';
 import MathJaxConfig from '../components/MathJaxConfig.astro';
 
@@ -19,11 +18,9 @@ const needs_mermaid = mermaid === true;
 // YYYY-MM-DD 格式化（schema 已保证 date 为纯 YYYY-MM-DD 字符串，无时区歧义）
 const dateStr = date;
 ---
-<BaseLayout title={`${title} | The Time Forever`}>
+<BaseLayout title={`${title} | The Time Forever`} particleField busuanzi>
 <Fragment slot="head">
-    <link rel="icon" href="/images/favicon.png" type="image/png">
     <link rel="stylesheet" href="/assets/css/blog.css?v=20260723-archive-bg">
-    <link rel="stylesheet" href="/assets/css/site-tokens.css?v=20260723-refactor">
     <link rel="stylesheet" href="/assets/css/post.css?v=20260723-refactor">
 
     {needs_math && (
@@ -33,9 +30,6 @@ const dateStr = date;
         <script is:inline type="text/javascript" id="MathJax-script" async src="/assets/js/mathjax.js"></script>
       </>
     )}
-
-    {/* 不蒜子访问量统计 */}
-    <BusuanziScript />
 
     {needs_mermaid && (
       <>
@@ -51,7 +45,7 @@ const dateStr = date;
     {/* 返回首页按钮 */}
     <a href="/posts" class="home-btn">← 返回文章列表</a>
 
-    {/* 主题切换按钮：夜间显示太阳，白天显示月亮 */}
+    {/* 文章页专属主题切换按钮（与顶部条样式不同，使用 lucide sun/moon 图标） */}
     <button class="theme-toggle" type="button" aria-label="切换日间/夜间模式" title="切换日间/夜间模式">
         <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -94,8 +88,5 @@ const dateStr = date;
         </div>
 
     </div>
-
-    <script is:inline src="/assets/js/particle-field.js?v=20260723-refactor" defer></script>
-    <script is:inline src="/assets/js/theme-toggle.js?v=20260723-refactor" defer></script>
 
 </BaseLayout>
