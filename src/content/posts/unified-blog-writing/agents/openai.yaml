@@ -1,4 +1,0 @@
-interface:
-  display_name: "博客统一写作"
-  short_description: "按博客既有语气、结构与 Markdown 规范撰写统一风格文章"
-  default_prompt: "Use $unified-blog-writing to draft or revise a blog post in this repository style."

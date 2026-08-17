@@ -1,0 +1,50 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="页面未找到 · The Time Forever">
+  <Fragment slot="head">
+    <meta name="robots" content="noindex" />
+    <meta name="description" content="The Time Forever：这个页面可能已移动或不存在。" />
+    <link rel="stylesheet" href="/assets/css/not-found.css?v=20260817" />
+  </Fragment>
+
+  <main class="not-found-page">
+    <header class="not-found-topbar">
+      <a class="not-found-brand" href="/" aria-label="返回 The Time Forever 首页">The Time Forever</a>
+      <button class="theme-toggle" type="button" aria-label="切换深浅色模式" title="切换深浅色模式">
+        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path>
+        </svg>
+        <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <path d="M20.3 15.2A8.5 8.5 0 0 1 8.8 3.7 8.5 8.5 0 1 0 20.3 15.2Z"></path>
+        </svg>
+      </button>
+    </header>
+
+    <section class="not-found-content" aria-labelledby="not-found-title">
+      <div class="not-found-copy">
+        <p class="not-found-code" aria-hidden="true">404</p>
+        <p class="not-found-kicker">PAGE NOT FOUND</p>
+        <h1 id="not-found-title">这页走丢了。</h1>
+        <p class="not-found-description">链接可能已经失效，或者它正在通往一个尚未写下的故事。</p>
+        <nav class="not-found-actions" aria-label="继续浏览">
+          <a class="primary-action" href="/">返回首页</a>
+          <a class="secondary-action" href="/posts/">浏览文章</a>
+        </nav>
+      </div>
+
+      <div class="not-found-mark" aria-hidden="true">
+        <div class="mark-orbit mark-orbit-one"></div>
+        <div class="mark-orbit mark-orbit-two"></div>
+        <div class="mark-frame">
+          <img src="/images/favicon.png" alt="" width="192" height="192" decoding="async" />
+        </div>
+        <span class="mark-dot mark-dot-one"></span>
+        <span class="mark-dot mark-dot-two"></span>
+        <span class="mark-dot mark-dot-three"></span>
+      </div>
+    </section>
+  </main>
+</BaseLayout>
