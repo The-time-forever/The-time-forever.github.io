@@ -1,45 +1,24 @@
 ---
+import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import BusuanziScript from '../components/BusuanziScript.astro';
 import SiteStats from '../components/SiteStats.astro';
-import GuestbookPanel from '../components/GuestbookPanel.astro';
+import SiteTopbar from '../components/SiteTopbar.astro';
+import avatar from '../assets/images/avatar/avatar.png';
 ---
 
-<BaseLayout title="关于我 · The Time Forever">
+<BaseLayout title="关于我 · The Time Forever" guestbook particleField busuanzi>
 <Fragment slot="head">
-  <meta name="color-scheme" content="light dark">
   <meta
     name="description"
     content="关于我 — The Time Forever，西安交通大学自动化本科在读，记录学习过程，发布教程。"
   />
-  <link rel="stylesheet" href="/assets/css/site-tokens.css?v=20260723-refactor">
   <link rel="stylesheet" href="/assets/css/about.css?v=20260810-about-v4">
-  <link rel="stylesheet" href="/assets/css/guestbook.css?v=20260810-close-center">
+  <link rel="stylesheet" href="/assets/css/site-topbar.css?v=20260817-mobile-menu">
 </Fragment>
   <canvas class="particle-field" id="particle-field" aria-hidden="true"></canvas>
 
   <div class="site-shell">
-    <header class="topbar">
-      <a class="brand" href="/">The Time Forever</a>
-      <div class="topbar-actions">
-        <nav class="nav" aria-label="主要导航">
-          <a href="/">首页</a>
-          <a href="/posts/">文章</a>
-          <a href="/about/" aria-current="page">关于我</a>
-          <a href="#guestbook-panel" data-open-guestbook aria-controls="guestbook-panel" aria-expanded="false">留言</a>
-          <a href="https://github.com/The-time-forever">GitHub</a>
-        </nav>
-        <button class="theme-toggle" type="button" aria-label="切换深浅色模式" title="切换深浅色模式">
-          <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-            <circle cx="12" cy="12" r="4"></circle>
-            <path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path>
-          </svg>
-          <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-            <path d="M20.3 15.2A8.5 8.5 0 0 1 8.8 3.7 8.5 8.5 0 1 0 20.3 15.2Z"></path>
-          </svg>
-        </button>
-      </div>
-    </header>
+    <SiteTopbar activeKey="about" />
 
     <main>
       <section class="about-hero" aria-labelledby="about-title">
@@ -64,7 +43,17 @@ import GuestbookPanel from '../components/GuestbookPanel.astro';
             <span class="en">Profile</span>
           </div>
           <div class="profile">
-            <img class="avatar" src="/images/avatar1.png" alt="作者头像" />
+            <Image
+              class="avatar"
+              src={avatar}
+              alt="作者头像"
+              widths={[128, 168, 256]}
+              sizes="(max-width: 760px) 128px, 168px"
+              format="webp"
+              quality={80}
+              loading="lazy"
+              decoding="async"
+            />
             <div>
               <p class="name">The Time Forever</p>
               <p class="bio">
@@ -199,11 +188,4 @@ import GuestbookPanel from '../components/GuestbookPanel.astro';
       <p class="copyright">© 2026 The Time Forever<br>All the world's a stage, and all the men and women merely players.</p>
     </footer>
   </div>
-
-  <GuestbookPanel />
-
-  <script src="/assets/js/theme-toggle.js?v=20260723-refactor" defer></script>
-  <script src="/assets/js/particle-field.js?v=20260723-refactor" defer></script>
-  <script src="/assets/js/guestbook.js?v=20260724-shared" defer></script>
-  <BusuanziScript />
 </BaseLayout>

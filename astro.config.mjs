@@ -12,7 +12,6 @@ export default defineConfig({
   site: 'https://the-time-forever.github.io',
   integrations: [sitemap()],
   markdown: {
-    syntaxHighlight: false,
     processor: unified({
       remarkPlugins: [
         remarkMath,
@@ -21,7 +20,12 @@ export default defineConfig({
         kramdownToc,
         [remarkToc, { heading: '目录', tight: true, ordered: false }],
       ],
-      rehypePlugins: [],
     }),
+    shikiConfig: {
+      themes: {
+        light: 'github-light',
+        dark: 'github-dark',
+      },
+    },
   },
 });

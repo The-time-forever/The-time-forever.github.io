@@ -1,0 +1,104 @@
+---
+// 顶部条导航，被 about.astro / posts/index.astro 共用。
+// 视觉由对应页面 CSS 中的 .topbar/.nav/.theme-toggle 控制。
+//
+// 用 activeKey 标记当前页，未匹配则为 undefined → 无 aria-current。
+export interface Props {
+  activeKey?: 'home' | 'posts' | 'about' | 'guestbook';
+}
+const { activeKey } = Astro.props;
+
+const links: Array<{
+  key: NonNullable<Props['activeKey']>;
+  href: string;
+  label: string;
+  external?: boolean;
+  isGuestbook?: boolean;
+}> = [
+  { key: 'home', href: '/', label: '首页' },
+  { key: 'posts', href: '/posts/', label: '文章' },
+  { key: 'about', href: '/about/', label: '关于我' },
+  {
+    key: 'guestbook',
+    href: '#guestbook-panel',
+    label: '留言',
+    isGuestbook: true,
+  },
+  { key: 'home', href: 'https://github.com/The-time-forever', label: 'GitHub', external: true },
+];
+---
+<header class="topbar" data-site-topbar data-menu-open="false">
+  <a class="brand" href="/">The Time Forever</a>
+  <div class="topbar-actions">
+    <nav class="nav" id="site-topbar-navigation" aria-label="主要导航">
+      {links.map((link) => {
+        if (link.isGuestbook) {
+          return (
+            <a
+              href={link.href}
+              data-open-guestbook
+              aria-controls="guestbook-panel"
+              aria-expanded="false"
+              aria-current={activeKey === link.key ? 'page' : undefined}>留言</a>
+          );
+        }
+        return (
+          <a
+            href={link.href}
+            target={link.external ? '_blank' : undefined}
+            rel={link.external ? 'noreferrer' : undefined}
+            aria-current={activeKey === link.key ? 'page' : undefined}>{link.label}</a>
+        );
+      })}
+    </nav>
+    <button class="theme-toggle" type="button" aria-label="切换深浅色模式" title="切换深浅色模式">
+      <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+        <circle cx="12" cy="12" r="4"></circle>
+        <path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path>
+      </svg>
+      <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+        <path d="M20.3 15.2A8.5 8.5 0 0 1 8.8 3.7 8.5 8.5 0 1 0 20.3 15.2Z"></path>
+      </svg>
+    </button>
+    <button
+      class="topbar-menu-toggle"
+      type="button"
+      aria-label="打开导航菜单"
+      aria-controls="site-topbar-navigation"
+      aria-expanded="false"
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <line x1="3" y1="6" x2="21" y2="6" stroke="currentColor" stroke-width="1.6" />
+        <line x1="3" y1="12" x2="21" y2="12" stroke="currentColor" stroke-width="1.6" />
+        <line x1="3" y1="18" x2="21" y2="18" stroke="currentColor" stroke-width="1.6" />
+      </svg>
+    </button>
+  </div>
+</header>
+
+<script>
+  document.querySelectorAll('[data-site-topbar]').forEach((topbar) => {
+    const menuToggle = topbar.querySelector<HTMLButtonElement>('.topbar-menu-toggle');
+    const navigation = topbar.querySelector<HTMLElement>('.nav');
+
+    if (!menuToggle || !navigation) return;
+
+    const setMenuOpen = (open: boolean) => {
+      topbar.setAttribute('data-menu-open', String(open));
+      menuToggle.setAttribute('aria-expanded', String(open));
+      menuToggle.setAttribute('aria-label', open ? '关闭导航菜单' : '打开导航菜单');
+    };
+
+    menuToggle.addEventListener('click', () => {
+      setMenuOpen(topbar.getAttribute('data-menu-open') !== 'true');
+    });
+
+    navigation.addEventListener('click', (event) => {
+      if ((event.target as Element).closest('a')) setMenuOpen(false);
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') setMenuOpen(false);
+    });
+  });
+</script>
