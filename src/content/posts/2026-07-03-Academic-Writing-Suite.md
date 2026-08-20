@@ -1,6 +1,8 @@
 ---
 title: "Academic Writing Suite：一个面向学术写作的技能包"
 date: 2026-07-03
+author: Adam
+description: 介绍用于辅助论文写作的 Academic Writing Suite 技能包及其功能范围。
 permalink: /posts/2026/07/03/academic-writing-suite/
 categories: [学术写作]
 tags: [学术写作, Skills, AI]

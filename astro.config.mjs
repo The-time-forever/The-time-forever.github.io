@@ -1,4 +1,5 @@
 import { defineConfig } from 'astro/config';
+import { fileURLToPath } from 'node:url';
 import sitemap from '@astrojs/sitemap';
 import { unified } from '@astrojs/markdown-remark';
 import remarkToc from 'remark-toc';
@@ -25,6 +26,14 @@ export default defineConfig({
       themes: {
         light: 'github-light',
         dark: 'github-dark',
+      },
+    },
+  },
+  vite: {
+    resolve: {
+      alias: {
+        // picomatch is CommonJS, but Astro loads content collections in an ESM-only runner.
+        picomatch: fileURLToPath(new URL('./src/utils/picomatch-compat.mjs', import.meta.url)),
       },
     },
   },

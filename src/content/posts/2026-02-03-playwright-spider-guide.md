@@ -1,6 +1,8 @@
 ---
 title: 用 Playwright 写爬虫：对抗反爬与动态渲染的实战指南
 date: 2026-02-03
+author: Adam
+description: 从环境搭建到反爬处理，讲解如何用 Playwright 稳定采集动态网页数据。
 permalink: /posts/2026/02/03/playwright-spider-guide/
 categories: [技术折腾]
 tags: [爬虫, Playwright, 自动化]

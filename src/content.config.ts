@@ -12,6 +12,8 @@ const posts = defineCollection({
       (v) => (v instanceof Date ? v.toISOString().slice(0, 10) : v),
       z.string().regex(/^\d{4}-\d{2}-\d{2}$/)
     ),
+    author: z.string().optional(),
+    description: z.string().optional(),
     categories: z.array(z.enum(['技术折腾', '学术写作', '工具效率', '知识笔记'])).optional(),
     featured: z.boolean().optional(),
     tags: z.array(z.string()).max(4).optional(),

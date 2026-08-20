@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 420" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <rect width="760" height="420" fill="#fafaf9"/>
+  <defs><marker id="line" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#78716c"/></marker></defs>
+  <text x="20" y="34" fill="#1c1917" font-size="14" font-weight="600">是否选择 Astro？决策树</text>
+  <rect x="260" y="60" width="240" height="40" fill="#1c1917"/><text x="380" y="85" fill="#fafaf9" font-size="12" text-anchor="middle">项目主要是只读内容？</text>
+  <line x1="380" y1="100" x2="190" y2="160" stroke="#78716c" stroke-width="1" marker-end="url(#line)"/><line x1="380" y1="100" x2="530" y2="160" stroke="#78716c" stroke-width="1" marker-end="url(#line)"/><text x="285" y="138" fill="#78716c" font-size="10" text-anchor="middle">是</text><text x="455" y="138" fill="#78716c" font-size="10" text-anchor="middle">否</text>
+  <rect x="70" y="160" width="240" height="40" fill="#fff" stroke="#1c1917" stroke-width="1"/><text x="190" y="185" fill="#1c1917" font-size="11" text-anchor="middle">强交互仪表板？</text>
+  <line x1="190" y1="200" x2="100" y2="250" stroke="#78716c" stroke-width="1" marker-end="url(#line)"/><line x1="190" y1="200" x2="260" y2="250" stroke="#78716c" stroke-width="1" marker-end="url(#line)"/><text x="150" y="232" fill="#78716c" font-size="10" text-anchor="middle">是</text><text x="220" y="232" fill="#78716c" font-size="10" text-anchor="middle">否</text>
+  <rect x="410" y="160" width="240" height="40" fill="#fff" stroke="#1c1917" stroke-width="1"/><text x="530" y="185" fill="#1c1917" font-size="11" text-anchor="middle">跨组件状态密度高？</text>
+  <line x1="530" y1="200" x2="450" y2="250" stroke="#78716c" stroke-width="1" marker-end="url(#line)"/><line x1="530" y1="200" x2="620" y2="250" stroke="#78716c" stroke-width="1" marker-end="url(#line)"/><text x="490" y="232" fill="#78716c" font-size="10" text-anchor="middle">高</text><text x="580" y="232" fill="#78716c" font-size="10" text-anchor="middle">低</text>
+  <rect x="30" y="250" width="140" height="50" fill="#1c1917"/><text x="100" y="275" fill="#fafaf9" font-size="11" text-anchor="middle" font-weight="600">Astro</text><text x="100" y="291" fill="#d6d3d1" font-size="9" text-anchor="middle">MPA + Islands</text>
+  <rect x="190" y="250" width="140" height="50" fill="#fff" stroke="#78716c" stroke-width="1" stroke-dasharray="3 3"/><text x="260" y="275" fill="#78716c" font-size="11" text-anchor="middle">Astro 仍可用</text><text x="260" y="291" fill="#a8a29e" font-size="9" text-anchor="middle">+ RSC / SPA 重区域</text>
+  <rect x="380" y="250" width="140" height="50" fill="#fff" stroke="#78716c" stroke-width="1" stroke-dasharray="3 3"/><text x="450" y="275" fill="#78716c" font-size="11" text-anchor="middle">SPA / RSC</text><text x="450" y="291" fill="#a8a29e" font-size="9" text-anchor="middle">Next.js · Remix</text>
+  <rect x="550" y="250" width="140" height="50" fill="#1c1917"/><text x="620" y="275" fill="#fafaf9" font-size="11" text-anchor="middle" font-weight="600">Astro</text><text x="620" y="291" fill="#d6d3d1" font-size="9" text-anchor="middle">Client Island 为主</text>
+  <line x1="20" y1="345" x2="740" y2="345" stroke="#e7e5e4" stroke-width="1"/><text x="20" y="370" fill="#a8a29e" font-size="10">判断轴：① 内容/应用比例  ② 跨组件状态密度  ③ SEO / 首屏权重</text><text x="20" y="390" fill="#a8a29e" font-size="10">实心块 = 默认推荐；虚线块 = 视情况；Astro 可作为局部使用</text>
+</svg>
