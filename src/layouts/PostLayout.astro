@@ -9,12 +9,13 @@ interface Props {
 }
 
 const { post } = Astro.props;
-const { title, date, math, mermaid } = post.data;
+const { title, date, math, mermaid, tabs } = post.data;
 const { author } = post.data;
 
-// 按需加载：仅当 frontmatter 显式声明 math/mermaid: true 时加载对应库，避免正文正则误判
+// 按需加载：仅当 frontmatter 显式声明 math/mermaid/tabs: true 时加载对应资源，避免正文正则误判
 const needs_math = math === true;
 const needs_mermaid = mermaid === true;
+const needs_tabs = tabs === true;
 
 // YYYY-MM-DD 格式化（schema 已保证 date 为纯 YYYY-MM-DD 字符串，无时区歧义）
 const dateStr = date;
@@ -36,6 +37,14 @@ const dateStr = date;
       <>
         {/* Mermaid：仅加载渲染器，2.8MB mermaid.min.js 由渲染器在图进入视口时懒加载 */}
         <script is:inline src="/assets/js/mermaid-renderer.js?v=20260808-lazy" defer></script>
+      </>
+    )}
+
+    {needs_tabs && (
+      <>
+        {/* 长文分 Tab 展示（不用侧边栏），样式复用站点主题变量 */}
+        <link rel="stylesheet" href="/assets/css/tabs.css?v=20260916-back-btn-inline">
+        <script is:inline src="/assets/js/tabs.js?v=20260916-back-btn-inline" defer></script>
       </>
     )}
 </Fragment>

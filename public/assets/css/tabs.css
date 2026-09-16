@@ -1,0 +1,160 @@
+/* 文章内 Tab 切换（frontmatter: tabs: true），复用 post.css/blog.css 的主题变量 */
+.tab-group {
+    margin: 1.5em 0;
+}
+
+.tab-list {
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-bottom: 1px solid var(--hairline);
+    margin-bottom: 1.5em;
+    scrollbar-width: thin;
+}
+
+.tab-btn {
+    flex: 0 0 auto;
+    padding: 10px 16px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    color: var(--muted);
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.tab-btn:hover {
+    color: var(--text);
+}
+
+.tab-btn:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+}
+
+.tab-btn[aria-selected="true"] {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+}
+
+.tab-panel[hidden] {
+    display: none;
+}
+
+.tab-panel > :first-child {
+    margin-top: 0;
+}
+
+/* 嵌套子 tab：用胶囊按钮和第一层的下划线风格区分开 */
+.tab-panel > .tab-group {
+    margin: 0;
+}
+
+.tab-panel > .tab-group > .tab-list {
+    border-bottom: none;
+    gap: 6px;
+    margin-bottom: 1.25em;
+}
+
+.tab-panel > .tab-group > .tab-list > .tab-btn {
+    padding: 6px 14px;
+    border: 1px solid var(--card-border);
+    border-radius: 999px;
+    background: var(--card-bg);
+}
+
+.tab-panel > .tab-group > .tab-list > .tab-btn[aria-selected="true"] {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg);
+}
+
+/* 系统（Windows / macOS）全局开关 */
+.os-switch {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 1em;
+}
+
+.os-switch-label {
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+.os-switch-btn {
+    padding: 6px 16px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    color: var(--muted);
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 999px;
+    cursor: pointer;
+    transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.os-switch-btn:hover {
+    color: var(--text);
+}
+
+.os-switch-btn[aria-pressed="true"] {
+    color: var(--bg);
+    background: var(--accent);
+    border-color: var(--accent);
+}
+
+[data-os-root][data-os="windows"] .os-macos {
+    display: none;
+}
+
+[data-os-root][data-os="macos"] .os-windows {
+    display: none;
+}
+
+/* 长文分区后，在 tab 内容末尾放一个跳回顶层导航的按钮，不遮挡正文 */
+.back-to-tabs-wrap {
+    display: flex;
+    justify-content: center;
+    margin-top: 2.5em;
+}
+
+.back-to-tabs-btn {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    color: var(--home-btn-text);
+    background: color-mix(in srgb, var(--bg) 82%, transparent);
+    border: 1px solid var(--home-btn-border);
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.back-to-tabs-btn:hover {
+    background: var(--home-btn-hover-bg);
+    color: var(--home-btn-hover-text);
+    border-color: var(--home-btn-hover-border);
+}
+
+.glass-container .tab-panel figure {
+    margin: 1em 0;
+}
+
+.glass-container .tab-panel figcaption {
+    margin-top: 0.5em;
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.85rem;
+}
+
+@media (max-width: 600px) {
+    .tab-btn {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+    }
+}

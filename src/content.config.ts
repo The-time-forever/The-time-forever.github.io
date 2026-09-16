@@ -21,6 +21,7 @@ const posts = defineCollection({
     redirect_to: z.string().optional(),
     math: z.boolean().optional(),
     mermaid: z.boolean().optional(),
+    tabs: z.boolean().optional(),
   }),
 });
 
