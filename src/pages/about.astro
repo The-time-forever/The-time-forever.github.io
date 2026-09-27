@@ -4,6 +4,102 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import SiteStats from '../components/SiteStats.astro';
 import SiteTopbar from '../components/SiteTopbar.astro';
 import avatar from '../assets/images/avatar/avatar.png';
+
+// 次元倾向转速表：0 = 纯三次元（左端），1 = 纯二次元（右端），0.5 = 中线
+const gaugeValue = 0.75;
+const GAUGE_CX = 100;
+const GAUGE_CY = 100;
+const GAUGE_R = 80;
+
+// 取值 t（0–1）映射到半圆上的点，t = 0 在左端，t = 1 在右端
+const gaugePoint = (t: number, r: number) => {
+  const angle = Math.PI * (1 - t);
+  return {
+    x: +(GAUGE_CX + r * Math.cos(angle)).toFixed(2),
+    y: +(GAUGE_CY - r * Math.sin(angle)).toFixed(2),
+  };
+};
+const gaugeArc = (from: number, to: number) => {
+  const a = gaugePoint(from, GAUGE_R);
+  const b = gaugePoint(to, GAUGE_R);
+  return `M${a.x} ${a.y} A${GAUGE_R} ${GAUGE_R} 0 0 1 ${b.x} ${b.y}`;
+};
+const gaugeTicks = Array.from({ length: 21 }, (_, i) => {
+  const major = i % 5 === 0;
+  const outer = gaugePoint(i / 20, GAUGE_R - 6);
+  const inner = gaugePoint(i / 20, GAUGE_R - (major ? 18 : 12));
+  return { major, x1: outer.x, y1: outer.y, x2: inner.x, y2: inner.y };
+});
+
+const courseGroups = [
+  {
+    title: '数学基础',
+    items: ['高等数学', '线性代数与解析几何', '复变函数与积分变换', '离散数学', '概率统计与随机过程', '运筹学'],
+  },
+  {
+    title: '计算机',
+    items: ['程序设计基础', '数据结构与算法', '数字设计与计算机原理'],
+  },
+  {
+    title: '电路与物理',
+    items: ['大学物理', '电路', '模拟电子学基础'],
+  },
+  {
+    title: '系统与工程',
+    items: ['系统建模与动力学分析', '工程制图'],
+  },
+];
+
+// 熟练程度档位：了解 / 熟悉 / 精通，请如实标注以便他人评估协作可能
+const SKILL_LEVELS = ['了解', '熟悉', '精通'];
+const skillGroups: { title: string; items: { name: string; level: 1 | 2 | 3 }[] }[] = [
+  {
+    title: '编程语言',
+    items: [
+      { name: 'C 语言', level: 2 },
+      { name: 'Python', level: 2 },
+      { name: 'JavaScript / TypeScript', level: 2 },
+    ],
+  },
+  {
+    title: '前端与站点',
+    items: [
+      { name: 'HTML / CSS', level: 2 },
+      { name: 'Astro', level: 2 },
+    ],
+  },
+  {
+    title: '工具与写作',
+    items: [
+      { name: 'Git / GitHub', level: 2 },
+      { name: 'Markdown', level: 2 },
+      { name: 'LaTeX', level: 2 },
+      { name: 'Linux / WSL2', level: 2 },
+    ],
+  },
+];
+
+const agentGroups = [
+  {
+    title: 'CLI',
+    label: 'CLI Agent 使用经验',
+    items: [
+      'Claude Code', 'Codex', 'Grok Build', 'Pi Coding Agent', 'Hermes Agent', 'MiMo Code',
+      'GitHub Copilot CLI', 'Gemini CLI', 'Kilo Code CLI', 'Qoder CLI', 'DeepCode CLI', 'Cline',
+      'MysteryCode', 'OpenCode', 'Reasonix', 'RepoWiki',
+    ],
+  },
+  {
+    title: 'IDE',
+    label: 'IDE Agent 使用经验',
+    items: ['Cursor', 'Windsurf', 'Trae', 'Qoder'],
+  },
+  {
+    title: 'Desktop',
+    label: 'Desktop Agent 使用经验',
+    items: ['ChatGPT', 'Claude Desktop', 'Cherry Studio', 'Grok Bot', 'OpenCode', 'Perplexity'],
+  },
+];
 ---
 
 <BaseLayout title="关于我 · The Time Forever" guestbook particleField busuanzi>
@@ -12,7 +108,7 @@ import avatar from '../assets/images/avatar/avatar.png';
     name="description"
     content="关于我 — The Time Forever，西安交通大学自动化本科在读，记录学习过程，发布教程。"
   />
-  <link rel="stylesheet" href="/assets/css/about.css?v=20260810-about-v4">
+  <link rel="stylesheet" href="/assets/css/about.css?v=20260927-about-skills">
   <link rel="stylesheet" href="/assets/css/site-topbar.css?v=20260817-mobile-menu">
 </Fragment>
   <canvas class="particle-field" id="particle-field" aria-hidden="true"></canvas>
@@ -31,205 +127,168 @@ import avatar from '../assets/images/avatar/avatar.png';
             记录生活、学习与思考。
           </p>
         </div>
+
+        <div class="profile" aria-label="个人简介">
+          <Image
+            class="avatar"
+            src={avatar}
+            alt="作者头像"
+            widths={[128, 168, 256]}
+            sizes="(max-width: 720px) 88px, (max-width: 1050px) 128px, 168px"
+            format="webp"
+            quality={80}
+            loading="eager"
+            decoding="async"
+          />
+          <div class="profile-text">
+            <p class="name">The Time Forever</p>
+            <p class="bio">
+              记录一些学习过程，发表一些看法。
+            </p>
+            <ul class="interest-tags" aria-label="个人标签">
+              <li class="interest-tag">技术宅</li>
+              <li class="interest-tag">绝区零</li>
+            </ul>
+          </div>
+          <figure class="dimension-gauge" role="img" aria-label="次元倾向：偏向二次元">
+            <svg viewBox="0 0 200 124" aria-hidden="true">
+              <path class="gauge-track" d={gaugeArc(0, 1)}></path>
+              <path class="gauge-fill" d={gaugeArc(0, gaugeValue)}></path>
+              {gaugeTicks.map((tick) => (
+                <line class:list={['gauge-tick', { major: tick.major }]} x1={tick.x1} y1={tick.y1} x2={tick.x2} y2={tick.y2}></line>
+              ))}
+              <line class="gauge-divider" x1={GAUGE_CX} y1={GAUGE_CY} x2={GAUGE_CX} y2={GAUGE_CY - GAUGE_R - 10}></line>
+              <g class="gauge-needle" style={`--needle-angle: ${(gaugeValue - 0.5) * 180}deg`}>
+                <path d={`M${GAUGE_CX - 3.5} ${GAUGE_CY} L${GAUGE_CX} ${GAUGE_CY - GAUGE_R + 12} L${GAUGE_CX + 3.5} ${GAUGE_CY} Z`}></path>
+              </g>
+              <circle class="gauge-hub" cx={GAUGE_CX} cy={GAUGE_CY} r="6"></circle>
+              <text class="gauge-label" x={GAUGE_CX - GAUGE_R} y="120" text-anchor="middle">三次元</text>
+              <text class="gauge-label" x={GAUGE_CX + GAUGE_R} y="120" text-anchor="middle">二次元</text>
+            </svg>
+          </figure>
+        </div>
       </section>
 
       <section class="about-content" aria-label="关于作者">
 
-        <!-- 01 · 个人简介 -->
-        <section class="about-section" aria-labelledby="profile-title">
-          <div class="about-section-head">
-            <span class="num">01</span>
-            <h2 id="profile-title">个人简介</h2>
-            <span class="en">Profile</span>
-          </div>
-          <div class="profile">
-            <Image
-              class="avatar"
-              src={avatar}
-              alt="作者头像"
-              widths={[128, 168, 256]}
-              sizes="(max-width: 760px) 128px, 168px"
-              format="webp"
-              quality={80}
-              loading="lazy"
-              decoding="async"
-            />
-            <div>
-              <p class="name">The Time Forever</p>
-              <p class="bio">
-                记录一些学习过程，发表一些看法。
-              </p>
-              <ul class="interest-tags" aria-label="个人标签">
-                <li class="interest-tag">技术宅</li>
-                <li class="interest-tag">2.5 次元</li>
-              </ul>
-            </div>
-          </div>
-        </section>
-
-        <!-- 02 · 教育背景 -->
+        <!-- 01 · 教育背景 -->
         <section class="about-section" aria-labelledby="education-title">
           <div class="about-section-head">
-            <span class="num">02</span>
+            <span class="num">01</span>
             <h2 id="education-title">教育背景</h2>
             <span class="en">Education</span>
           </div>
 
-          <div class="timeline">
-            <div class="tl-row">
-              <div class="tl-body">
-                <h3>自动化 · 本科在读</h3>
-                <p class="org">西安交通大学</p>
-                <p class="course-label">主修课程</p>
-                <ul class="course-cloud" aria-label="主修课程">
-                  <li class="course-chip">高等数学</li>
-                  <li class="course-chip">线性代数与解析几何</li>
-                  <li class="course-chip">复变函数与积分变换</li>
-                  <li class="course-chip">离散数学</li>
-                  <li class="course-chip">程序设计基础</li>
-                  <li class="course-chip">数据结构与算法</li>
-                  <li class="course-chip">大学物理</li>
-                  <li class="course-chip">电路</li>
-                  <li class="course-chip">模拟电子学基础</li>
-                  <li class="course-chip">数字设计与计算机原理</li>
-                  <li class="course-chip">系统建模与动力学分析</li>
-                  <li class="course-chip">概率统计与随机过程</li>
-                  <li class="course-chip">运筹学</li>
-                  <li class="course-chip">工程制图</li>
-                </ul>
-              </div>
+          <div class="about-section-body">
+            <div class="edu-card">
+              <h3>自动化 · 本科在读</h3>
+              <p class="org">西安交通大学</p>
+              <p class="course-label">主修课程</p>
+              <dl class="course-groups" aria-label="主修课程">
+                {courseGroups.map((group) => (
+                  <div class="course-group">
+                    <dt>{group.title}</dt>
+                    <dd>
+                      <ul class="course-list">
+                        {group.items.map((item) => <li>{item}</li>)}
+                      </ul>
+                    </dd>
+                  </div>
+                ))}
+              </dl>
             </div>
           </div>
         </section>
 
-        <!-- 03 · 专业技能 -->
+        <!-- 02 · 专业技能 -->
         <section class="about-section" aria-labelledby="skills-title">
           <div class="about-section-head">
-            <span class="num">03</span>
+            <span class="num">02</span>
             <h2 id="skills-title">专业技能</h2>
             <span class="en">Skills</span>
           </div>
 
-          <div class="skill-group">
-            <h3>编程语言</h3>
-            <ul class="skill-list">
-              <li class="skill-chip">C 语言 <span class="level">熟悉</span></li>
-              <li class="skill-chip">Python <span class="level">熟悉</span></li>
-              <li class="skill-chip">JavaScript / TypeScript <span class="level">熟悉</span></li>
-            </ul>
+          <div class="about-section-body">
+            {skillGroups.map((group) => (
+              <div class="skill-group">
+                <h3>{group.title}</h3>
+                <ul class="skill-meter-list">
+                  {group.items.map((item) => (
+                    <li class="skill-meter-row">
+                      <span class="skill-name">{item.name}</span>
+                      <span class="skill-meter" aria-hidden="true">
+                        {SKILL_LEVELS.map((_, i) => <i class:list={{ on: i < item.level }}></i>)}
+                      </span>
+                      <span class="level">{SKILL_LEVELS[item.level - 1]}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
-
-          <div class="skill-group">
-            <h3>前端与站点</h3>
-            <ul class="skill-list">
-              <li class="skill-chip">HTML / CSS <span class="level">熟悉</span></li>
-              <li class="skill-chip">Astro <span class="level">熟悉</span></li>
-            </ul>
-          </div>
-
-          <div class="skill-group">
-            <h3>工具与写作</h3>
-            <ul class="skill-list">
-              <li class="skill-chip">Git / GitHub <span class="level">熟悉</span></li>
-              <li class="skill-chip">Markdown <span class="level">熟悉</span></li>
-              <li class="skill-chip">LaTeX <span class="level">熟悉</span></li>
-              <li class="skill-chip">Linux / WSL2 <span class="level">熟悉</span></li>
-            </ul>
-          </div>
-          <!-- 熟练程度档位：了解 / 熟悉 / 精通，请如实标注以便他人评估协作可能 -->
         </section>
 
-        <!-- 04 · Agent 使用经验 -->
+        <!-- 03 · Agent 使用经验 -->
         <section class="about-section" aria-labelledby="agent-title">
           <div class="about-section-head">
-            <span class="num">04</span>
-            <h2 id="agent-title">Agent使用经验</h2>
+            <span class="num">03</span>
+            <h2 id="agent-title">Agent 使用经验</h2>
             <span class="en">Agent Experience</span>
           </div>
 
-          <div class="skill-group">
-            <h3>CLI</h3>
-            <ul class="skill-list" aria-label="CLI Agent 使用经验">
-              <li class="skill-chip">Claude Code</li>
-              <li class="skill-chip">Codex</li>
-              <li class="skill-chip">Grok Build</li>
-              <li class="skill-chip">Pi Coding Agent</li>
-              <li class="skill-chip">Hermes Agent</li>
-              <li class="skill-chip">MiMo Code</li>
-              <li class="skill-chip">GitHub Copilot CLI</li>
-              <li class="skill-chip">Gemini CLI</li>
-              <li class="skill-chip">Kilo Code CLI</li>
-              <li class="skill-chip">Qoder CLI</li>
-              <li class="skill-chip">DeepCode CLI</li>
-              <li class="skill-chip">Cline</li>
-              <li class="skill-chip">MysteryCode</li>
-              <li class="skill-chip">OpenCode</li>
-              <li class="skill-chip">Reasonix</li>
-              <li class="skill-chip">RepoWiki</li>
-            </ul>
-          </div>
-
-          <div class="skill-group">
-            <h3>IDE</h3>
-            <ul class="skill-list" aria-label="IDE Agent 使用经验">
-              <li class="skill-chip">Cursor</li>
-              <li class="skill-chip">Windsurf</li>
-              <li class="skill-chip">Trae</li>
-              <li class="skill-chip">Qoder</li>
-            </ul>
-          </div>
-
-          <div class="skill-group">
-            <h3>Desktop</h3>
-            <ul class="skill-list" aria-label="Desktop Agent 使用经验">
-              <li class="skill-chip">ChatGPT</li>
-              <li class="skill-chip">Claude Desktop</li>
-              <li class="skill-chip">Cherry Studio</li>
-              <li class="skill-chip">Grok Bot</li>
-              <li class="skill-chip">OpenCode</li>
-              <li class="skill-chip">Perplexity</li>
-            </ul>
+          <div class="about-section-body">
+            {agentGroups.map((group) => (
+              <div class="skill-group">
+                <h3>{group.title}<span class="count">{group.items.length}</span></h3>
+                <ul class="agent-list" aria-label={group.label}>
+                  {group.items.map((item) => <li class="agent-item">{item}</li>)}
+                </ul>
+              </div>
+            ))}
           </div>
         </section>
 
-        <!-- 05 · 联系方式 -->
+        <!-- 04 · 联系方式 -->
         <section class="about-section" aria-labelledby="contact-title">
           <div class="about-section-head">
-            <span class="num">05</span>
+            <span class="num">04</span>
             <h2 id="contact-title">联系方式</h2>
             <span class="en">Contact</span>
           </div>
-          <ul class="contact-list">
-            <!-- 暂不展示邮箱联系方式，需要时取消注释并替换为真实邮箱
-            <li>
-              <a href="mailto:you@example.com">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
-                  <rect x="3" y="5" width="18" height="14" rx="2"></rect>
-                  <path d="m3 7 9 6 9-6"></path>
-                </svg>
-                you@example.com
-              </a>
-            </li>
-            -->
-            <li>
-              <a href="https://github.com/The-time-forever" target="_blank" rel="noreferrer">
-                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                  <path d="M12 2C6.48 2 2 6.58 2 12.25c0 4.53 2.87 8.37 6.84 9.73.5.1.68-.22.68-.49 0-.24-.01-.88-.01-1.73-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.11-1.5-1.11-1.5-.91-.64.07-.62.07-.62 1 .07 1.53 1.06 1.53 1.06.89 1.56 2.34 1.11 2.91.85.09-.66.35-1.11.63-1.36-2.22-.26-4.56-1.14-4.56-5.06 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.7 0 0 .84-.28 2.75 1.05a9.36 9.36 0 0 1 5 0c1.91-1.33 2.75-1.05 2.75-1.05.55 1.4.2 2.44.1 2.7.64.72 1.03 1.63 1.03 2.75 0 3.93-2.34 4.79-4.57 5.05.36.32.68.94.68 1.9 0 1.37-.01 2.47-.01 2.81 0 .27.18.6.69.49A10.26 10.26 0 0 0 22 12.25C22 6.58 17.52 2 12 2Z"></path>
-                </svg>
-                GitHub · @The-time-forever
-              </a>
-            </li>
-            <li>
-              <a href="/rss.xml" aria-label="RSS 订阅">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
-                  <path d="M4 11a9 9 0 0 1 9 9"></path>
-                  <path d="M4 4a16 16 0 0 1 16 16"></path>
-                  <circle cx="5" cy="19" r="1.5" fill="currentColor"></circle>
-                </svg>
-                RSS 订阅
-              </a>
-            </li>
-          </ul>
+
+          <div class="about-section-body">
+            <ul class="contact-list">
+              <!-- 暂不展示邮箱联系方式，需要时取消注释并替换为真实邮箱
+              <li>
+                <a href="mailto:you@example.com">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                    <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+                    <path d="m3 7 9 6 9-6"></path>
+                  </svg>
+                  you@example.com
+                </a>
+              </li>
+              -->
+              <li>
+                <a href="https://github.com/The-time-forever" target="_blank" rel="noreferrer">
+                  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M12 2C6.48 2 2 6.58 2 12.25c0 4.53 2.87 8.37 6.84 9.73.5.1.68-.22.68-.49 0-.24-.01-.88-.01-1.73-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.11-1.5-1.11-1.5-.91-.64.07-.62.07-.62 1 .07 1.53 1.06 1.53 1.06.89 1.56 2.34 1.11 2.91.85.09-.66.35-1.11.63-1.36-2.22-.26-4.56-1.14-4.56-5.06 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.7 0 0 .84-.28 2.75 1.05a9.36 9.36 0 0 1 5 0c1.91-1.33 2.75-1.05 2.75-1.05.55 1.4.2 2.44.1 2.7.64.72 1.03 1.63 1.03 2.75 0 3.93-2.34 4.79-4.57 5.05.36.32.68.94.68 1.9 0 1.37-.01 2.47-.01 2.81 0 .27.18.6.69.49A10.26 10.26 0 0 0 22 12.25C22 6.58 17.52 2 12 2Z"></path>
+                  </svg>
+                  GitHub · @The-time-forever
+                </a>
+              </li>
+              <li>
+                <a href="/rss.xml" aria-label="RSS 订阅">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                    <path d="M4 11a9 9 0 0 1 9 9"></path>
+                    <path d="M4 4a16 16 0 0 1 16 16"></path>
+                    <circle cx="5" cy="19" r="1.5" fill="currentColor"></circle>
+                  </svg>
+                  RSS 订阅
+                </a>
+              </li>
+            </ul>
+          </div>
         </section>
 
       </section>
