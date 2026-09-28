@@ -268,7 +268,7 @@
     .about-content {
       width: var(--page);
       margin: 0 auto;
-      padding-bottom: 72px;
+      padding-bottom: 24px;
     }
     .about-section {
       padding: clamp(40px, 6vh, 64px) 0;
@@ -459,35 +459,51 @@
       background: var(--accent);
     }
 
-    /* ===== 联系方式 ===== */
+    /* ===== 联系方式：整行可点的行式清单 ===== */
     .contact-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 14px 40px;
-      list-style: none;
       margin: 0;
       padding: 0;
+      list-style: none;
+      border-top: 1px solid var(--line);
     }
+    .contact-list li { border-bottom: 1px solid var(--line); }
     .contact-list a {
-      display: inline-flex;
+      display: grid;
+      grid-template-columns: 20px 7em minmax(0, 1fr) 18px;
       align-items: center;
-      gap: 12px;
-      padding: 12px 0;
+      gap: 16px;
+      padding: 16px 0;
       color: var(--ink);
-      font-family: var(--serif);
-      font-size: 1.12rem;
       text-decoration: none;
-      border-bottom: 1px solid var(--line-strong);
-      transition: color 180ms ease, border-color 180ms ease;
+      transition: color 180ms ease;
     }
-    .contact-list a:hover {
-      color: var(--accent-dark);
-      border-color: var(--accent);
-    }
+    .contact-list a:hover { color: var(--accent-dark); }
     .contact-list svg {
       width: 20px;
       height: 20px;
       color: var(--accent-dark);
+    }
+    .contact-label {
+      font-family: var(--serif);
+      font-size: 1.08rem;
+    }
+    .contact-value {
+      overflow: hidden;
+      color: var(--muted);
+      font-size: 0.9rem;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .contact-list a:hover .contact-value { color: inherit; }
+    .contact-list .contact-arrow {
+      width: 18px;
+      height: 18px;
+      color: var(--muted);
+      transition: transform 180ms ease, color 180ms ease;
+    }
+    .contact-list a:hover .contact-arrow {
+      color: var(--accent);
+      transform: translate(3px, -3px);
     }
 
     /* ===== Footer（与归档页一致） ===== */
@@ -580,6 +596,10 @@
         padding-top: 16px;
       }
       .edu-card { padding-left: 16px; }
+      .contact-list a {
+        grid-template-columns: 20px auto minmax(0, 1fr) 18px;
+        gap: 12px;
+      }
       .course-group {
         grid-template-columns: minmax(0, 1fr);
         gap: 4px;
