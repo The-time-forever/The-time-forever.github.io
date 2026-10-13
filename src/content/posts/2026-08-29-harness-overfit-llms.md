@@ -2,6 +2,7 @@
 title: "当模型离开熟悉的 Harness：LLM 智能体的配置效应、适配与评测"
 date: 2026-08-29
 author: Adam
+featured: true
 description: 基于公开证据综述 harness 对 LLM 智能体表现的影响：同一模型在不同 harness 下成本与失败模式的差异、陌生工具 schema 上的调用回归，及其对评测与工程实践的启示。
 permalink: /posts/2026/08/29/harness-overfit-llms/
 categories: [知识笔记]
