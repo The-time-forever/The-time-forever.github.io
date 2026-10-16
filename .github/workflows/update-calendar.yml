@@ -106,4 +106,4 @@ jobs:
         if: failure()
         run: |
           echo '### Calendar update failed' >> "$GITHUB_STEP_SUMMARY"
-          echo 'Review the failed step and docs/calendar-automation.md. An unsuccessful build never reaches the commit step. A rejected push leaves main unchanged. A deployment failure can be retried with deploy.yml workflow_dispatch.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Review the failed step above. An unsuccessful build never reaches the commit step. A rejected push leaves main unchanged. A deployment failure can be retried with deploy.yml workflow_dispatch.' >> "$GITHUB_STEP_SUMMARY"
