@@ -10,8 +10,12 @@ See `AGENTS.md` for repository conventions (project structure, coding style, com
 - `npm run dev` — start the Astro dev server.
 - `npm run build` — validate content collections and build the production site into `dist/`.
 - `npm run preview` — serve the built `dist/` output for a final check.
+- `python -m pip install -r scripts/requirements-calendar.txt` — install the calendar updater dependency (Python 3.12+).
+- `python scripts/update_calendar.py --dry-run` — discover and validate the current Beijing month's official wallpaper pair. Add `--year YYYY --month M` together for a specific month.
+- `python scripts/update_calendar.py --build` — update the pair and metadata, with Astro build validation and rollback on failure.
+- `python -m unittest discover -s scripts/tests -v` — run the calendar updater failure-protection tests.
 
-There is no lint or test command configured. After any change, run `npm run build` (this validates the Zod content schema and Astro/TS types) and manually check `/`, `/posts/`, and any changed post page in a browser, including MathJax/Mermaid rendering if the post uses them.
+There is no frontend lint or unit-test command configured. Run the Python tests when changing calendar update logic. For site changes, run `npm run build` and manually check `/`, `/posts/`, `/about/`, the not-found route, and any changed post page in a browser, including MathJax/Mermaid rendering if the post uses them.
 
 ## Architecture
 
@@ -38,4 +42,10 @@ This is a static blog: Astro (content collections) generating pages that were or
 
 ### Deployment
 
-`.github/workflows/deploy.yml` builds on every push/PR (using `ASTRO_BASE` from `actions/configure-pages`) but only deploys to GitHub Pages on push to `main`. Don't rely on `ASTRO_BASE` locally — it's only set in CI.
+`.github/workflows/deploy.yml` builds on pushes to `main`, PRs, and manual dispatch (using `ASTRO_BASE` from `actions/configure-pages`). Pushes and manual runs on `main` deploy to GitHub Pages; PR runs only build. The optional manual `revision` input selects the verified commit to check out. Don't rely on `ASTRO_BASE` locally — it's only set in CI.
+
+### Calendar wallpaper updates
+
+`scripts/update_calendar.py` discovers official ZZZ announcements and downloads the PC/mobile pair through the official Minas share flow. It updates the fixed homepage JPG paths and `src/data/calendar.json`; `src/pages/index.astro` reads the metadata for `alt` while retaining Astro image optimization and responsive sources. Preserve validation of both images, transaction recovery, build-failure rollback, and hash-based duplicate detection. Detailed maintenance rules are in `AGENTS.md` under Calendar Wallpaper Automation.
+
+`.github/workflows/update-calendar.yml` checks on days 1-10 at 02:17 UTC (10:17 Beijing), with manual `year`, `month`, `dry_run` and `force` inputs. It runs the Python tests and updates with `--build` before committing the pair and metadata to `main`. It explicitly dispatches `deploy.yml` with the committed revision because default `GITHUB_TOKEN` pushes do not start push workflows; keep this dispatch and the manual deployment condition intact.
