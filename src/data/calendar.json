@@ -1,6 +1,31 @@
 {
-  "year_month": null,
-  "year": null,
-  "month": 7,
-  "images": {}
+  "year_month": "2026-10",
+  "year": 2026,
+  "month": 10,
+  "announcement_url": "https://zzz.mihoyo.com/news/166576",
+  "published_at": "2026-10-02 12:00:00",
+  "share_url": "https://minas.mihoyo.com/d/182a14ec7db34be38f0f/",
+  "updated_at": "2026-10-16T11:40:32.790365+00:00",
+  "images": {
+    "desktop": {
+      "format": "PNG",
+      "width": 2560,
+      "height": 1440,
+      "original_sha256": "56d44cef549b7828899911556f16e540ecb32c676cf2e43ffcf9f029254124c8",
+      "sha256": "438ba57781c7c556a2a015a444703099e99f6a5b4422a0a74777beedbd3613e4",
+      "name": "10月月历壁纸_PC版.png",
+      "bytes": 5441315,
+      "download_url": "https://minas.mihoyo.com/d/182a14ec7db34be38f0f/files/?p=%2F10%E6%9C%88%E6%9C%88%E5%8E%86%E5%A3%81%E7%BA%B8_PC%E7%89%88.png&dl=1"
+    },
+    "mobile": {
+      "format": "PNG",
+      "width": 1290,
+      "height": 2796,
+      "original_sha256": "0adff9919f9c73b1aab7257d99e64119dec3b259f6687c0481b1b16c820967b7",
+      "sha256": "cf48d56ea7412908985e51a66e8b37ab2eaa10fa6858ebf2ce77773bdd0f5e89",
+      "name": "10月月历壁纸_手机版.png",
+      "bytes": 4756124,
+      "download_url": "https://minas.mihoyo.com/d/182a14ec7db34be38f0f/files/?p=%2F10%E6%9C%88%E6%9C%88%E5%8E%86%E5%A3%81%E7%BA%B8_%E6%89%8B%E6%9C%BA%E7%89%88.png&dl=1"
+    }
+  }
 }
