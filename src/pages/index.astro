@@ -7,7 +7,12 @@ import { getPostUrl } from '../utils/permalink';
 import { Image, getImage } from 'astro:assets';
 import heroDesktop from '../assets/images/homepage/hero-calendar-desktop.jpg';
 import heroMobile from '../assets/images/homepage/hero-calendar-mobile.jpg';
+import calendar from '../data/calendar.json';
 import banner from '../assets/images/homepage/project-visual-banner.png';
+
+const calendarAlt = calendar.year
+  ? `《绝区零》${calendar.year}年${calendar.month}月官方月历壁纸`
+  : `《绝区零》${calendar.month}月官方月历壁纸`;
 
 // 为移动端首图生成 WebP 响应式 srcset（通过 getImage 走 Astro 图片优化管线）
 const mobileWidths = [375, 480, 640, 760];
@@ -103,7 +108,7 @@ function categoriesArr(c: unknown): string[] {
           <Image
             class="hero-media"
             src={heroDesktop}
-            alt="蓝黑漫画风格的七月日历插画"
+            alt={calendarAlt}
             widths={[640, 1280, 1920, 2560]}
             sizes="100vw"
             format="webp"

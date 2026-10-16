@@ -1,0 +1,379 @@
+{
+  "checked_at": "2026-10-16T11:36:50.670865+00:00",
+  "site_files_unchanged": true,
+  "results": [
+    {
+      "status": "validated",
+      "year_month": "2026-01",
+      "changed": false,
+      "metadata": {
+        "year_month": "2026-01",
+        "year": 2026,
+        "month": 1,
+        "announcement_url": "https://zzz.mihoyo.com/news/161895",
+        "published_at": "2026-01-01 17:00:00",
+        "share_url": "https://minas.mihoyo.com/d/9bc8fbeeb4f64562bc08/",
+        "updated_at": "2026-10-16T11:32:48.607667+00:00",
+        "images": {
+          "desktop": {
+            "format": "PNG",
+            "width": 2560,
+            "height": 1440,
+            "original_sha256": "4e1f3eb4027b05eadbd3429780dc95a6569a659c56f2669f98d74348355836bd",
+            "sha256": "f65a8a320a449c982071e7a868640d60b132e977679829c08ccc99e4911c0e33",
+            "name": "1月月历壁纸_PC版.png",
+            "bytes": 5657157,
+            "download_url": "https://minas.mihoyo.com/d/9bc8fbeeb4f64562bc08/files/?p=%2F1%E6%9C%88%E6%9C%88%E5%8E%86%E5%A3%81%E7%BA%B8_PC%E7%89%88.png&dl=1"
+          },
+          "mobile": {
+            "format": "PNG",
+            "width": 1290,
+            "height": 2796,
+            "original_sha256": "7b4f18b197636cc8fa929be788c9fedfe7791b5d33abce04e01b5fffadbf3a2b",
+            "sha256": "255ed3851e63b6a3a82c53664246ebacf32b8a1d50d1af2915a97046513b54f0",
+            "name": "1月月历壁纸_手机版.png",
+            "bytes": 4791423,
+            "download_url": "https://minas.mihoyo.com/d/9bc8fbeeb4f64562bc08/files/?p=%2F1%E6%9C%88%E6%9C%88%E5%8E%86%E5%A3%81%E7%BA%B8_%E6%89%8B%E6%9C%BA%E7%89%88.png&dl=1"
+          }
+        }
+      }
+    },
+    {
+      "status": "validated",
+      "year_month": "2026-02",
+      "changed": false,
+      "metadata": {
+        "year_month": "2026-02",
+        "year": 2026,
+        "month": 2,
+        "announcement_url": "https://zzz.mihoyo.com/news/162469",
+        "published_at": "2026-02-01 12:30:00",
+        "share_url": "https://minas.mihoyo.com/d/e0ef9064b6b94bb897f7/",
+        "updated_at": "2026-10-16T11:33:20.293063+00:00",
+        "images": {
+          "desktop": {
+            "format": "PNG",
+            "width": 2560,
+            "height": 1440,
+            "original_sha256": "ff3bd7d10e212740fe594f4aaf949156adc9275af6671edfcc0989251dad000d",
+            "sha256": "5ae4c2e510a9b2787120bb263d15889e981079819ecbfeaad874ffe1097e78fe",
+            "name": "2月月历壁纸_PC版.png",
+            "bytes": 5217698,
+            "download_url": "https://minas.mihoyo.com/d/e0ef9064b6b94bb897f7/files/?p=%2F2%E6%9C%88%E6%9C%88%E5%8E%86%E5%A3%81%E7%BA%B8_PC%E7%89%88.png&dl=1"
+          },
+          "mobile": {
+            "format": "PNG",
+            "width": 1290,
+            "height": 2796,
+            "original_sha256": "b14494d6055b307aba3fdd8fb941e0bf24e05649d908a638292750118536e100",
+            "sha256": "da897d05089d83b6cb68d097574c6d859c3cd65f3ec27510fa0c5ff8430cfe4b",
+            "name": "2月月历壁纸_手机版.png",
+            "bytes": 5481231,
+            "download_url": "https://minas.mihoyo.com/d/e0ef9064b6b94bb897f7/files/?p=%2F2%E6%9C%88%E6%9C%88%E5%8E%86%E5%A3%81%E7%BA%B8_%E6%89%8B%E6%9C%BA%E7%89%88.png&dl=1"
+          }
+        }
+      }
+    },
+    {
+      "status": "validated",
+      "year_month": "2026-03",
+      "changed": false,
+      "metadata": {
+        "year_month": "2026-03",
+        "year": 2026,
+        "month": 3,
+        "announcement_url": "https://zzz.mihoyo.com/news/162984",
+        "published_at": "2026-03-01 12:30:00",
+        "share_url": "https://minas.mihoyo.com/d/43287cf704aa4648be14/",
+        "updated_at": "2026-10-16T11:38:05.298249+00:00",
+        "images": {
+          "desktop": {
+            "format": "JPEG",
+            "width": 2560,
+            "height": 1440,
+            "original_sha256": "a83b1cd78445d7e7d54bfafcb50bee7d1cdce631a61013a83d186f56dbedcc79",
+            "sha256": "a83b1cd78445d7e7d54bfafcb50bee7d1cdce631a61013a83d186f56dbedcc79",
+            "name": "3月月历壁纸_PC版.jpg",
+            "bytes": 1138164,
+            "download_url": "https://minas.mihoyo.com/d/43287cf704aa4648be14/files/?p=%2F3%E6%9C%88%E6%9C%88%E5%8E%86%E5%A3%81%E7%BA%B8_PC%E7%89%88.jpg&dl=1"
+          },
+          "mobile": {
+            "format": "JPEG",
+            "width": 1290,
+            "height": 2796,
+            "original_sha256": "0d64b214611b952b7364e83c5c2f430792d9eedfe5267dbe893994e048029efd",
+            "sha256": "0d64b214611b952b7364e83c5c2f430792d9eedfe5267dbe893994e048029efd",
+            "name": "3月月历壁纸_手机版.jpg",
+            "bytes": 1185176,
+            "download_url": "https://minas.mihoyo.com/d/43287cf704aa4648be14/files/?p=%2F3%E6%9C%88%E6%9C%88%E5%8E%86%E5%A3%81%E7%BA%B8_%E6%89%8B%E6%9C%BA%E7%89%88.jpg&dl=1"
+          }
+        }
+      },
+      "previous_attempt": {
+        "status": "failed",
+        "error": "Network request failed (URLError)."
+      }
+    },
+    {
+      "status": "validated",
+      "year_month": "2026-04",
+      "changed": false,
+      "metadata": {
+        "year_month": "2026-04",
+        "year": 2026,
+        "month": 4,
+        "announcement_url": "https://zzz.mihoyo.com/news/163366",
+        "published_at": "2026-04-01 12:30:00",
+        "share_url": "https://minas.mihoyo.com/d/1ef6ccac23fd4fb9b096/",
+        "updated_at": "2026-10-16T11:38:07.596651+00:00",
+        "images": {
+          "desktop": {
+            "format": "PNG",
+            "width": 2560,
+            "height": 1440,
+            "original_sha256": "3951455cf4201e64d24fdd3afe0e4f8ade5afd4484ece2f95dd08016a7893f49",
+            "sha256": "5c7d8d7ccdf581c453d168611e174bf24500668fac163c6707b87c18eaf9f505",
+            "name": "4月月历壁纸_PC版.png",
+            "bytes": 5686412,
+            "download_url": "https://minas.mihoyo.com/d/1ef6ccac23fd4fb9b096/files/?p=%2F4%E6%9C%88%E6%9C%88%E5%8E%86%E5%A3%81%E7%BA%B8_PC%E7%89%88.png&dl=1"
+          },
+          "mobile": {
+            "format": "PNG",
+            "width": 1290,
+            "height": 2796,
+            "original_sha256": "fa221b34bba767a85c44ad1e8f0d942caaef998c305a4f70eea3e7460b4cefb1",
+            "sha256": "af6edfe1ad99cdcd1012afa639466677e92a70a3104bc2d0a7b1aa1305f47de9",
+            "name": "4月月历壁纸_手机版.png",
+            "bytes": 5717016,
+            "download_url": "https://minas.mihoyo.com/d/1ef6ccac23fd4fb9b096/files/?p=%2F4%E6%9C%88%E6%9C%88%E5%8E%86%E5%A3%81%E7%BA%B8_%E6%89%8B%E6%9C%BA%E7%89%88.png&dl=1"
+          }
+        }
+      },
+      "previous_attempt": {
+        "status": "failed",
+        "error": "Network request failed (URLError)."
+      }
+    },
+    {
+      "status": "validated",
+      "year_month": "2026-05",
+      "changed": false,
+      "metadata": {
+        "year_month": "2026-05",
+        "year": 2026,
+        "month": 5,
+        "announcement_url": "https://zzz.mihoyo.com/news/163820",
+        "published_at": "2026-05-01 12:30:00",
+        "share_url": "https://minas.mihoyo.com/d/c014aceea95e4b348e28/",
+        "updated_at": "2026-10-16T11:35:05.643334+00:00",
+        "images": {
+          "desktop": {
+            "format": "PNG",
+            "width": 2560,
+            "height": 1440,
+            "original_sha256": "60aef299f773ec481681b5efc03320d9da71a16ab7924693cad01e5faba84771",
+            "sha256": "358de8e9d56eaf91535aa9729418327eee769bcc31993e287062c1d1cf20265d",
+            "name": "5月月历壁纸_PC版.png",
+            "bytes": 5766350,
+            "download_url": "https://minas.mihoyo.com/d/c014aceea95e4b348e28/files/?p=%2F5%E6%9C%88%E6%9C%88%E5%8E%86%E5%A3%81%E7%BA%B8_PC%E7%89%88.png&dl=1"
+          },
+          "mobile": {
+            "format": "PNG",
+            "width": 1290,
+            "height": 2796,
+            "original_sha256": "914baf30bf15c478dabd4f370b691c44cb7af14628f479890c211b432e5cd5ac",
+            "sha256": "9b46befd1b15008716d74511caaa1b5284930bfb6c7ff9580f890b0aac2e41fd",
+            "name": "5月月历壁纸_手机版.png",
+            "bytes": 5598530,
+            "download_url": "https://minas.mihoyo.com/d/c014aceea95e4b348e28/files/?p=%2F5%E6%9C%88%E6%9C%88%E5%8E%86%E5%A3%81%E7%BA%B8_%E6%89%8B%E6%9C%BA%E7%89%88.png&dl=1"
+          }
+        }
+      }
+    },
+    {
+      "status": "validated",
+      "year_month": "2026-06",
+      "changed": false,
+      "metadata": {
+        "year_month": "2026-06",
+        "year": 2026,
+        "month": 6,
+        "announcement_url": "https://zzz.mihoyo.com/news/164439",
+        "published_at": "2026-06-01 12:30:00",
+        "share_url": "https://minas.mihoyo.com/d/b9fba8cedfd94bbbb987/",
+        "updated_at": "2026-10-16T11:38:09.860436+00:00",
+        "images": {
+          "desktop": {
+            "format": "PNG",
+            "width": 2560,
+            "height": 1440,
+            "original_sha256": "09dba61715ae0f3d921e50c7bca5b4cc685f70061991c41a64d4095e964e9dcd",
+            "sha256": "5adbc072a90c7bbd41da58261a8845251bf074822550c338c340a41d79b2689e",
+            "name": "6月月历壁纸_PC版.png",
+            "bytes": 4929633,
+            "download_url": "https://minas.mihoyo.com/d/b9fba8cedfd94bbbb987/files/?p=%2F6%E6%9C%88%E6%9C%88%E5%8E%86%E5%A3%81%E7%BA%B8_PC%E7%89%88.png&dl=1"
+          },
+          "mobile": {
+            "format": "PNG",
+            "width": 1290,
+            "height": 2796,
+            "original_sha256": "0dddf2befb25c6430eca724c226a68644d05917f956dae6cea8c6860373776a9",
+            "sha256": "f96dae1411881a83fdf4266e49fa7cb256b5cda566a7e7d9b76713a206ece1cd",
+            "name": "6月月历壁纸_手机版.png",
+            "bytes": 4912773,
+            "download_url": "https://minas.mihoyo.com/d/b9fba8cedfd94bbbb987/files/?p=%2F6%E6%9C%88%E6%9C%88%E5%8E%86%E5%A3%81%E7%BA%B8_%E6%89%8B%E6%9C%BA%E7%89%88.png&dl=1"
+          }
+        }
+      },
+      "previous_attempt": {
+        "status": "failed",
+        "error": "Network request failed (URLError)."
+      }
+    },
+    {
+      "status": "validated",
+      "year_month": "2026-07",
+      "changed": false,
+      "metadata": {
+        "year_month": "2026-07",
+        "year": 2026,
+        "month": 7,
+        "announcement_url": "https://zzz.mihoyo.com/news/165104",
+        "published_at": "2026-07-01 12:00:00",
+        "share_url": "https://minas.mihoyo.com/d/612e569d59c14472a2d4/",
+        "updated_at": "2026-10-16T11:36:02.915854+00:00",
+        "images": {
+          "desktop": {
+            "format": "JPEG",
+            "width": 2560,
+            "height": 1440,
+            "original_sha256": "a3459b9fff81cfe6348da8599e4545a7875a13f15dea03b14e78e21c06a85a5e",
+            "sha256": "a3459b9fff81cfe6348da8599e4545a7875a13f15dea03b14e78e21c06a85a5e",
+            "name": "7月月历壁纸_PC版.jpg",
+            "bytes": 1272622,
+            "download_url": "https://minas.mihoyo.com/d/612e569d59c14472a2d4/files/?p=%2F7%E6%9C%88%E6%9C%88%E5%8E%86%E5%A3%81%E7%BA%B8_PC%E7%89%88.jpg&dl=1"
+          },
+          "mobile": {
+            "format": "JPEG",
+            "width": 1290,
+            "height": 2796,
+            "original_sha256": "958307326b533828edbcf6e825ea7004a1d2c04b6055c7face6aeec7d1b6ecac",
+            "sha256": "958307326b533828edbcf6e825ea7004a1d2c04b6055c7face6aeec7d1b6ecac",
+            "name": "7月月历壁纸_手机版.jpg",
+            "bytes": 1218882,
+            "download_url": "https://minas.mihoyo.com/d/612e569d59c14472a2d4/files/?p=%2F7%E6%9C%88%E6%9C%88%E5%8E%86%E5%A3%81%E7%BA%B8_%E6%89%8B%E6%9C%BA%E7%89%88.jpg&dl=1"
+          }
+        }
+      }
+    },
+    {
+      "status": "validated",
+      "year_month": "2026-08",
+      "changed": false,
+      "metadata": {
+        "year_month": "2026-08",
+        "year": 2026,
+        "month": 8,
+        "announcement_url": "https://zzz.mihoyo.com/news/165489",
+        "published_at": "2026-08-02 12:00:00",
+        "share_url": "https://minas.mihoyo.com/d/bbef691d98a44fbe963b/",
+        "updated_at": "2026-10-16T11:36:18.028628+00:00",
+        "images": {
+          "desktop": {
+            "format": "JPEG",
+            "width": 2560,
+            "height": 1440,
+            "original_sha256": "58caf5ca053360b0eb5e460a61ebf2c112245b3513ccc604710eaafa19c8949a",
+            "sha256": "58caf5ca053360b0eb5e460a61ebf2c112245b3513ccc604710eaafa19c8949a",
+            "name": "8月月历壁纸_PC版.jpg",
+            "bytes": 1118100,
+            "download_url": "https://minas.mihoyo.com/d/bbef691d98a44fbe963b/files/?p=%2F8%E6%9C%88%E6%9C%88%E5%8E%86%E5%A3%81%E7%BA%B8_PC%E7%89%88.jpg&dl=1"
+          },
+          "mobile": {
+            "format": "JPEG",
+            "width": 1290,
+            "height": 2796,
+            "original_sha256": "34aed327fdbd4c58bc67059d9752c931ab20aa26f542c1fc256ba3bee4875849",
+            "sha256": "34aed327fdbd4c58bc67059d9752c931ab20aa26f542c1fc256ba3bee4875849",
+            "name": "8月月历壁纸_手机版.jpg",
+            "bytes": 1134761,
+            "download_url": "https://minas.mihoyo.com/d/bbef691d98a44fbe963b/files/?p=%2F8%E6%9C%88%E6%9C%88%E5%8E%86%E5%A3%81%E7%BA%B8_%E6%89%8B%E6%9C%BA%E7%89%88.jpg&dl=1"
+          }
+        }
+      }
+    },
+    {
+      "status": "validated",
+      "year_month": "2026-09",
+      "changed": false,
+      "metadata": {
+        "year_month": "2026-09",
+        "year": 2026,
+        "month": 9,
+        "announcement_url": "https://zzz.mihoyo.com/news/165954",
+        "published_at": "2026-09-01 12:30:00",
+        "share_url": "https://minas.mihoyo.com/d/18cf62a3dcef41caa129/",
+        "updated_at": "2026-10-16T11:36:33.069339+00:00",
+        "images": {
+          "desktop": {
+            "format": "JPEG",
+            "width": 2560,
+            "height": 1440,
+            "original_sha256": "46def2bd397a6d8917fce99306ebee6b4e1934e8454ccf2b478c48ddd96e217e",
+            "sha256": "46def2bd397a6d8917fce99306ebee6b4e1934e8454ccf2b478c48ddd96e217e",
+            "name": "9月月历壁纸_PC版.jpg",
+            "bytes": 1107008,
+            "download_url": "https://minas.mihoyo.com/d/18cf62a3dcef41caa129/files/?p=%2F9%E6%9C%88%E6%9C%88%E5%8E%86%E5%A3%81%E7%BA%B8_PC%E7%89%88.jpg&dl=1"
+          },
+          "mobile": {
+            "format": "JPEG",
+            "width": 1290,
+            "height": 2796,
+            "original_sha256": "278b171eb189af502bc4f246964ff73226e691773ab9c2335e1abb0a4b3aed33",
+            "sha256": "278b171eb189af502bc4f246964ff73226e691773ab9c2335e1abb0a4b3aed33",
+            "name": "9月月历壁纸_手机版.jpg",
+            "bytes": 1118234,
+            "download_url": "https://minas.mihoyo.com/d/18cf62a3dcef41caa129/files/?p=%2F9%E6%9C%88%E6%9C%88%E5%8E%86%E5%A3%81%E7%BA%B8_%E6%89%8B%E6%9C%BA%E7%89%88.jpg&dl=1"
+          }
+        }
+      }
+    },
+    {
+      "status": "validated",
+      "year_month": "2026-10",
+      "changed": false,
+      "metadata": {
+        "year_month": "2026-10",
+        "year": 2026,
+        "month": 10,
+        "announcement_url": "https://zzz.mihoyo.com/news/166576",
+        "published_at": "2026-10-02 12:00:00",
+        "share_url": "https://minas.mihoyo.com/d/182a14ec7db34be38f0f/",
+        "updated_at": "2026-10-16T11:36:50.664866+00:00",
+        "images": {
+          "desktop": {
+            "format": "PNG",
+            "width": 2560,
+            "height": 1440,
+            "original_sha256": "56d44cef549b7828899911556f16e540ecb32c676cf2e43ffcf9f029254124c8",
+            "sha256": "438ba57781c7c556a2a015a444703099e99f6a5b4422a0a74777beedbd3613e4",
+            "name": "10月月历壁纸_PC版.png",
+            "bytes": 5441315,
+            "download_url": "https://minas.mihoyo.com/d/182a14ec7db34be38f0f/files/?p=%2F10%E6%9C%88%E6%9C%88%E5%8E%86%E5%A3%81%E7%BA%B8_PC%E7%89%88.png&dl=1"
+          },
+          "mobile": {
+            "format": "PNG",
+            "width": 1290,
+            "height": 2796,
+            "original_sha256": "0adff9919f9c73b1aab7257d99e64119dec3b259f6687c0481b1b16c820967b7",
+            "sha256": "cf48d56ea7412908985e51a66e8b37ab2eaa10fa6858ebf2ce77773bdd0f5e89",
+            "name": "10月月历壁纸_手机版.png",
+            "bytes": 4756124,
+            "download_url": "https://minas.mihoyo.com/d/182a14ec7db34be38f0f/files/?p=%2F10%E6%9C%88%E6%9C%88%E5%8E%86%E5%A3%81%E7%BA%B8_%E6%89%8B%E6%9C%BA%E7%89%88.png&dl=1"
+          }
+        }
+      }
+    }
+  ],
+  "original_hashes_match_research": true
+}

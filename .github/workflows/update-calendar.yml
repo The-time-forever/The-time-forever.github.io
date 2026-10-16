@@ -1,0 +1,109 @@
+name: Update calendar wallpaper
+
+on:
+  schedule:
+    - cron: '17 2 1-10 * *'
+  workflow_dispatch:
+    inputs:
+      year:
+        description: 'Year (blank = current Beijing year)'
+        type: string
+      month:
+        description: 'Month 1-12 (blank = current Beijing month)'
+        type: string
+      dry_run:
+        description: 'Download and validate only'
+        type: boolean
+        default: false
+      force:
+        description: 'Revalidate an already updated month'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: update-calendar-main
+  cancel-in-progress: false
+
+jobs:
+  update:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      actions: write # Dispatch deploy.yml explicitly after a bot push.
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: scripts/requirements-calendar.txt
+      - name: Install image dependency
+        run: python -m pip install -r scripts/requirements-calendar.txt
+      - name: Run failure protection tests
+        run: python -m unittest discover -s scripts/tests -v
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install site dependencies
+        run: npm ci
+      - name: Discover, download, validate and build
+        id: calendar
+        env:
+          INPUT_YEAR: ${{ inputs.year }}
+          INPUT_MONTH: ${{ inputs.month }}
+          INPUT_DRY_RUN: ${{ inputs.dry_run }}
+          INPUT_FORCE: ${{ inputs.force }}
+        shell: bash
+        run: |
+          args=(--build)
+          if [[ -n "$INPUT_YEAR" || -n "$INPUT_MONTH" ]]; then
+            args+=(--year "$INPUT_YEAR" --month "$INPUT_MONTH")
+          fi
+          if [[ "$INPUT_DRY_RUN" == true ]]; then args+=(--dry-run); fi
+          if [[ "$INPUT_FORCE" == true ]]; then args+=(--force); fi
+          python scripts/update_calendar.py "${args[@]}"
+      - name: Commit the verified wallpaper pair
+        id: commit
+        if: steps.calendar.outputs.changed == 'true'
+        env:
+          YEAR_MONTH: ${{ steps.calendar.outputs.year_month }}
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/assets/images/homepage/hero-calendar-desktop.jpg src/assets/images/homepage/hero-calendar-mobile.jpg src/data/calendar.json
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "chore: update calendar wallpaper for $YEAR_MONTH"
+          # A concurrent user push rejects this push; never force-push over it.
+          git push origin HEAD:main
+          echo "pushed=true" >> "$GITHUB_OUTPUT"
+      - name: Dispatch Pages deployment or retry an interrupted dispatch
+        if: inputs.dry_run != true && (steps.commit.outputs.pushed == 'true' || steps.calendar.outputs.status == 'already-updated')
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          revision=$(git rev-parse HEAD)
+          # Skip when this exact revision already has a successful/in-progress deploy.
+          existing=$(gh run list --workflow deploy.yml --commit "$revision" --limit 20 --json event,status,conclusion --jq '[.[] | select((.event == "push" or .event == "workflow_dispatch") and (.status != "completed" or .conclusion == "success"))] | length')
+          if [[ "$existing" -eq 0 ]]; then
+            gh workflow run deploy.yml --ref main -f revision="$revision"
+            echo "Deployment dispatched for \`$revision\`." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Deployment already exists for \`$revision\`." >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Failure guidance
+        if: failure()
+        run: |
+          echo '### Calendar update failed' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Review the failed step and docs/calendar-automation.md. An unsuccessful build never reaches the commit step. A rejected push leaves main unchanged. A deployment failure can be retried with deploy.yml workflow_dispatch.' >> "$GITHUB_STEP_SUMMARY"

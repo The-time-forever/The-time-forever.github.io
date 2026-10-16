@@ -14,3 +14,8 @@ dist/
 
 # KiloCode
 .kilo/
+
+# Calendar updater temporary files and crash recovery journal
+__pycache__/
+.calendar-update.lock
+.calendar-transaction/
