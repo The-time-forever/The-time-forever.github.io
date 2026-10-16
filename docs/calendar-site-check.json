@@ -1,0 +1,58 @@
+{
+  "url": "https://the-time-forever.github.io",
+  "desktop": {
+    "alt": "《绝区零》2026年10月官方月历壁纸",
+    "currentSrc": "https://the-time-forever.github.io/_astro/hero-calendar-desktop.CyNW8y-J_1eFmMT.webp",
+    "width": 1440,
+    "height": 810
+  },
+  "mobile": {
+    "alt": "《绝区零》2026年10月官方月历壁纸",
+    "currentSrc": "https://the-time-forever.github.io/_astro/hero-calendar-mobile.DCvSM5rG_Z1dGTXF.webp",
+    "width": 389,
+    "height": 844
+  },
+  "results": [
+    {
+      "path": "/",
+      "status": 200,
+      "title": "The Time Forever",
+      "textLength": 960,
+      "overflow": false
+    },
+    {
+      "path": "/posts/",
+      "status": 200,
+      "title": "文章归档 · The Time Forever",
+      "textLength": 1572,
+      "overflow": false
+    },
+    {
+      "path": "/about/",
+      "status": 200,
+      "title": "关于我 · The Time Forever",
+      "textLength": 925,
+      "overflow": false
+    },
+    {
+      "path": "/not-a-real-calendar-page/",
+      "status": 404,
+      "title": "页面未找到 · The Time Forever",
+      "textLength": 84,
+      "overflow": false
+    },
+    {
+      "interaction": "theme-toggle",
+      "before": "light",
+      "after": "dark"
+    },
+    {
+      "path": "/",
+      "viewport": 390,
+      "overflow": false
+    }
+  ],
+  "errors": [
+    "Failed to load resource: the server responded with a status of 404 ()"
+  ]
+}

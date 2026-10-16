@@ -35,7 +35,7 @@ src/assets/images/homepage/hero-calendar-mobile.jpg
 src/data/calendar.json
 ```
 
-元数据记录成功更新年月、公告、分享入口、源图及 JPG 的 SHA-256。首页 `alt` 读取其中年月。初始记录保留现有七月图片的月份，年份留空；首次成功更新会补齐来源和校验值。
+元数据记录成功更新年月、公告、分享入口、源图及 JPG 的 SHA-256。首页 `alt` 读取其中年月。2026 年 10 月图片与完整来源记录已由自动更新工作流写入。
 
 ## 手动运行 Actions
 

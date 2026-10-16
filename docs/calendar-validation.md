@@ -18,7 +18,7 @@
 
 ## 失败保护测试
 
-执行 `python -m unittest discover -s scripts/tests -v`，测试覆盖：
+执行 `python -m unittest discover -s scripts/tests -v`，19 项测试全部通过；GitHub Ubuntu runner 上也通过了相同的 19 项测试。测试覆盖：
 
 - 网络超时及有限 GET 重试，密码 POST 不重复提交。
 - 公告未发布、密码错误、缺少手机版。
@@ -48,13 +48,29 @@
 | 留言板 | 打开后取消 inert、焦点移至关闭按钮；关闭后恢复 inert |
 | 页面结构 | 原有图片导入、Image/getImage、srcset、CSS 与主视觉布局保持原结构 |
 
-本文底部保留实际 10 月本地预览截图。
+随后对线上站点 `https://the-time-forever.github.io` 重复页面与桌面/手机图片检查，结果一致。线上优化图片 URL 与本地构建相同，`alt` 为 2026 年 10 月，未出现横向滚动。线上主题切换从 light 变为 dark。完整 HTTP、标题、图片 URL 和视口数据见 [线上检查记录](calendar-site-check.json)。本文底部保留线上截图，手机截图为切换后的深色模式。
 
 ## GitHub Actions 与 Pages
 
 仓库权限与配置已核查：默认分支 `main`，当前无 ruleset，Pages 使用 workflow 部署。
 
-自动更新工作流、机器人提交、显式部署及线上显示的实际执行记录将在全链路运行完成后补入本节。
+| 环节 | 实际执行记录 | 结果 |
+| --- | --- | --- |
+| 实现提交 | [`64def87`](https://github.com/The-time-forever/The-time-forever.github.io/commit/64def87cfa26bb10f5f47b38b9b34b58b74acb18) | 已推送 main |
+| 首次 10 月自动更新 | [运行 38895272794](https://github.com/The-time-forever/The-time-forever.github.io/actions/runs/38895272794) | 成功；下载、19 项测试、npm ci、25 页构建、提交、推送与部署触发均通过 |
+| 机器人更新提交 | [`95f09a8`](https://github.com/The-time-forever/The-time-forever.github.io/commit/95f09a80a6b81c51a145dac2515c27addba593ef) | 仅修改两张 JPG 和 calendar.json |
+| 显式 Pages 部署 | [运行 38895354002](https://github.com/The-time-forever/The-time-forever.github.io/actions/runs/38895354002) | workflow_dispatch，构建与 deploy 两个 job 均成功 |
+| 同月第二次自动更新 | [运行 38895446998](https://github.com/The-time-forever/The-time-forever.github.io/actions/runs/38895446998) | 成功，already-updated、changed=false；未生成新提交或重复部署 |
+| 线上结果 | [首页](https://the-time-forever.github.io/) | 桌面及手机版均显示 10 月图，说明文字正确 |
+
+第二次运行后远程 main 保持 `95f09a80a6b81c51a145dac2515c27addba593ef`。机器人使用默认 `GITHUB_TOKEN` 推送后，由同一更新 job 显式调用部署工作流，已验证这一链路可以完成 Pages 发布。首次实现提交触发的旧版本部署被更新版本的并发部署取消，最终生效的是 10 月图片提交。
+
+机器人提交同步到本地后，两张 JPG 的字节 SHA-256 与 metadata 一致：
+
+```text
+desktop 438ba57781c7c556a2a015a444703099e99f6a5b4422a0a74777beedbd3613e4
+mobile  cf48d56ea7412908985e51a66e8b37ab2eaa10fa6858ebf2ce77773bdd0f5e89
+```
 
 ## 已知边界
 
